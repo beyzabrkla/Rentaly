@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="Rentaly.BusinessLayer/Rentaly.BusinessLayer.csproj" />
   <Project Path="Rentaly.DataAccessLayer/Rentaly.DataAccessLayer.csproj" />
   <Project Path="Rentaly.EntityLayer/Rentaly.EntityLayer.csproj" />
+  <Project Path="Rentaly.WebUı/Rentaly.WebUI.csproj" />
 </Solution>
