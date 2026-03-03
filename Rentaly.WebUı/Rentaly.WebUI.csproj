@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\Rentaly HTML\fonts\et-line-font\.DS_Store" />
+    <None Include="wwwroot\Rentaly HTML\fonts\et-line-font\fonts\.DS_Store" />
+    <None Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\.github\ISSUE_TEMPLATE.md" />
+    <None Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\.github\PULL_REQUEST_TEMPLATE.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Rentaly HTML\vendor\FormGuide\PHPFormValidator\tests\" />
+    <Folder Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\examples\" />
+    <Folder Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\language\" />
+  </ItemGroup>
+
+</Project>
