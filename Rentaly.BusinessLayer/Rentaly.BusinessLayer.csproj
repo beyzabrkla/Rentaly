@@ -14,4 +14,8 @@
     <Folder Include="ValidationRules\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rentaly.DataAccessLayer\Rentaly.DataAccessLayer.csproj" />
+  </ItemGroup>
+
 </Project>
