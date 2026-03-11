@@ -7,16 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\Rentaly HTML\fonts\et-line-font\.DS_Store" />
-    <None Include="wwwroot\Rentaly HTML\fonts\et-line-font\fonts\.DS_Store" />
-    <None Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\.github\ISSUE_TEMPLATE.md" />
-    <None Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\.github\PULL_REQUEST_TEMPLATE.md" />
+    <Compile Remove="wwwroot\Rentaly HTML\**" />
+    <Content Remove="wwwroot\Rentaly HTML\**" />
+    <EmbeddedResource Remove="wwwroot\Rentaly HTML\**" />
+    <None Remove="wwwroot\Rentaly HTML\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Rentaly HTML\vendor\FormGuide\PHPFormValidator\tests\" />
-    <Folder Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\examples\" />
-    <Folder Include="wwwroot\Rentaly HTML\vendor\phpmailer\phpmailer\language\" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
   </ItemGroup>
 
 </Project>

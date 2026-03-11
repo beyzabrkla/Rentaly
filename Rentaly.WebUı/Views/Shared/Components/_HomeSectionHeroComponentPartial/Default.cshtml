@@ -1,0 +1,87 @@
+﻿<section id="section-hero" aria-label="section" class="jarallax full-height vertical-center">
+    <img src="/RentalyHTML/images/background/1.jpg" class="jarallax-img" alt="">
+    <div class="container position-relative z1000">
+        <div class="row align-items-center">
+            <div class="col-lg-6 text-light">
+                <h4><span class="id-color">Araç Kiralamanın Hızlı ve Kolay Yolu</span></h4>
+                <div class="spacer-10"></div>
+                <h1 class="mb-2">Dünyayı konforlu araçlarımızla keşfedin</h1>
+                <div class="spacer-10"></div>
+                <p class="lead">Olağanüstü konforlu ve şık araç filomuzla unutulmaz maceralara atılın ve dünyayı benzersiz bir rahatlıkla keşfedin.</p>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="spacer-single sm-hide"></div>
+                <div class="p-4 rounded-3 shadow-soft text-light" data-bgcolor="rgba(0, 0, 0, .6)">
+
+                    <form name="contactForm" id='contact_form' method="post">
+                        <h5>Araç tipiniz nedir?</h5>
+
+                        <div class="de_form de_radio row g-3">
+                            <div class="radio-img col-lg-3 col-sm-3 col-6">
+                                <input id="radio-1a" name="Car_Type" type="radio" value="Residential" checked="checked">
+                                <label for="radio-1a"><img src="/RentalyHTML/images/select-form/car.png" alt="">Binek</label>
+                            </div>
+
+                            <div class="radio-img col-lg-3 col-sm-3 col-6">
+                                <input id="radio-1b" name="Car_Type" type="radio" value="Office">
+                                <label for="radio-1b"><img src="/RentalyHTML/images/select-form/van.png" alt="">Panelvan</label>
+                            </div>
+
+                            <div class="radio-img col-lg-3 col-sm-3 col-6">
+                                <input id="radio-1c" name="Car_Type" type="radio" value="Commercial">
+                                <label for="radio-1c"><img src="/RentalyHTML/images/select-form/minibus.png" alt="">Minibüs</label>
+                            </div>
+
+                            <div class="radio-img col-lg-3 col-sm-3 col-6">
+                                <input id="radio-1d" name="Car_Type" type="radio" value="Retail">
+                                <label for="radio-1d"><img src="/RentalyHTML/images/select-form/sportscar.png" alt="">Prestij</label>
+                            </div>
+                        </div>
+
+                        <div class="spacer-20"></div>
+
+                        <div class="row">
+                            <div class="col-lg-6 mb20">
+                                <h5>Alış Yeri</h5>
+                                <input type="text" name="PickupLocation" onfocus="geolocate()" placeholder="Alış konumunu girin" id="autocomplete" autocomplete="off" class="form-control">
+                            </div>
+
+                            <div class="col-lg-6 mb20">
+                                <h5>Dönüş Yeri</h5>
+                                <input type="text" name="DropoffLocation" onfocus="geolocate()" placeholder="Dönüş konumunu girin" id="autocomplete2" autocomplete="off" class="form-control">
+                            </div>
+
+                            <div class="col-lg-6 mb20">
+                                <h5>Alış Tarihi ve Saati</h5>
+                                <div class="date-time-field">
+                                    <input type="text" id="date-picker" name="Pick Up Date" value="" placeholder="Tarih Seçin">
+                                    <select name="Pick Up Time" id="pickup-time">
+                                        <option selected disabled value="Select time">Saat</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6 mb20">
+                                <h5>Dönüş Tarihi ve Saati</h5>
+                                <div class="date-time-field">
+                                    <input type="text" id="date-picker-2" name="Collection Date" value="" placeholder="Tarih Seçin">
+                                    <select name="Collection Time" id="collection-time">
+                                        <option selected disabled value="Select time">Saat</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type='submit' id='send_message' value='Araç Bul' class="btn-main pull-right">
+
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="position-absolute d-flex bottom-20">
+    </div>
+</section>
