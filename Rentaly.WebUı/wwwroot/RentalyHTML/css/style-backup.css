@@ -66,7 +66,7 @@
 
 /* ================================================== */
 
-@import url("../fonts/font-awesome//RentalyHTML/css/font-awesome.css");
+@import url("../fonts/font-awesome/css/font-awesome.css");
 @import url("../fonts/icofont/icofont.min.css");
 
 /* ================================================== */
@@ -1983,11 +1983,11 @@ input[type="checkbox"] {
     -webkit-border-radius: 3px;
     -moz-appearance: none;
     appearance: none;
-    background: url('..//RentalyHTML/images/ui/arrow-down-form.png') no-repeat 98% 60%;
+    background: url('../images/ui/arrow-down-form.png') no-repeat 98% 60%;
 }
 
 .form-underline select:focus {
-    background: url('..//RentalyHTML/images/ui/arrow-down-form-hover.png') no-repeat 98% 60%;
+    background: url('../images/ui/arrow-down-form-hover.png') no-repeat 98% 60%;
 }
 
 .form-underline input[type=text],
@@ -9054,7 +9054,7 @@ footer .tiny-border span {
 }
 
 .side-layout.side-custom-bg header {
-    background: url(..//RentalyHTML/images/background/bg-header.jpg) top left;
+    background: url(../images/background/bg-header.jpg) top left;
     background-size: cover;
 }
 
@@ -12962,7 +12962,7 @@ img {
     header.header-mobile #mainmenu>li>span {
         width: 36px;
         height: 36px;
-        background: url(..//RentalyHTML/images/ui/arrow-down.png) center no-repeat;
+        background: url(../images/ui/arrow-down.png) center no-repeat;
         position: absolute;
         right: 0;
         margin-top: 10px;
@@ -12971,13 +12971,13 @@ img {
     }
 
     header.header-mobile #mainmenu li span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up.png) center no-repeat;
+        background: url(../images/ui/arrow-up.png) center no-repeat;
     }
 
     header.header-mobile #mainmenu li>ul>li>span {
         width: 36px;
         height: 36px;
-        background: url(..//RentalyHTML/images/ui/arrow-down.png) center no-repeat;
+        background: url(../images/ui/arrow-down.png) center no-repeat;
         position: absolute;
         right: 0;
         margin-top: -45px;
@@ -12986,7 +12986,7 @@ img {
     }
 
     header.header-mobile #mainmenu>li>ul>li>span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up.png) center no-repeat;
+        background: url(../images/ui/arrow-up.png) center no-repeat;
     }
 
     header.header-mobile #mainmenu li ul li a {
@@ -12999,12 +12999,12 @@ img {
 
     header.header-light.header-mobile #mainmenu>li>span,
     header.header-light.header-mobile #mainmenu li>ul>li>span {
-        background: url(..//RentalyHTML/images/ui/arrow-down.png) center no-repeat;
+        background: url(../images/ui/arrow-down.png) center no-repeat;
     }
 
     header.header-light.header-mobile #mainmenu>li>span.active,
     header.header-light.header-mobile #mainmenu li>ul>li>span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up.png) center no-repeat;
+        background: url(../images/ui/arrow-up.png) center no-repeat;
     }
 
     #mainmenu li ul.mega {

@@ -1404,7 +1404,7 @@
         jQuery("#selector .opt").on("click", function() {
             jQuery("#selector .opt").removeClass("active");
             var color = jQuery(this).data('color');
-            jQuery("#colors").attr("href", '/RentalyHTML/css/colors/'+color+'.css');
+            jQuery("#colors").attr("href", 'css/colors/'+color+'.css');
             jQuery(this).addClass("active");
          });
      }
@@ -1413,10 +1413,10 @@
      // rtl begin //
       if (rtl_mode=="on") {
             jQuery("body").addClass('rtl');
-            jQuery("#bootstrap").attr("href", '/RentalyHTML/css/bootstrap.rtl.min.css');
-            jQuery("#bootstrap-grid").attr("href", '/RentalyHTML/css/bootstrap-grid.rtl.min.css');
-            jQuery("#bootstrap-reboot").attr("href", '/RentalyHTML/css/bootstrap-reboot.rtl.min.css');
-            jQuery("#mdb").attr("href", '/RentalyHTML/css/mdb.rtl.min.css');
+            jQuery("#bootstrap").attr("href", 'css/bootstrap.rtl.min.css');
+            jQuery("#bootstrap-grid").attr("href", 'css/bootstrap-grid.rtl.min.css');
+            jQuery("#bootstrap-reboot").attr("href", 'css/bootstrap-reboot.rtl.min.css');
+            jQuery("#mdb").attr("href", 'css/mdb.rtl.min.css');
             jQuery('html').attr("dir","rtl")
         };
      // rtl end // 
@@ -1431,19 +1431,19 @@
              switch (iteration) {
                  case 1:
                      jQuery("body").addClass('rtl');
-                     jQuery("#bootstrap").attr("href", '/RentalyHTML/css/bootstrap.rtl.min.css');
-                     jQuery("#bootstrap-grid").attr("href", '/RentalyHTML/css/bootstrap-grid.rtl.min.css');
-                     jQuery("#bootstrap-reboot").attr("href", '/RentalyHTML/css/bootstrap-reboot.rtl.min.css');
-                     jQuery("#mdb").attr("href", '/RentalyHTML/css/mdb.rtl.min.css');
+                     jQuery("#bootstrap").attr("href", 'css/bootstrap.rtl.min.css');
+                     jQuery("#bootstrap-grid").attr("href", 'css/bootstrap-grid.rtl.min.css');
+                     jQuery("#bootstrap-reboot").attr("href", 'css/bootstrap-reboot.rtl.min.css');
+                     jQuery("#mdb").attr("href", 'css/mdb.rtl.min.css');
                      jQuery('html').attr("dir","rtl");
                      jQuery(this).find(".sc-val").text('Click to Disable');
                      break;
                  case 2:
                     jQuery("body").removeClass('rtl');
-                    jQuery("#bootstrap").attr("href", '/RentalyHTML/css/bootstrap.min.css');
-                    jQuery("#bootstrap-grid").attr("href", '/RentalyHTML/css/bootstrap-grid.min.css');
-                    jQuery("#bootstrap-reboot").attr("href", '/RentalyHTML/css/bootstrap-reboot.min.css');
-                    jQuery("#mdb").attr("href", '/RentalyHTML/css/mdb.min.css');
+                    jQuery("#bootstrap").attr("href", 'css/bootstrap.min.css');
+                    jQuery("#bootstrap-grid").attr("href", 'css/bootstrap-grid.min.css');
+                    jQuery("#bootstrap-reboot").attr("href", 'css/bootstrap-reboot.min.css');
+                    jQuery("#mdb").attr("href", 'css/mdb.min.css');
                     jQuery('html').attr("dir","ltr");
                     jQuery(this).find(".sc-val").text('Click to Enable');
                     break;

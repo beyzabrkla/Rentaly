@@ -19,7 +19,7 @@
 
 /* ================================================== */
 
-@import url("../fonts/font-awesome//RentalyHTML/css/font-awesome.css");
+@import url("../fonts/font-awesome/css/font-awesome.css");
 @import url("../fonts/elegant_font/HTML_CSS/style.css");
 @import url("../fonts/et-line-font/style.css");
 @import url("../fonts/icofont/icofont.min.css");
@@ -1423,7 +1423,7 @@ section.no-bg,
 /* ================================================== */
 
 footer {
-    /*background:url('..//RentalyHTML/images/logo-big.png') -50% center no-repeat var(--primary-color) !important;*/
+    /*background:url('../images/logo-big.png') -50% center no-repeat var(--primary-color) !important;*/
     padding: 80px 0 0 0;
     font-size: 15px;
 }
@@ -2320,7 +2320,7 @@ header.header-light .logo-2 {
 
 .p-tagline,
 .p-title.invert {
-    background: var(--secondary-color)C;
+    background: var(--secondary-color);
 }
 
 .p-title {
@@ -2656,11 +2656,11 @@ input[type="checkbox"] {
     -webkit-border-radius: 0px;
     -moz-appearance: none;
     appearance: none;
-    background: url('..//RentalyHTML/images/ui/arrow-down-form.png') no-repeat 98% 60%;
+    background: url('../images/ui/arrow-down-form.png') no-repeat 98% 60%;
 }
 
 .form-underline select:focus {
-    background: url('..//RentalyHTML/images/ui/arrow-down-form-hover.png') no-repeat 98% 60%;
+    background: url('../images/ui/arrow-down-form-hover.png') no-repeat 98% 60%;
 }
 
 .form-underline input[type=text],
@@ -11633,7 +11633,7 @@ footer .tiny-border span {
 }
 
 .side-layout.side-custom-bg header {
-    background: url(..//RentalyHTML/images/background/bg-header.jpg) top left;
+    background: url(../images/background/bg-header.jpg) top left;
     background-size: cover;
 }
 
@@ -16986,21 +16986,21 @@ a.btn-slider:hover {
       }
 
       #de-carousel .carousel-item:nth-child(1) {
-        background-image: url('https://mdbootstrap.com/img/Photos/Others//RentalyHTML/images/76.jpg');
+        background-image: url('https://mdbootstrap.com/img/Photos/Others/images/76.jpg');
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center center;
       }
 
       #de-carousel .carousel-item:nth-child(2) {
-        background-image: url('https://mdbootstrap.com/img/Photos/Others//RentalyHTML/images/77.jpg');
+        background-image: url('https://mdbootstrap.com/img/Photos/Others/images/77.jpg');
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center center;
       }
 
       #de-carousel .carousel-item:nth-child(3) {
-        background-image: url('https://mdbootstrap.com/img/Photos/Others//RentalyHTML/images/78.jpg');
+        background-image: url('https://mdbootstrap.com/img/Photos/Others/images/78.jpg');
         background-repeat: no-repeat;
         background-size: cover;
         background-position: center center;
@@ -18037,7 +18037,7 @@ img {
     header.header-mobile #mainmenu>li>span {
         width: 36px;
         height: 36px;
-        background: url(..//RentalyHTML/images/ui/arrow-down.png) center no-repeat;
+        background: url(../images/ui/arrow-down.png) center no-repeat;
         position: absolute;
         right: 0;
         margin-top: 10px;
@@ -18051,21 +18051,21 @@ img {
     }
 
     .dark-scheme header.header-mobile #mainmenu>li>span {
-        background: url(..//RentalyHTML/images/ui/arrow-down-light.png) center no-repeat;
+        background: url(../images/ui/arrow-down-light.png) center no-repeat;
     }
 
     header.header-mobile #mainmenu li span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up.png) center no-repeat;
+        background: url(../images/ui/arrow-up.png) center no-repeat;
     }
 
     .dark-scheme header.header-mobile #mainmenu li span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up-light.png) center no-repeat;
+        background: url(../images/ui/arrow-up-light.png) center no-repeat;
     }
 
     header.header-mobile #mainmenu li>ul>li>span {
         width: 36px;
         height: 36px;
-        background: url(..//RentalyHTML/images/ui/arrow-down.png) center no-repeat;
+        background: url(../images/ui/arrow-down.png) center no-repeat;
         position: absolute;
         right: 0;
         margin-top: -45px;
@@ -18074,7 +18074,7 @@ img {
     }
 
     header.header-mobile #mainmenu>li>ul>li>span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up.png) center no-repeat;
+        background: url(../images/ui/arrow-up.png) center no-repeat;
     }
 
     header.header-mobile #mainmenu li ul li a.menu-item {
@@ -18095,12 +18095,12 @@ img {
 
     header.header-light.header-mobile #mainmenu>li>span,
     header.header-light.header-mobile #mainmenu li>ul>li>span {
-        background: url(..//RentalyHTML/images/ui/arrow-down.png) center no-repeat;
+        background: url(../images/ui/arrow-down.png) center no-repeat;
     }
 
     header.header-light.header-mobile #mainmenu>li>span.active,
     header.header-light.header-mobile #mainmenu li>ul>li>span.active {
-        background: url(..//RentalyHTML/images/ui/arrow-up.png) center no-repeat;
+        background: url(../images/ui/arrow-up.png) center no-repeat;
     }
 
     #mainmenu li ul.mega {

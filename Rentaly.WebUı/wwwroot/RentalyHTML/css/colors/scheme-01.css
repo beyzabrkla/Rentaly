@@ -1,7 +1,7 @@
 :root {
-  --primary-color: #1ECB15;
-  --primary-color-rgb: 120, 202, 92;
+    --primary-color: #CC0C0C;
+    --primary-color-rgb: 204, 12, 12; /* #CC0C0C'nin RGB karşılığı */
 
-  --secondary-color: #179510;
-  --secondary-color-rgb: 23, 149, 16;
+    --secondary-color: #CC0C0C;
+    --secondary-color-rgb: 204, 12, 12;
 }
