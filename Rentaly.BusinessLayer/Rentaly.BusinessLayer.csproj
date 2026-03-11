@@ -9,7 +9,10 @@
   <ItemGroup>
     <Folder Include="ErrorMessages\" />
     <Folder Include="Container\" />
-    <Folder Include="ValidationRules\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.12.0" />
   </ItemGroup>
 
   <ItemGroup>
