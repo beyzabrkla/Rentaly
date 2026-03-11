@@ -1,0 +1,7 @@
+:root {
+    --primary-color: #CC0C0C;
+    --primary-color-rgb: 204, 12, 12; /* #CC0C0C'nin RGB karşılığı */
+
+    --secondary-color: #CC0C0C;
+    --secondary-color-rgb: 204, 12, 12;
+}
