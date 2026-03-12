@@ -1,0 +1,1576 @@
+﻿@{
+    ViewData["Title"] = "CreateCar";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* ── CreateCar Page Styles ── */
+        .form-section {
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+            .form-section:hover {
+                box-shadow: var(--shadow-md);
+            }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            background: #252525;
+        }
+
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+            margin-top: 1px;
+        }
+
+        .section-body {
+            padding: 24px;
+        }
+
+        /* Form controls */
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .form-label .required {
+                color: var(--danger);
+                font-size: 14px;
+                line-height: 1;
+            }
+
+        .form-control, .form-select {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            color: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            background: #2a2a2a;
+            transition: var(--transition);
+            outline: none;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary);
+                background: #2a2a2a;
+                color: #ffffff;
+                box-shadow: 0 0 0 3px rgba(204,12,12,0.15);
+            }
+
+            .form-control::placeholder {
+                color: #808080;
+            }
+
+            .form-control.is-valid, .form-select.is-valid {
+                border-color: var(--success);
+                box-shadow: 0 0 0 3px rgba(16,185,129,0.08);
+            }
+
+        .invalid-feedback {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+            .form-control.is-invalid ~ .invalid-feedback,
+            .form-select.is-invalid ~ .invalid-feedback,
+            .invalid-feedback.show {
+                display: flex;
+            }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        /* Icon inputs */
+        .input-icon-wrap {
+            position: relative;
+        }
+
+            .input-icon-wrap .input-icon {
+                position: absolute;
+                left: 13px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 14px;
+                pointer-events: none;
+                transition: var(--transition);
+            }
+
+            .input-icon-wrap .form-control {
+                padding-left: 38px;
+            }
+
+            .input-icon-wrap:focus-within .input-icon {
+                color: var(--primary);
+            }
+
+        .input-suffix {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-left: 1px solid var(--border);
+            background: #2a2a2a;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            pointer-events: none;
+        }
+
+        /* Fuel type pill selectors */
+        .fuel-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .fuel-radio {
+            display: none;
+        }
+
+            .fuel-radio + label {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                padding: 8px 16px;
+                border: 1.5px solid var(--border);
+                border-radius: 40px;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: var(--transition);
+                user-select: none;
+            }
+
+                .fuel-radio + label:hover {
+                    border-color: var(--primary);
+                    color: var(--primary);
+                    background: var(--primary-light);
+                }
+
+            .fuel-radio:checked + label {
+                border-color: var(--primary);
+                background: var(--primary);
+                color: #fff;
+                box-shadow: 0 3px 8px rgba(26,86,219,0.3);
+            }
+
+        /* Counter buttons */
+        .counter-input {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .counter-btn {
+            width: 38px;
+            height: 42px;
+            border: none;
+            background: #2a2a2a;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .counter-btn:hover {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+
+        .counter-val {
+            width: 52px;
+            height: 42px;
+            border: none;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            text-align: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            outline: none;
+            background: #1a1a1a;
+        }
+
+        /* Toggle switch rows */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .toggle-row:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .toggle-row:first-child {
+                padding-top: 0;
+            }
+
+        .toggle-label strong {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .toggle-label span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .form-switch .form-check-input {
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+            border-color: var(--border);
+            background-color: #e2e8f0;
+        }
+
+            .form-switch .form-check-input:checked {
+                background-color: var(--primary);
+                border-color: var(--primary);
+            }
+
+            .form-switch .form-check-input:focus {
+                box-shadow: 0 0 0 3px rgba(26,86,219,0.15);
+            }
+
+        /* Image upload */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #252525;
+            position: relative;
+        }
+
+            .upload-zone:hover, .upload-zone.dragover {
+                border-color: var(--primary);
+                background: var(--primary-light);
+            }
+
+            .upload-zone input[type="file"] {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+        .upload-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .upload-zone:hover .upload-icon {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .upload-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+        }
+
+        .upload-sub {
+            font-size: 12.5px;
+            color: var(--text-muted);
+        }
+
+        #imgPreviewWrap {
+            display: none;
+            margin-top: 14px;
+        }
+
+        #imgPreview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        /* Price summary banner */
+        .price-banner {
+            background: linear-gradient(135deg, #1a56db, #3b82f6);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            color: #fff;
+            display: none;
+        }
+
+        /* Plate preview */
+        .plate-preview {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #1a1a2e;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .plate-flag {
+            background: #003399;
+            color: #FFD700;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+
+            .plate-flag span {
+                font-size: 15px;
+                line-height: 1;
+            }
+
+        .plate-number {
+            background: #2a2a2a;
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: 900;
+            padding: 4px 12px;
+            letter-spacing: 3px;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        /* Steps bar */
+        .form-steps {
+            display: flex;
+            align-items: center;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            box-shadow: var(--shadow-sm);
+            gap: 0;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .step-item.active .step-num {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 0 4px rgba(26,86,219,0.15);
+        }
+
+        .step-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--primary);
+        }
+
+        .step-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .step-sep {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+            margin: 0 10px;
+            min-width: 16px;
+        }
+
+        /* Live summary rows */
+        .sum-row {
+            display: none;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .sum-row:last-of-type {
+                border-bottom: none;
+            }
+
+        /* Sticky action bar */
+        .action-bar {
+            position: sticky;
+            bottom: 0;
+            background: #1a1a1a;
+            border-top: 1px solid var(--border);
+            padding: 14px 0;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            z-index: 100;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.07);
+        }
+
+        .btn-cancel-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            padding: 10px 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+            .btn-cancel-form:hover {
+                background: #2a2a2a;
+                color: var(--text-main);
+                border-color: #94a3b8;
+            }
+
+        .btn-draft {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #2a2a2a;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: var(--radius-sm);
+            padding: 10px 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .btn-draft:hover {
+                background: #3a3a3a;
+                border-color: var(--primary);
+            }
+
+        .btn-submit-car {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 24px;
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .btn-submit-car:hover {
+                background: var(--primary-dark);
+                box-shadow: 0 4px 14px rgba(204,12,12,0.4);
+                transform: translateY(-1px);
+            }
+
+            .btn-submit-car:disabled {
+                opacity: .7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        /* char counter */
+        .char-count {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* img tab switch */
+        .img-tabs {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 14px;
+        }
+
+        .img-tab-btn {
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .img-tab-btn.active {
+                background: var(--primary);
+                color: #fff;
+            }
+
+            .img-tab-btn:not(.active) {
+                background: #2a2a2a;
+                color: var(--text-muted);
+            }
+
+        @@media (max-width: 767px) {
+            .section-body {
+                padding: 14px;
+            }
+
+            .action-bar {
+                padding: 12px 0;
+            }
+
+            .step-sub {
+                display: none;
+            }
+
+            .step-sep {
+                min-width: 8px;
+                margin: 0 6px;
+            }
+        }
+    </style>
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Yeni Araç Ekle</h1>
+        <p class="page-subtitle">Filoya yeni bir araç kaydı oluşturun.</p>
+    </div>
+    <a href="/Car/CarList" class="btn-cancel-form">
+        <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+    </a>
+</div>
+
+<!-- Steps indicator -->
+<div class="form-steps">
+    <div class="step-item active">
+        <div class="step-num"><i class="fa-solid fa-car"></i></div>
+        <div>
+            <div class="step-label">Kimlik & Sınıf</div>
+            <div class="step-sub">Plaka, VIN, marka</div>
+        </div>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step-item active">
+        <div class="step-num"><i class="fa-solid fa-gauge"></i></div>
+        <div>
+            <div class="step-label">Teknik</div>
+            <div class="step-sub">Yıl, yakıt, koltuk</div>
+        </div>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step-item active">
+        <div class="step-num"><i class="fa-solid fa-lira-sign"></i></div>
+        <div>
+            <div class="step-label">Fiyatlandırma</div>
+            <div class="step-sub">Günlük & depozito</div>
+        </div>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step-item active">
+        <div class="step-num"><i class="fa-solid fa-image"></i></div>
+        <div>
+            <div class="step-label">Medya & Durum</div>
+            <div class="step-sub">Görsel & aktiflik</div>
+        </div>
+    </div>
+</div>
+
+<form id="carForm" asp-action="Create" asp-controller="Car" method="post" enctype="multipart/form-data" novalidate>
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+
+        <!-- ═══ LEFT COLUMN ═══ -->
+        <div class="col-12 col-xl-8">
+
+            <!-- 1 · Kimlik Bilgileri -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a0a;color:var(--primary);">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Araç Kimlik Bilgileri</p>
+                        <p class="section-subtitle">Plaka ve şasi numarası zorunludur</p>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+
+                        <!-- Plaka -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="PlateNumber">
+                                Plaka Numarası <span class="required">*</span>
+                            </label>
+                            <div class="input-icon-wrap">
+                                <input type="text"
+                                       id="PlateNumber"
+                                       name="PlateNumber"
+                                       class="form-control"
+                                       placeholder="34 ABC 123"
+                                       maxlength="10"
+                                       autocomplete="off"
+                                       style="font-weight:700;letter-spacing:2px;font-family:'Plus Jakarta Sans',sans-serif;"
+                                       oninput="this.value=this.value.toUpperCase(); updatePlatePreview(); liveValidate(this)" />
+                                <i class="fa-solid fa-hashtag input-icon"></i>
+                            </div>
+                            <div class="invalid-feedback" id="plateError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Plaka numarası zorunludur.
+                            </div>
+                            <!-- Canlı plaka önizlemesi -->
+                            <div id="platePreviewWrap" style="display:none; margin-top:10px;">
+                                <div class="plate-preview">
+                                    <div class="plate-flag">
+                                        <span>🇹🇷</span>
+                                        <small style="letter-spacing:1px;">TR</small>
+                                    </div>
+                                    <div class="plate-number" id="platePreviewText">— — —</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VIN / Şasi No -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="VIN">
+                                Şasi Numarası (VIN) <span class="required">*</span>
+                            </label>
+                            <div class="input-icon-wrap">
+                                <input type="text"
+                                       id="VIN"
+                                       name="VIN"
+                                       class="form-control"
+                                       placeholder="WBA5A5C5XED123456"
+                                       maxlength="17"
+                                       autocomplete="off"
+                                       style="font-family:monospace;letter-spacing:1px;font-size:13px;"
+                                       oninput="this.value=this.value.toUpperCase(); updateVinCount(); liveValidate(this)" />
+                                <i class="fa-solid fa-barcode input-icon"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-start mt-1">
+                                <div class="invalid-feedback" id="vinError">
+                                    <i class="fa-solid fa-circle-exclamation"></i> 17 haneli VIN numarası giriniz.
+                                </div>
+                                <div class="char-count ms-auto"><span id="vinCount">0</span>/17</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2 · Sınıflandırma -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d2d0a;color:var(--accent);">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Sınıflandırma</p>
+                        <p class="section-subtitle">Marka, model, kategori ve şube</p>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="BrandId">
+                                Marka <span class="required">*</span>
+                            </label>
+                            <select id="BrandId" name="BrandId" class="form-select"
+                                    onchange="loadModels(this.value); liveValidate(this); updateSummary()">
+                                <option value="">— Marka Seçin —</option>
+                                @* ViewBag.Brands listesi buraya bind edilecek *@
+                                @if (ViewBag.Brands != null)
+                                {
+                                    foreach (var brand in ViewBag.Brands)
+                                    {
+                                        <option value="@brand.BrandId">@brand.BrandName</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <!-- Statik fallback (geliştirme ortamı) -->
+                                    <option value="1">BMW</option>
+                                    <option value="2">Mercedes-Benz</option>
+                                    <option value="3">Audi</option>
+                                    <option value="4">Toyota</option>
+                                    <option value="5">Volkswagen</option>
+                                    <option value="6">Ford</option>
+                                    <option value="7">Volvo</option>
+                                    <option value="8">Hyundai</option>
+                                    <option value="9">Tesla</option>
+                                    <option value="10">Renault</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="brandError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Marka seçimi zorunludur.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="ModelId">
+                                Model <span class="required">*</span>
+                            </label>
+                            <select id="ModelId" name="ModelId" class="form-select"
+                                    onchange="liveValidate(this); updateSummary()">
+                                <option value="">— Önce marka seçin —</option>
+                                @if (ViewBag.Models != null)
+                                {
+                                    foreach (var model in ViewBag.Models)
+                                    {
+                                        <option value="@@model.ModelId">@@model.ModelName</option>
+                                    }
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="modelError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Model seçimi zorunludur.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="CategoryId">
+                                Kategori <span class="required">*</span>
+                            </label>
+                            <select id="CategoryId" name="CategoryId" class="form-select"
+                                    onchange="liveValidate(this)">
+                                <option value="">— Kategori Seçin —</option>
+                                @if (ViewBag.Categories != null)
+                                {
+                                    foreach (var cat in ViewBag.Categories)
+                                    {
+                                        <option value="@cat.CategoryId">@cat.CategoryName</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="1">Sedan</option>
+                                    <option value="2">SUV / Crossover</option>
+                                    <option value="3">Hatchback</option>
+                                    <option value="4">Station Wagon</option>
+                                    <option value="5">Coupe</option>
+                                    <option value="6">Minivan / MPV</option>
+                                    <option value="7">Pick-up</option>
+                                    <option value="8">Cabrio</option>
+                                    <option value="9">Elektrikli</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="categoryError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Kategori seçimi zorunludur.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="BranchId">
+                                Şube <span class="required">*</span>
+                            </label>
+                            <select id="BranchId" name="BranchId" class="form-select"
+                                    onchange="liveValidate(this)">
+                                <option value="">— Şube Seçin —</option>
+                                @if (ViewBag.Branches != null)
+                                {
+                                    foreach (var branch in ViewBag.Branches)
+                                    {
+                                        <option value="@branch.BranchId">@branch.BranchName</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="1">İstanbul — Merkez</option>
+                                    <option value="2">İstanbul — Atatürk Hav.</option>
+                                    <option value="3">İstanbul — Sabiha Gökcen</option>
+                                    <option value="4">Ankara — Merkez</option>
+                                    <option value="5">İzmir — Merkez</option>
+                                    <option value="6">Antalya — Hava Limanı</option>
+                                    <option value="7">Bursa — Merkez</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="branchError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Şube seçimi zorunludur.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 · Teknik Detaylar -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d0a;color:#10b981;">
+                        <i class="fa-solid fa-screwdriver-wrench"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Teknik Detaylar</p>
+                        <p class="section-subtitle">Yıl, kilometre, yakıt tipi ve koltuk bilgileri</p>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label" for="Year">
+                                Model Yılı <span class="required">*</span>
+                            </label>
+                            <div class="input-icon-wrap">
+                                <input type="number" id="Year" name="Year"
+                                       class="form-control"
+                                       placeholder="2024" min="1990" max="2026"
+                                       oninput="liveValidate(this); updateSummary()" />
+                                <i class="fa-solid fa-calendar input-icon"></i>
+                            </div>
+                            <div class="invalid-feedback" id="yearError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Geçerli bir yıl giriniz.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label" for="Kilometer">
+                                Kilometre <span class="required">*</span>
+                            </label>
+                            <div class="input-icon-wrap" style="position:relative;">
+                                <input type="number" id="Kilometer" name="Kilometer"
+                                       class="form-control"
+                                       placeholder="0" min="0"
+                                       style="padding-right:50px;"
+                                       oninput="liveValidate(this)" />
+                                <i class="fa-solid fa-road input-icon"></i>
+                                <span class="input-suffix">km</span>
+                            </div>
+                            <div class="invalid-feedback" id="kmError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Kilometre bilgisi zorunludur.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label" for="Transmission">
+                                Vites Tipi <span class="required">*</span>
+                            </label>
+                            <select id="Transmission" name="Transmission" class="form-select"
+                                    onchange="liveValidate(this); updateSummary()">
+                                <option value="">— Seçin —</option>
+                                <option value="Otomatik">Otomatik</option>
+                                <option value="Manuel">Manuel</option>
+                                <option value="Yarı Otomatik">Yarı Otomatik</option>
+                                <option value="CVT">CVT</option>
+                            </select>
+                            <div class="invalid-feedback" id="transError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Vites tipi zorunludur.
+                            </div>
+                        </div>
+
+                        <!-- Yakıt Tipi Pill Seçici -->
+                        <div class="col-12">
+                            <label class="form-label">
+                                Yakıt Tipi <span class="required">*</span>
+                            </label>
+                            <div class="fuel-options">
+                                <input type="radio" class="fuel-radio" name="FuelType" id="fuel_benzin" value="Benzin" />
+                                <label for="fuel_benzin"><i class="fa-solid fa-gas-pump"></i> Benzin</label>
+
+                                <input type="radio" class="fuel-radio" name="FuelType" id="fuel_dizel" value="Dizel" />
+                                <label for="fuel_dizel"><i class="fa-solid fa-fill-drip"></i> Dizel</label>
+
+                                <input type="radio" class="fuel-radio" name="FuelType" id="fuel_elektrik" value="Elektrik" />
+                                <label for="fuel_elektrik"><i class="fa-solid fa-bolt"></i> Elektrik</label>
+
+                                <input type="radio" class="fuel-radio" name="FuelType" id="fuel_hibrit" value="Hibrit" />
+                                <label for="fuel_hibrit"><i class="fa-solid fa-leaf"></i> Hibrit</label>
+
+                                <input type="radio" class="fuel-radio" name="FuelType" id="fuel_lpg" value="LPG" />
+                                <label for="fuel_lpg"><i class="fa-solid fa-fire-flame-curved"></i> LPG</label>
+                            </div>
+                            <div class="invalid-feedback show" id="fuelError" style="display:none!important;">
+                                <i class="fa-solid fa-circle-exclamation"></i> Yakıt tipi seçimi zorunludur.
+                            </div>
+                        </div>
+
+                        <!-- Koltuk & Bagaj Sayacı -->
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label">
+                                Koltuk Sayısı <span class="required">*</span>
+                            </label>
+                            <div class="counter-input">
+                                <button type="button" class="counter-btn" onclick="adjustCounter('SeatCount', -1)">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                                <input type="number" id="SeatCount" name="SeatCount"
+                                       class="counter-val" value="5" min="1" max="20" readonly />
+                                <button type="button" class="counter-btn" onclick="adjustCounter('SeatCount', 1)">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <p class="form-hint">
+                                <i class="fa-solid fa-circle-info me-1" style="color:var(--primary);"></i>
+                                Sürücü dahil toplam koltuk sayısı
+                            </p>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label">
+                                Bagaj Kapasitesi <span class="required">*</span>
+                            </label>
+                            <div class="counter-input">
+                                <button type="button" class="counter-btn" onclick="adjustCounter('LuggageCount', -1)">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                                <input type="number" id="LuggageCount" name="LuggageCount"
+                                       class="counter-val" value="2" min="0" max="10" readonly />
+                                <button type="button" class="counter-btn" onclick="adjustCounter('LuggageCount', 1)">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
+                            <p class="form-hint">
+                                <i class="fa-solid fa-circle-info me-1" style="color:var(--primary);"></i>
+                                Orta boy valiz kapasitesi
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 · Fiyatlandırma -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d2d0a;color:#d97706;">
+                        <i class="fa-solid fa-turkish-lira-sign"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Fiyatlandırma</p>
+                        <p class="section-subtitle">Günlük kiralama ücreti ve depozito miktarı</p>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="DailyPrice">
+                                Günlük Kiralama Ücreti <span class="required">*</span>
+                            </label>
+                            <div class="input-icon-wrap" style="position:relative;">
+                                <input type="number" id="DailyPrice" name="DailyPrice"
+                                       class="form-control"
+                                       placeholder="0.00" min="0" step="0.01"
+                                       style="padding-right:42px;"
+                                       oninput="updatePriceBanner(); liveValidate(this); updateSummary()" />
+                                <i class="fa-solid fa-turkish-lira-sign input-icon"></i>
+                                <span class="input-suffix">₺</span>
+                            </div>
+                            <div class="invalid-feedback" id="priceError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Günlük fiyat zorunludur.
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="DepositAmount">
+                                Depozito Miktarı <span class="required">*</span>
+                            </label>
+                            <div class="input-icon-wrap" style="position:relative;">
+                                <input type="number" id="DepositAmount" name="DepositAmount"
+                                       class="form-control"
+                                       placeholder="0.00" min="0" step="0.01"
+                                       style="padding-right:42px;"
+                                       oninput="updatePriceBanner(); liveValidate(this)" />
+                                <i class="fa-solid fa-shield-halved input-icon"></i>
+                                <span class="input-suffix">₺</span>
+                            </div>
+                            <div class="invalid-feedback" id="depositError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Depozito miktarı zorunludur.
+                            </div>
+                        </div>
+
+                        <!-- Fiyat Özeti Banner -->
+                        <div class="col-12">
+                            <div class="price-banner" id="priceBanner">
+                                <div class="row g-2 text-center">
+                                    <div class="col-4">
+                                        <div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Günlük</div>
+                                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;" id="bannerDaily">—</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Haftalık</div>
+                                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;" id="bannerWeekly">—</div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">Aylık</div>
+                                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;" id="bannerMonthly">—</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2);font-size:12.5px;opacity:.85;display:flex;align-items:center;gap:6px;">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                    Depozito: <strong id="bannerDeposit">—</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /LEFT COLUMN -->
+        <!-- ═══ RIGHT COLUMN ═══ -->
+        <div class="col-12 col-xl-4">
+
+            <!-- Görsel Yükleme -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a2d;color:#9333ea;">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Araç Görseli</p>
+                        <p class="section-subtitle">Dosya yükle veya URL gir</p>
+                    </div>
+                </div>
+                <div class="section-body">
+
+                    <!-- Tab switch -->
+                    <div class="img-tabs">
+                        <button type="button" class="img-tab-btn active" id="tabUpload" onclick="switchImgTab('upload')">
+                            <i class="fa-solid fa-upload me-1"></i> Dosya Yükle
+                        </button>
+                        <button type="button" class="img-tab-btn" id="tabUrl" onclick="switchImgTab('url')">
+                            <i class="fa-solid fa-link me-1"></i> URL Gir
+                        </button>
+                    </div>
+
+                    <!-- Upload zone -->
+                    <div id="uploadPanel">
+                        <div class="upload-zone" id="uploadZone"
+                             ondragover="handleDragOver(event)"
+                             ondrop="handleDrop(event)"
+                             ondragleave="handleDragLeave(event)">
+                            <input type="file" id="imageFile" name="ImageFile" accept="image/*"
+                                   onchange="handleFileSelect(event)" />
+                            <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <div class="upload-title">Görseli buraya sürükleyin</div>
+                            <div class="upload-sub">veya <span style="color:var(--primary);font-weight:600;">dosya seçin</span></div>
+                            <div style="margin-top:8px;font-size:11.5px;color:var(--text-muted);">
+                                JPG, PNG, WEBP — Maks. 5 MB
+                            </div>
+                        </div>
+                        <div id="imgPreviewWrap">
+                            <img id="imgPreview" src="" alt="Önizleme" />
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+                                <span id="imgFileName" style="font-size:12px;color:var(--text-muted);"></span>
+                                <button type="button" onclick="clearImage()"
+                                        style="border:none;background:none;color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;">
+                                    <i class="fa-solid fa-xmark me-1"></i>Kaldır
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- URL panel -->
+                    <div id="urlPanel" style="display:none;">
+                        <label class="form-label" for="ImageUrl">Görsel URL'si</label>
+                        <div style="position:relative;">
+                            <input type="url" id="ImageUrl" name="ImageUrl"
+                                   class="form-control"
+                                   placeholder="https://example.com/car.jpg"
+                                   style="padding-right:90px;"
+                                   oninput="previewUrlImg(this.value)" />
+                            <button type="button"
+                                    style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--primary-light);border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--primary);cursor:pointer;"
+                                    onclick="previewUrlImg(document.getElementById('ImageUrl').value)">
+                                <i class="fa-solid fa-eye me-1"></i>Önizle
+                            </button>
+                        </div>
+                        <div id="urlPreviewWrap" style="display:none;margin-top:10px;">
+                            <img id="urlImgPreview" src="" alt="URL Önizleme"
+                                 style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);"
+                                 onerror="this.parentElement.style.display='none'" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Durum Ayarları -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d0a;color:#10b981;">
+                        <i class="fa-solid fa-toggle-on"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Durum Ayarları</p>
+                        <p class="section-subtitle">Kiralama ve sistem durumu</p>
+                    </div>
+                </div>
+                <div class="section-body" style="padding:16px 24px;">
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">
+                            <strong>
+                                <i class="fa-solid fa-circle-check me-2" style="color:#10b981;"></i>
+                                Müsait Durumu
+                            </strong>
+                            <span>Araç kiralamaya açık olsun</span>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox"
+                                   id="IsAvailable" name="IsAvailable" value="true" checked />
+                            <input type="hidden" name="IsAvailable" value="false" />
+                        </div>
+                    </div>
+
+                    <div class="toggle-row">
+                        <div class="toggle-label">
+                            <strong>
+                                <i class="fa-solid fa-power-off me-2" style="color:var(--primary);"></i>
+                                Aktif Durumu
+                            </strong>
+                            <span>Araç sistemde görünsün</span>
+                        </div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox"
+                                   id="IsActive" name="IsActive" value="true" checked />
+                            <input type="hidden" name="IsActive" value="false" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Canlı Kayıt Özeti -->
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a0a;color:var(--primary);">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                    <div>
+                        <p class="section-title">Kayıt Özeti</p>
+                        <p class="section-subtitle">Form dolduğunda güncellenir</p>
+                    </div>
+                </div>
+                <div class="section-body" style="padding:14px 24px;">
+
+                    <div id="sumEmpty" style="text-align:center;padding:10px 0;color:var(--text-muted);font-size:13px;">
+                        <i class="fa-regular fa-file-lines" style="font-size:26px;display:block;margin-bottom:8px;opacity:.35;"></i>
+                        Formu doldurmaya başlayın…
+                    </div>
+
+                    <div class="sum-row" id="sumPlate">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--text-muted);">Plaka</span>
+                            <strong id="sumPlateVal" style="font-family:'Plus Jakarta Sans',sans-serif;letter-spacing:1px;"></strong>
+                        </div>
+                    </div>
+                    <div class="sum-row" id="sumBrand">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--text-muted);">Marka / Model</span>
+                            <strong id="sumBrandVal"></strong>
+                        </div>
+                    </div>
+                    <div class="sum-row" id="sumYear">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--text-muted);">Yıl</span>
+                            <strong id="sumYearVal"></strong>
+                        </div>
+                    </div>
+                    <div class="sum-row" id="sumFuel">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--text-muted);">Yakıt / Vites</span>
+                            <strong id="sumFuelVal"></strong>
+                        </div>
+                    </div>
+                    <div class="sum-row" id="sumPrice">
+                        <div style="display:flex;justify-content:space-between;">
+                            <span style="color:var(--text-muted);">Günlük Fiyat</span>
+                            <strong id="sumPriceVal" style="color:var(--primary);"></strong>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <!-- /RIGHT COLUMN -->
+
+    </div>
+
+    <!-- ═══ Sticky Action Bar ═══ -->
+    <div class="action-bar">
+        <div style="font-size:13px;color:var(--text-muted);">
+            <i class="fa-solid fa-circle-exclamation me-1" style="color:var(--accent);"></i>
+            <span style="color:var(--danger);">*</span> ile işaretli alanlar zorunludur
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="/Car/CarList" class="btn-cancel-form">
+                <i class="fa-solid fa-xmark"></i> Vazgeç
+            </a>
+            <button type="button" class="btn-draft" onclick="saveDraftCar()">
+                <i class="fa-regular fa-floppy-disk"></i> Taslak Kaydet
+            </button>
+            <button type="submit" class="btn-submit-car" id="submitBtn" onclick="validateCarForm(event)">
+                <i class="fa-solid fa-check"></i> Aracı Kaydet
+            </button>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts {
+    <script>
+        /* ══════════════════════════════════════════
+           CreateCar Page Scripts
+        ══════════════════════════════════════════ */
+
+        // ── Model listesi (marka seçimine göre AJAX ile doldurulabilir) ──
+        const brandModels = {
+            '1': ['3 Serisi','5 Serisi','7 Serisi','X3','X5','X6','M3','M5'],
+            '2': ['A Serisi','C Serisi','E Serisi','S Serisi','GLC','GLE','CLA'],
+            '3': ['A3','A4','A6','A8','Q3','Q5','Q7','TT','RS6'],
+            '4': ['Corolla','Camry','RAV4','Land Cruiser','Yaris','C-HR','Hilux'],
+            '5': ['Golf','Passat','Tiguan','Arteon','T-Roc','Touareg','Polo'],
+            '6': ['Focus','Mondeo','Explorer','Mustang','Kuga','Edge','Ranger'],
+            '7': ['XC40','XC60','XC90','S60','S90','V60','V90'],
+            '8': ['i10','i20','i30','Tucson','Santa Fe','Kona','Ioniq 6'],
+            '9': ['Model 3','Model Y','Model S','Model X','Cybertruck'],
+            '10': ['Clio','Megane','Kadjar','Captur','Talisman','Austral'],
+        };
+
+        function loadModels(brandId) {
+            const sel = document.getElementById('ModelId');
+            sel.innerHTML = '<option value="">— Model Seçin —</option>';
+
+            // Eğer backend'den modeller gelmiyorsa statik listeyi kullan
+            const models = brandModels[brandId];
+            if (models) {
+                models.forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m; opt.textContent = m;
+                    sel.appendChild(opt);
+                });
+            }
+
+            // AJAX ile yüklemek için:
+            // fetch(`/Car/GetModelsByBrand?brandId=${brandId}`)
+            //     .then(r => r.json())
+            //     .then(data => {
+            //         data.forEach(m => {
+            //             const opt = document.createElement('option');
+            //             opt.value = m.modelId; opt.textContent = m.modelName;
+            //             sel.appendChild(opt);
+            //         });
+            //     });
+
+            updateSummary();
+        }
+
+        // ── Plaka önizlemesi ──
+        function updatePlatePreview() {
+            const val = document.getElementById('PlateNumber').value.trim();
+            const wrap = document.getElementById('platePreviewWrap');
+            const text = document.getElementById('platePreviewText');
+            if (val.length >= 2) {
+                wrap.style.display = 'block';
+                text.textContent = val;
+            } else {
+                wrap.style.display = 'none';
+            }
+            updateSummary();
+        }
+
+        // ── VIN karakter sayacı ──
+        function updateVinCount() {
+            const len = document.getElementById('VIN').value.length;
+            document.getElementById('vinCount').textContent = len;
+            const errEl = document.getElementById('vinError');
+            errEl.style.display = (len > 0 && len !== 17) ? 'flex' : 'none';
+        }
+
+        // ── Step counter (+/-) ──
+        function adjustCounter(id, delta) {
+            const el = document.getElementById(id);
+            const min = parseInt(el.min) || 0;
+            const max = parseInt(el.max) || 99;
+            el.value = Math.max(min, Math.min(max, parseInt(el.value) + delta));
+        }
+
+        // ── Fiyat Banner ──
+        function updatePriceBanner() {
+            const daily   = parseFloat(document.getElementById('DailyPrice').value)   || 0;
+            const deposit = parseFloat(document.getElementById('DepositAmount').value) || 0;
+            const banner  = document.getElementById('priceBanner');
+
+            if (daily > 0) {
+                banner.style.display = 'block';
+                document.getElementById('bannerDaily').textContent   = '₺' + daily.toLocaleString('tr-TR');
+                document.getElementById('bannerWeekly').textContent  = '₺' + (daily * 7).toLocaleString('tr-TR');
+                document.getElementById('bannerMonthly').textContent = '₺' + (daily * 30).toLocaleString('tr-TR');
+                document.getElementById('bannerDeposit').textContent = deposit > 0 ? '₺' + deposit.toLocaleString('tr-TR') : '—';
+            } else {
+                banner.style.display = 'none';
+            }
+            updateSummary();
+        }
+
+        // ── Canlı kayıt özeti ──
+        function updateSummary() {
+            const plate  = document.getElementById('PlateNumber').value;
+            const bSel   = document.getElementById('BrandId');
+            const mSel   = document.getElementById('ModelId');
+            const year   = document.getElementById('Year').value;
+            const fuel   = document.querySelector('input[name="FuelType"]:checked')?.value || '';
+            const trans  = document.getElementById('Transmission').value;
+            const price  = document.getElementById('DailyPrice').value;
+
+            let hasAny = false;
+
+            function setRow(rowId, valId, show, text) {
+                const row = document.getElementById(rowId);
+                const val = document.getElementById(valId);
+                row.style.display = show ? 'block' : 'none';
+                if (show) { val.textContent = text; hasAny = true; }
+            }
+
+            setRow('sumPlate', 'sumPlateVal', !!plate, plate);
+            const bText = bSel.options[bSel.selectedIndex]?.text;
+            const mText = mSel.options[mSel.selectedIndex]?.text;
+            setRow('sumBrand', 'sumBrandVal', !!(bSel.value && mSel.value), `${bText} ${mText}`);
+            setRow('sumYear',  'sumYearVal',  !!year,  year);
+            setRow('sumFuel',  'sumFuelVal',  !!(fuel || trans), [fuel, trans].filter(Boolean).join(' / '));
+            setRow('sumPrice', 'sumPriceVal', !!price, `₺${parseFloat(price).toLocaleString('tr-TR')} / gün`);
+
+            document.getElementById('sumEmpty').style.display = hasAny ? 'none' : 'block';
+        }
+
+        // ── Tek alan doğrulama ──
+        function liveValidate(el) {
+            if (!el.value || el.value === '') {
+                el.classList.add('is-invalid'); el.classList.remove('is-valid');
+            } else {
+                el.classList.remove('is-invalid'); el.classList.add('is-valid');
+            }
+            updateSummary();
+        }
+
+        // ── Görsel Tab Değiştir ──
+        function switchImgTab(tab) {
+            const isUpload = tab === 'upload';
+            document.getElementById('uploadPanel').style.display = isUpload ? 'block' : 'none';
+            document.getElementById('urlPanel').style.display    = isUpload ? 'none'  : 'block';
+            document.getElementById('tabUpload').classList.toggle('active', isUpload);
+            document.getElementById('tabUrl').classList.toggle('active', !isUpload);
+        }
+
+        // ── Dosya yükleme ──
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Dosya boyutu 5 MB\'dan büyük olamaz.', 'danger'); return;
+            }
+            const reader = new FileReader();
+            reader.onload = ev => renderImgPreview(ev.target.result, file.name);
+            reader.readAsDataURL(file);
+        }
+
+        function handleDragOver(e)  { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+        function handleDrop(e) {
+            e.preventDefault(); e.currentTarget.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = ev => renderImgPreview(ev.target.result, file.name);
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderImgPreview(src, name) {
+            document.getElementById('imgPreview').src = src;
+            document.getElementById('imgPreviewWrap').style.display = 'block';
+            document.getElementById('imgFileName').textContent = name || '';
+            document.querySelector('#uploadZone .upload-icon').style.display   = 'none';
+            document.querySelector('#uploadZone .upload-title').style.display  = 'none';
+            document.querySelector('#uploadZone .upload-sub').style.display    = 'none';
+        }
+
+        function clearImage() {
+            document.getElementById('imageFile').value = '';
+            document.getElementById('imgPreviewWrap').style.display = 'none';
+            document.querySelector('#uploadZone .upload-icon').style.display  = 'flex';
+            document.querySelector('#uploadZone .upload-title').style.display = 'block';
+            document.querySelector('#uploadZone .upload-sub').style.display   = 'block';
+        }
+
+        function previewUrlImg(url) {
+            if (!url) return;
+            document.getElementById('urlPreviewWrap').style.display = 'block';
+            document.getElementById('urlImgPreview').src = url;
+        }
+
+        // ── Form Doğrulama & Gönder ──
+        function validateCarForm(e) {
+            e.preventDefault();
+
+            const required = ['PlateNumber','VIN','BrandId','ModelId','CategoryId',
+                              'BranchId','Year','Kilometer','DailyPrice','DepositAmount','Transmission'];
+            let valid = true;
+
+            required.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (!el.value || el.value === '') {
+                    el.classList.add('is-invalid'); valid = false;
+                } else {
+                    el.classList.remove('is-invalid'); el.classList.add('is-valid');
+                }
+            });
+
+            // VIN uzunluk kontrolü
+            const vin = document.getElementById('VIN');
+            if (vin.value.length > 0 && vin.value.length !== 17) {
+                vin.classList.add('is-invalid'); valid = false;
+                document.getElementById('vinError').style.display = 'flex';
+            }
+
+            // Yakıt tipi kontrolü
+            const fuel = document.querySelector('input[name="FuelType"]:checked');
+            const fuelErr = document.getElementById('fuelError');
+            if (!fuel) {
+                fuelErr.style.cssText = 'display:flex!important;';
+                valid = false;
+            } else {
+                fuelErr.style.cssText = 'display:none!important;';
+            }
+
+            if (!valid) {
+                showToast('Lütfen zorunlu alanları eksiksiz doldurun.', 'danger');
+                document.querySelector('.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            // Submit
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kaydediliyor…';
+            btn.disabled = true;
+            document.getElementById('carForm').submit();
+        }
+
+        function saveDraftCar() {
+            showToast('Taslak başarıyla kaydedildi.', 'info');
+        }
+
+        // ── Yakıt seçiminde özet güncelle ──
+        document.querySelectorAll('input[name="FuelType"]').forEach(r => {
+            r.addEventListener('change', () => {
+                document.getElementById('fuelError').style.cssText = 'display:none!important;';
+                updateSummary();
+            });
+        });
+
+        // ── Seçimler değiştiğinde özet güncelle ──
+        ['BrandId','ModelId','CategoryId','BranchId','Year','Transmission'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', updateSummary);
+        });
+    </script>
+}
+

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Araç Listesi — RentCar Admin</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ========== SIDEBAR ========== -->
+<aside class="sidebar" id="sidebar">
+
+  <a href="admin-layout.html" class="sidebar-logo">
+    <div class="logo-icon"><i class="fa-solid fa-car-side"></i></div>
+    <div class="logo-text">
+      <strong>RentCar</strong>
+      <span>Admin Panel</span>
+    </div>
+  </a>
+
+  <nav class="sidebar-nav" id="sidebarNav">
+
+    <div class="menu-label">Ana Menü</div>
+    <a href="admin-layout.html" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-gauge-high"></i></span>
+      <span class="link-text">Dashboard</span>
+    </a>
+
+    <div class="menu-label">Araç Yönetimi</div>
+
+    <div class="has-submenu open" id="vehicleMenu">
+      <div class="nav-link" onclick="toggleSubmenu('vehicleSubmenu', 'vehicleMenu')">
+        <span class="nav-icon"><i class="fa-solid fa-cars"></i></span>
+        <span class="link-text">Araç Yönetimi</span>
+        <i class="fa-solid fa-chevron-right submenu-arrow ms-auto"></i>
+      </div>
+      <div class="submenu open" id="vehicleSubmenu">
+        <a href="vehicle-list.html" class="nav-link active">
+          <span class="nav-icon"><i class="fa-solid fa-list"></i></span>
+          <span class="link-text">Araç Listesi</span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-icon"><i class="fa-solid fa-plus"></i></span>
+          <span class="link-text">Yeni Araç Ekle</span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-icon"><i class="fa-solid fa-trademark"></i></span>
+          <span class="link-text">Marka Yönetimi</span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-icon"><i class="fa-solid fa-cube"></i></span>
+          <span class="link-text">Model Yönetimi</span>
+        </a>
+        <a href="#" class="nav-link">
+          <span class="nav-icon"><i class="fa-solid fa-tags"></i></span>
+          <span class="link-text">Kategori Yönetimi</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="menu-label">Operasyon</div>
+    <a href="#" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-building"></i></span>
+      <span class="link-text">Şube Yönetimi</span>
+    </a>
+    <a href="#" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+      <span class="link-text">Müşteri Yönetimi</span>
+      <span class="menu-badge">12</span>
+    </a>
+    <a href="#" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-calendar-check"></i></span>
+      <span class="link-text">Rezervasyon Yönetimi</span>
+      <span class="menu-badge">5</span>
+    </a>
+    <a href="#" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-credit-card"></i></span>
+      <span class="link-text">Ödeme Yönetimi</span>
+    </a>
+
+    <div class="menu-label">Sistem</div>
+    <a href="#" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>
+      <span class="link-text">Raporlar</span>
+    </a>
+    <a href="#" class="nav-link">
+      <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+      <span class="link-text">Ayarlar</span>
+    </a>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff&size=80" alt="Admin" />
+      <div class="user-info">
+        <div class="user-name">Admin User</div>
+        <div class="user-role">Süper Yönetici</div>
+      </div>
+    </div>
+  </div>
+
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebarMobile()"></div>
+
+<!-- ========== MAIN WRAPPER ========== -->
+<div class="main-wrapper" id="mainWrapper">
+
+  <!-- NAVBAR -->
+  <nav class="navbar-top" id="navbarTop">
+    <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="navbar-breadcrumb d-none d-sm-block">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="admin-layout.html">Ana Sayfa</a></li>
+        <li class="breadcrumb-item"><a href="#">Araç Yönetimi</a></li>
+        <li class="breadcrumb-item active">Araç Listesi</li>
+      </ol>
+    </div>
+
+    <div class="navbar-actions ms-auto">
+      <div class="dropdown notif-dropdown">
+        <button class="action-btn" data-bs-toggle="dropdown">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge-dot"></span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <div class="notif-header">
+            <h6>Bildirimler</h6>
+            <a href="#">Tümünü Gör</a>
+          </div>
+          <div class="notif-list">
+            <div class="notif-item">
+              <div class="notif-icon" style="background:#e8efff;color:#1a56db;"><i class="fa-solid fa-calendar-check"></i></div>
+              <div class="notif-text"><p>Yeni rezervasyon talebi alındı</p><small>2 dakika önce</small></div>
+            </div>
+            <div class="notif-item">
+              <div class="notif-icon" style="background:#f0fdf4;color:#10b981;"><i class="fa-solid fa-credit-card"></i></div>
+              <div class="notif-text"><p>₺4.200 ödeme alındı</p><small>3 saat önce</small></div>
+            </div>
+          </div>
+        </ul>
+      </div>
+
+      <button class="action-btn"><i class="fa-regular fa-envelope"></i></button>
+
+      <div class="navbar-divider d-none d-sm-block"></div>
+
+      <div class="dropdown admin-dropdown">
+        <a href="#" class="dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
+          <img src="https://ui-avatars.com/api/?name=Admin+User&background=1a56db&color=fff&size=80" alt="Admin" />
+          <div class="admin-info d-none d-lg-flex">
+            <span class="admin-name">Admin User</span>
+            <span class="admin-role">Süper Yönetici</span>
+          </div>
+          <i class="fa-solid fa-chevron-down" style="font-size:11px;color:var(--text-muted);margin-left:2px;"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li><a class="dropdown-item" href="#"><i class="fa-regular fa-user"></i> Profil</a></li>
+          <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear"></i> Ayarlar</a></li>
+          <li><hr class="dropdown-divider" /></li>
+          <li><a class="dropdown-item text-danger" href="#"><i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- PAGE CONTENT -->
+  <main class="page-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Araç Listesi</h1>
+        <p class="page-subtitle">Filodaki tüm araçları görüntüleyin ve yönetin.</p>
+      </div>
+      <button class="btn-primary-custom" onclick="showToast('Yeni araç ekleme formu açıldı!', 'info')">
+        <i class="fa-solid fa-plus"></i> Yeni Araç Ekle
+      </button>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--text-main);" id="totalCount">10</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Toplam Araç</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#10b981;" id="availableCount">7</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Müsait</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--accent);" id="rentedCount">3</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Kirada</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+          <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--primary);" id="visibleCount">10</div>
+          <div style="font-size:12.5px;color:var(--text-muted);">Gösterilen</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar-card">
+      <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Araç ara (marka, model, yıl...)" oninput="filterVehicles()" />
+      </div>
+      <select class="filter-select" id="brandFilter" onchange="filterVehicles()">
+        <option value="">Tüm Markalar</option>
+        <option value="BMW">BMW</option>
+        <option value="Mercedes">Mercedes</option>
+        <option value="Toyota">Toyota</option>
+        <option value="Audi">Audi</option>
+        <option value="Volkswagen">Volkswagen</option>
+        <option value="Ford">Ford</option>
+        <option value="Volvo">Volvo</option>
+        <option value="Hyundai">Hyundai</option>
+        <option value="Tesla">Tesla</option>
+      </select>
+      <select class="filter-select" id="statusFilter" onchange="filterVehicles()">
+        <option value="">Tüm Durumlar</option>
+        <option value="Müsait">Müsait</option>
+        <option value="Kirada">Kirada</option>
+      </select>
+      <select class="filter-select" id="fuelFilter" onchange="filterVehicles()">
+        <option value="">Tüm Yakıt Tipleri</option>
+        <option value="Benzin">Benzin</option>
+        <option value="Dizel">Dizel</option>
+        <option value="Elektrik">Elektrik</option>
+        <option value="Hibrit">Hibrit</option>
+      </select>
+      <button class="btn-action btn-detail" onclick="resetFilters()" style="flex:none;padding:9px 14px;font-size:13px;">
+        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+      </button>
+    </div>
+
+    <!-- Results info -->
+    <p class="results-count" id="resultsText">
+      Toplam <strong>10</strong> araç listeleniyor
+    </p>
+
+    <!-- Vehicle Grid -->
+    <div class="row g-4" id="vehicleGrid">
+      <!-- Cards injected by JS -->
+    </div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="text-center py-5" style="display:none!important;">
+      <div style="font-size:56px;color:var(--border);margin-bottom:16px;"><i class="fa-solid fa-car-burst"></i></div>
+      <h5 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;">Araç Bulunamadı</h5>
+      <p style="color:var(--text-muted);font-size:14px;">Arama veya filtre kriterlerinizi değiştirmeyi deneyin.</p>
+      <button class="btn-primary-custom" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Filtreleri Temizle</button>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-text">© 2026 <span>RentCar</span> Yönetim Paneli — Tüm Hakları Saklıdır</div>
+    <div class="footer-links">
+      <a href="#">Gizlilik Politikası</a>
+      <a href="#">Kullanım Koşulları</a>
+      <a href="#">Destek</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border:none;border-radius:var(--radius);box-shadow:var(--shadow-lg);">
+      <div class="modal-header" style="border-bottom:1px solid var(--border);padding:20px 24px;">
+        <h5 class="modal-title" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;">Aracı Sil</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" style="padding:20px 24px;">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div style="width:52px;height:52px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--danger);font-size:22px;flex-shrink:0;">
+            <i class="fa-solid fa-trash-can"></i>
+          </div>
+          <div>
+            <p style="margin:0;font-size:14.5px;color:var(--text-main);">
+              <strong id="deleteCarName">bu aracı</strong> silmek istediğinizden emin misiniz?
+            </p>
+            <p style="margin:0;font-size:13px;color:var(--text-muted);margin-top:4px;">Bu işlem geri alınamaz.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top:1px solid var(--border);padding:16px 24px;">
+        <button type="button" class="btn-action btn-detail" style="flex:none;padding:9px 20px;" data-bs-dismiss="modal">İptal</button>
+        <button type="button" class="btn-action btn-delete" style="flex:none;padding:9px 20px;" onclick="confirmDelete()">
+          <i class="fa-solid fa-trash-can"></i> Sil
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
