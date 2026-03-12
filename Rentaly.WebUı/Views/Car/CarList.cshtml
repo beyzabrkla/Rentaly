@@ -1,98 +1,502 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "CarList";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
-<!-- Page Header -->
-<div class="page-header">
-    <div>
-        <h1 class="page-title">Araç Listesi</h1>
-        <p class="page-subtitle">Filodaki tüm araçları görüntüleyin ve yönetin.</p>
-    </div>
-    <a class="btn-primary-custom" href="/Car/CreateCar">
-        <i class="fa-solid fa-plus"></i> Yeni Araç Ekle
-    </a>
-</div>
-
-<!-- Stats strip -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--text-main);" id="totalCount">10</div>
-            <div style="font-size:12.5px;color:var(--text-muted);">Toplam Araç</div>
+<section id="subheader" class="jarallax text-light">
+    <img src="/RentalyHTML/images/background/2.jpg" class="jarallax-img" alt="">
+    <div class="center-y relative text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h1>Araçlarımız</h1>
+                </div>
+                <div class="clearfix"></div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#10b981;" id="availableCount">7</div>
-            <div style="font-size:12.5px;color:var(--text-muted);">Müsait</div>
+</section>
+<section id="section-cars">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="item_filter_group">
+                    <h4>Vehicle Type</h4>
+                    <div class="de_form">
+                        <div class="de_checkbox">
+                            <input id="vehicle_type_1" name="vehicle_type_1" type="checkbox" value="vehicle_type_1">
+                            <label for="vehicle_type_1">Car</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="vehicle_type_2" name="vehicle_type_2" type="checkbox" value="vehicle_type_2">
+                            <label for="vehicle_type_2">Van</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="vehicle_type_3" name="vehicle_type_3" type="checkbox" value="vehicle_type_3">
+                            <label for="vehicle_type_3">Minibus</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="vehicle_type_4" name="vehicle_type_4" type="checkbox" value="vehicle_type_4">
+                            <label for="vehicle_type_4">Prestige</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="item_filter_group">
+                    <h4>Car Body Type</h4>
+                    <div class="de_form">
+                        <div class="de_checkbox">
+                            <input id="car_body_type_1" name="car_body_type_1" type="checkbox" value="car_body_type_1">
+                            <label for="car_body_type_1">Convertible</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_2" name="car_body_type_2" type="checkbox" value="car_body_type_2">
+                            <label for="car_body_type_2">Coupe</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_3" name="car_body_type_3" type="checkbox" value="car_body_type_3">
+                            <label for="car_body_type_3">Exotic Cars</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_4" name="car_body_type_4" type="checkbox" value="car_body_type_4">
+                            <label for="car_body_type_4">Hatchback</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_5" name="car_body_type_5" type="checkbox" value="car_body_type_5">
+                            <label for="car_body_type_5">Minivan</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_6" name="car_body_type_6" type="checkbox" value="car_body_type_6">
+                            <label for="car_body_type_6">Truck</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_7" name="car_body_type_7" type="checkbox" value="car_body_type_7">
+                            <label for="car_body_type_7">Sedan</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_8" name="car_body_type_8" type="checkbox" value="car_body_type_8">
+                            <label for="car_body_type_8">Sports Car</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_9" name="car_body_type_9" type="checkbox" value="car_body_type_9">
+                            <label for="car_body_type_9">Station Wagon</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_body_type_10" name="car_body_type_10" type="checkbox" value="car_body_type_10">
+                            <label for="car_body_type_10">SUV</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="item_filter_group">
+                    <h4>Car Seats</h4>
+                    <div class="de_form">
+                        <div class="de_checkbox">
+                            <input id="car_seat_1" name="car_seat_1" type="checkbox" value="car_seat_1">
+                            <label for="car_seat_1">2 seats</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_seat_2" name="car_seat_2" type="checkbox" value="car_seat_2">
+                            <label for="car_seat_2">4 seats</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_seat_3" name="car_seat_3" type="checkbox" value="car_seat_3">
+                            <label for="car_seat_3">6 seats</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_seat_4" name="car_seat_4" type="checkbox" value="car_seat_4">
+                            <label for="car_seat_4">6+ seats</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="item_filter_group">
+                    <h4>Car Engine Capacity (cc)</h4>
+                    <div class="de_form">
+                        <div class="de_checkbox">
+                            <input id="car_engine_1" name="car_engine_1" type="checkbox" value="car_engine_1">
+                            <label for="car_engine_1">1000 - 2000</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_engine_2" name="car_engine_2" type="checkbox" value="car_engine_2">
+                            <label for="car_engine_2">2000 - 4000</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_engine_3" name="car_engine_3" type="checkbox" value="car_engine_3">
+                            <label for="car_engine_3">4000 - 6000</label>
+                        </div>
+
+                        <div class="de_checkbox">
+                            <input id="car_engine_4" name="car_engine_4" type="checkbox" value="car_engine_4">
+                            <label for="car_engine_4">6000+</label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="item_filter_group">
+                    <h4>Price ($)</h4>
+                    <div class="price-input">
+                        <div class="field">
+                            <span>Min</span>
+                            <input type="number" class="input-min" value="0">
+                        </div>
+                        <div class="field">
+                            <span>Max</span>
+                            <input type="number" class="input-max" value="2000">
+                        </div>
+                    </div>
+                    <div class="slider">
+                        <div class="progress"></div>
+                    </div>
+                    <div class="range-input">
+                        <input type="range" class="range-min" min="0" max="2000" value="0" step="1">
+                        <input type="range" class="range-max" min="0" max="2000" value="2000" step="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="row">
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/jeep-renegade.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Jeep Renegade</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>25</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">SUV</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$265</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/bmw-m5.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Mini Cooper</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>79</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Sedan</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$244</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/ferrari-enzo.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Ferarri Enzo</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>55</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Exotic Car</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$167</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/ford-raptor.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Ford Raptor</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>89</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Truck</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$147</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/mini-cooper.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Mini Cooper</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>87</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Hatchback</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$238</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/vw-polo.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>VW Polo</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>37</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Hatchback</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$106</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/chevrolet-camaro.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Chevrolet Camaro</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>39</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Exotic Car</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$245</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/hyundai-staria.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Hyundai Staria</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>23</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Minivan</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$191</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/toyota-rav.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Toyota Rav 4</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>63</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">SUV</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$114</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/bentley.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Bentley</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>45</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">SUV</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$299</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/lexus.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Lexus</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>61</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Sedan</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$131</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-lg-6">
+                        <div class="de-item mb30">
+                            <div class="d-img">
+                                <img src="/RentalyHTML/images/cars-alt/range-rover.png" class="img-fluid" alt="">
+                            </div>
+                            <div class="d-info">
+                                <div class="d-text">
+                                    <h4>Range Rover</h4>
+                                    <div class="d-item_like">
+                                        <i class="fa fa-heart"></i><span>69</span>
+                                    </div>
+                                    <div class="d-atr-group">
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">5</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">2</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/3-green.svg" alt="">4</span>
+                                        <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">Exotic Car</span>
+                                    </div>
+                                    <div class="d-price">
+                                        Daily rate from <span>$228</span>
+                                        <a class="btn-main" href="02_dark-car-single.html">Rent Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--accent);" id="rentedCount">3</div>
-            <div style="font-size:12.5px;color:var(--text-muted);">Kirada</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--primary);" id="visibleCount">10</div>
-            <div style="font-size:12.5px;color:var(--text-muted);">Gösterilen</div>
-        </div>
-    </div>
-</div>
-
-<!-- Toolbar -->
-<div class="toolbar-card">
-    <div class="search-wrap">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Araç ara (marka, model, yıl...)" oninput="filterVehicles()" />
-    </div>
-    <select class="filter-select" id="brandFilter" onchange="filterVehicles()">
-        <option value="">Tüm Markalar</option>
-        <option value="BMW">BMW</option>
-        <option value="Mercedes">Mercedes</option>
-        <option value="Toyota">Toyota</option>
-        <option value="Audi">Audi</option>
-        <option value="Volkswagen">Volkswagen</option>
-        <option value="Ford">Ford</option>
-        <option value="Volvo">Volvo</option>
-        <option value="Hyundai">Hyundai</option>
-        <option value="Tesla">Tesla</option>
-    </select>
-    <select class="filter-select" id="statusFilter" onchange="filterVehicles()">
-        <option value="">Tüm Durumlar</option>
-        <option value="Müsait">Müsait</option>
-        <option value="Kirada">Kirada</option>
-    </select>
-    <select class="filter-select" id="fuelFilter" onchange="filterVehicles()">
-        <option value="">Tüm Yakıt Tipleri</option>
-        <option value="Benzin">Benzin</option>
-        <option value="Dizel">Dizel</option>
-        <option value="Elektrik">Elektrik</option>
-        <option value="Hibrit">Hibrit</option>
-    </select>
-    <button class="btn-action btn-detail" onclick="resetFilters()" style="flex:none;padding:9px 14px;font-size:13px;">
-        <i class="fa-solid fa-rotate-left"></i> Sıfırla
-    </button>
-</div>
-
-<!-- Results info -->
-<p class="results-count" id="resultsText">
-    Toplam <strong>10</strong> araç listeleniyor
-</p>
-
-<!-- Vehicle Grid -->
-<div class="row g-4" id="vehicleGrid">
-    <!-- Cards injected by JS -->
-</div>
-
-<!-- Empty state -->
-<div id="emptyState" class="text-center py-5" style="display:none!important;">
-    <div style="font-size:56px;color:var(--border);margin-bottom:16px;"><i class="fa-solid fa-car-burst"></i></div>
-    <h5 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;">Araç Bulunamadı</h5>
-    <p style="color:var(--text-muted);font-size:14px;">Arama veya filtre kriterlerinizi değiştirmeyi deneyin.</p>
-    <button class="btn-primary-custom" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Filtreleri Temizle</button>
-</div>
+</section>
 

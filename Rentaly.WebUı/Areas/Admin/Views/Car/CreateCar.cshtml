@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "CreateCar";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 @section Styles {
@@ -639,7 +639,7 @@
         <h1 class="page-title">Yeni Araç Ekle</h1>
         <p class="page-subtitle">Filoya yeni bir araç kaydı oluşturun.</p>
     </div>
-    <a href="/Car/CarList" class="btn-cancel-form">
+    <a href="/Admin/Car/CarList" class="btn-cancel-form">
         <i class="fa-solid fa-arrow-left"></i> Listeye Dön
     </a>
 </div>
@@ -1301,9 +1301,10 @@
             <span style="color:var(--danger);">*</span> ile işaretli alanlar zorunludur
         </div>
         <div class="d-flex gap-2 flex-wrap">
-            <a href="/Car/CarList" class="btn-cancel-form">
+            <a href="/Admin/Car/CarList" class="btn-cancel-form">
                 <i class="fa-solid fa-xmark"></i> Vazgeç
             </a>
+
             <button type="button" class="btn-draft" onclick="saveDraftCar()">
                 <i class="fa-regular fa-floppy-disk"></i> Taslak Kaydet
             </button>

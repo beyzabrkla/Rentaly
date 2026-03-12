@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace Rentaly.WebUI.Controllers
+namespace Rentaly.WebUI.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CarController : Controller
     {
         public IActionResult CarList()
@@ -9,7 +10,7 @@ namespace Rentaly.WebUI.Controllers
             return View();
         }
 
-        public IActionResult CarDetail() 
+        public IActionResult CreateCar()
         {
             return View();
         }
