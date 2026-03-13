@@ -15,9 +15,12 @@ namespace Rentaly.DataAccessLayer.RepositoryDesignPattern
 
         public async Task DeleteAsync(int id)
         {
-            var value = _rentalyContext.Set<T>().Find(id);
-            _rentalyContext.Set<T>().Remove(value);
-            await _rentalyContext.SaveChangesAsync();
+            var entity = await _rentalyContext.Set<T>().FindAsync(id);
+
+            if (entity != null)
+            {
+                _rentalyContext.Set<T>().Remove(entity);
+            }
         }
 
         public async Task<T> GetByIdAsync(int id)
@@ -33,13 +36,12 @@ namespace Rentaly.DataAccessLayer.RepositoryDesignPattern
         public async Task InsertAsync(T entity)
         {
             await _rentalyContext.Set<T>().AddAsync(entity);
-            await _rentalyContext.SaveChangesAsync();
         }
 
         public Task UpdateAsync(T entity)
         {
             _rentalyContext.Set<T>().Update(entity);
-            return _rentalyContext.SaveChangesAsync();
+            return Task.CompletedTask;
         }
     }
 }
