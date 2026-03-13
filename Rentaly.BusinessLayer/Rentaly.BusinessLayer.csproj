@@ -12,10 +12,12 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.12.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.25" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Rentaly.DataAccessLayer\Rentaly.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\Rentaly.EntityLayer\Rentaly.EntityLayer.csproj" />
   </ItemGroup>
 
 </Project>
