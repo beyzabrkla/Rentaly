@@ -1,4 +1,5 @@
-﻿using Rentaly.EntityLayer.Entities;
+﻿using Rentaly.DataAccessLayer.Abstract;
+using Rentaly.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace Rentaly.DataAccessLayer.Abstract
 {
-    public interface ICarModelDal :IGenericDal<CarModel>
+    public interface ICarModelDal : IGenericDal<CarModel>
     {
+        // CarModel'e özel metotlar
+        Task<List<CarModel>> GetModelsByBrandAsync(int brandId);
     }
 }

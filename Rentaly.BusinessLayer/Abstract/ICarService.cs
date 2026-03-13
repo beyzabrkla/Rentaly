@@ -7,7 +7,12 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Abstract
 {
-    public interface ICarService:IGenericService<Car>
+    public interface ICarService : IGenericService<Car>
     {
+        // Car'a özel business metotları
+        Task<List<Car>> GetAvailableCarsAsync();
+        Task<List<Car>> GetCarsByBrandAsync(int brandId);
+        Task<List<Car>> GetCarsByCategoryAsync(int categoryId);
+        Task<List<Car>> GetCarsByPriceRangeAsync(decimal minPrice, decimal maxPrice);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
+using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,31 +9,34 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
 {
-    public class CarManager : ICarService
+    public class CarManager : GenericManager<Car>, ICarService
     {
-        public Task TDeleteAsync(int id)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CarManager(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            throw new NotImplementedException();
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<Car> TGetByIdAsync(int id)
+        // Car'a özel metotlar
+        public async Task<List<Car>> GetAvailableCarsAsync()
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.CarDal.GetAvailableCarsAsync();
         }
 
-        public Task<List<Car>> TGetListAsync()
+        public async Task<List<Car>> GetCarsByBrandAsync(int brandId)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.CarDal.GetCarsByBrandAsync(brandId);
         }
 
-        public Task TInsertAsync(Car entity)
+        public async Task<List<Car>> GetCarsByCategoryAsync(int categoryId)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.CarDal.GetCarsByCategoryAsync(categoryId);
         }
 
-        public Task TUpdateAsync(Car entity)
+        public async Task<List<Car>> GetCarsByPriceRangeAsync(decimal minPrice, decimal maxPrice)
         {
-            throw new NotImplementedException();
+            return await _unitOfWork.CarDal.GetCarsByPriceRangeAsync(minPrice, maxPrice);
         }
     }
 }

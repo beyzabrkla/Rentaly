@@ -1,4 +1,5 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
+using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,31 +9,10 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
 {
-    public class CustomerManager : ICustomerService
+    public class CustomerManager : GenericManager<Customer>, ICustomerService
     {
-        public Task TDeleteAsync(int id)
+        public CustomerManager(IUnitOfWork uow) : base(uow)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<Customer> TGetByIdAsync(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<Customer>> TGetListAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task TInsertAsync(Customer entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task TUpdateAsync(Customer entity)
-        {
-            throw new NotImplementedException();
         }
     }
 }
