@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Abstract
 {
-    public interface ICarModelService :IGenericService<CarModel>
+    public interface ICarModelService : IGenericService<CarModel>
     {
+        // CarModel'e özel metotlar
+        Task<List<CarModel>> GetModelsByBrandAsync(int brandId);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
+using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,31 +9,18 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
 {
-    public class CarModelManager : ICarModelService
+    public class CarModelManager : GenericManager<CarModel>, ICarModelService
     {
-        public Task TDeleteAsync(int id)
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CarModelManager(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
-            throw new NotImplementedException();
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<CarModel> TGetByIdAsync(int id)
+        public async Task<List<CarModel>> GetModelsByBrandAsync(int brandId)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<CarModel>> TGetListAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task TInsertAsync(CarModel entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task TUpdateAsync(CarModel entity)
-        {
-            throw new NotImplementedException();
+            return await _unitOfWork.CarModelDal.GetModelsByBrandAsync(brandId);
         }
     }
 }
