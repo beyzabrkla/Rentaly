@@ -1,5 +1,6 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
 using Rentaly.DataAccessLayer.Abstract;
+using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -9,52 +10,31 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
 {
-    public class BrandManager : IBrandService
+    public class BrandManager : GenericManager<Brand>, IBrandService
     {
-        private readonly IBrandDal _brandDal;
+        private readonly IUnitOfWork _uow;
 
-        public BrandManager(IBrandDal brandDal)
+        public BrandManager(IUnitOfWork uow) :base(uow) 
         {
-            _brandDal = brandDal;
+            _uow = uow;
         }
 
-        public async Task TDeleteAsync(int id)
+        public override async Task TInsertAsync(Brand entity)
         {
-            await _brandDal.DeleteAsync(id);
-        }
-
-        public async Task<Brand> TGetByIdAsync(int id)
-        {
-            return await _brandDal.GetByIdAsync(id);
-        }
-
-        public async Task<List<Brand>> TGetListAsync()
-        {
-            return await _brandDal.GetListAsync();
-        }
-
-        public async Task TInsertAsync(Brand entity)
-        {
-            if (string.IsNullOrWhiteSpace(entity.BrandName))
-                throw new Exception("Marka adı boş olamaz");
-
-            if (entity.BrandName.Length < 2)
-                throw new Exception("Marka adı en az 2 karakter olmalıdır");
-
-            var brands = await _brandDal.GetListAsync();
-
+            // 1. İş akışı kontrolü (Örn: Veritabanında aynı isim var mı?)
+            var brands = await _uow.BrandDal.GetListAsync();
             if (brands.Any(x => x.BrandName.ToLower() == entity.BrandName.ToLower()))
                 throw new Exception("Bu marka zaten mevcut");
 
-            await _brandDal.InsertAsync(entity);
+            // 2. Kayıt işlemi
+            await base.TInsertAsync(entity);
         }
-        public async Task TUpdateAsync(Brand entity)
+        public override async Task TUpdateAsync(Brand entity) // 'override' ekledik
         {
             if (entity.BrandName.Length < 2)
                 throw new Exception("Marka adı çok kısa");
 
-            await _brandDal.UpdateAsync(entity);
-
+            await base.TUpdateAsync(entity); // base üzerinden güncelleme yapıyoruz
         }
     }
 }

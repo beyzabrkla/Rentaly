@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="UnitOfWork\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Rentaly.EntityLayer\Rentaly.EntityLayer.csproj" />
   </ItemGroup>
 

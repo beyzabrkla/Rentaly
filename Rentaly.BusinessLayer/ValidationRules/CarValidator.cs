@@ -23,7 +23,7 @@ namespace Rentaly.BusinessLayer.ValidationRules
             RuleFor(x => x.BrandId)
                 .GreaterThan(0).WithMessage("Marka seçimi yapılmalıdır");
 
-            RuleFor(x => x.ModelId)
+            RuleFor(x => x.CarModelId)
                 .GreaterThan(0).WithMessage("Model seçimi yapılmalıdır");
 
             RuleFor(x => x.CategoryId)
@@ -61,6 +61,9 @@ namespace Rentaly.BusinessLayer.ValidationRules
 
             RuleFor(x => x.FuelType)
                 .NotEmpty().WithMessage("Yakıt tipi boş geçilemez");
+
+            RuleFor(x => x.Transmission)
+                .NotEmpty().WithMessage("Şanzıman tipi (Manuel/Otomatik) seçilmelidir.");
         }
     }
 }

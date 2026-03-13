@@ -17,4 +17,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.23" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rentaly.BusinessLayer\Rentaly.BusinessLayer.csproj" />
+    <ProjectReference Include="..\Rentaly.DataAccessLayer\Rentaly.DataAccessLayer.csproj" />
+    <ProjectReference Include="..\Rentaly.EntityLayer\Rentaly.EntityLayer.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,7 +1,27 @@
+using Rentaly.BusinessLayer.Abstract;
+using Rentaly.BusinessLayer.Concrete;
+using Rentaly.DataAccessLayer.Concrete;
+using Rentaly.DataAccessLayer.UnitOfWork;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//DbContext kaydı (Veritabanı bağlantısı için)
+builder.Services.AddDbContext<RentalyContext>();
+
+//Unit of Work kaydı
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Service katmanı (Manager'lar) için kayıtlar
+builder.Services.AddScoped<IBranchService, BranchManager>();
+builder.Services.AddScoped<IBrandService, BrandManager>();
+builder.Services.AddScoped<ICarService, CarManager>();
+builder.Services.AddScoped<ICarModelService, CarModelManager>();
+builder.Services.AddScoped<ICategoryService, CategoryManager>();
+builder.Services.AddScoped<ICustomerService, CustomerManager>();
+builder.Services.AddScoped<IRentalService, RentalManager>();
 
 var app = builder.Build();
 
