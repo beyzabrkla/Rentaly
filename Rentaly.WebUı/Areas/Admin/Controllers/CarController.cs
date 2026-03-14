@@ -108,7 +108,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                             // CarImage nesnesini oluştur ve veritabanına ekle
                             var carImage = new CarImage
                             {
-                                ImageUrl = $"/uploads/cars/{fileName}",
+                                CoverImageUrl = $"/uploads/cars/{fileName}",
                                 CarId = car.CarId
                             };
 
@@ -186,9 +186,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     }
 
                     // Eski görseli sil
-                    if (!string.IsNullOrEmpty(car.ImageUrl))
+                    if (!string.IsNullOrEmpty(car.CoverImageUrl))
                     {
-                        var oldImagePath = Path.Combine("wwwroot", car.ImageUrl.TrimStart('/'));
+                        var oldImagePath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
                         if (System.IO.File.Exists(oldImagePath))
                         {
                             System.IO.File.Delete(oldImagePath);
@@ -210,7 +210,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         await imageFile.CopyToAsync(stream);
                     }
 
-                    car.ImageUrl = $"/uploads/cars/{fileName}";
+                    car.CoverImageUrl = $"/uploads/cars/{fileName}";
                 }
 
                 await _carService.TUpdateAsync(car);
@@ -241,9 +241,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 }
 
                 // Görseli sil
-                if (!string.IsNullOrEmpty(car.ImageUrl))
+                if (!string.IsNullOrEmpty(car.CoverImageUrl))
                 {
-                    var imagePath = Path.Combine("wwwroot", car.ImageUrl.TrimStart('/'));
+                    var imagePath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
                     if (System.IO.File.Exists(imagePath))
                     {
                         System.IO.File.Delete(imagePath);

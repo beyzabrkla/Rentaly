@@ -48,7 +48,7 @@ namespace Rentaly.BusinessLayer.ValidationRules
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Depozito negatif olamaz");
 
-            RuleFor(x => x.ImageUrl)
+            RuleFor(x => x.CoverImageUrl)
                 .NotEmpty().WithMessage("Araç görseli boş olamaz");
 
             RuleFor(x => x.SeatCount)
