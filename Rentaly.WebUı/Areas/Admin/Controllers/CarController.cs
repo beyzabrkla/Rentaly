@@ -11,6 +11,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         private readonly ICarService _carService;
         private readonly IBrandService _brandService;
         private readonly ICarModelService _carModelService;
+        private readonly ICarImageService _carImageService;
         private readonly ICategoryService _categoryService;
         private readonly IBranchService _branchService;
         private readonly IUnitOfWork _unitOfWork;
@@ -21,7 +22,8 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             ICarModelService carModelService,
             ICategoryService categoryService,
             IBranchService branchService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ICarImageService carImageService)
         {
             _carService = carService;
             _brandService = brandService;
@@ -29,11 +31,8 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             _categoryService = categoryService;
             _branchService = branchService;
             _unitOfWork = unitOfWork;
+            _carImageService = carImageService;
         }
-
-        // ═══════════════════════════════════════════════════════════
-        // ADMİN - ARAÇ LİSTESİ
-        // ═══════════════════════════════════════════════════════════
 
         [HttpGet]
         public async Task<IActionResult> CarList()
@@ -50,10 +49,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 return View(new List<Car>());
             }
         }
-
-        // ═══════════════════════════════════════════════════════════
-        // ADMİN - ARAÇ EKLEME
-        // ═══════════════════════════════════════════════════════════
 
         [HttpGet]
         public async Task<IActionResult> CreateCar()
@@ -76,7 +71,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCar(Car car, IFormFile imageFile)
+        public async Task<IActionResult> CreateCar(Car car, List<IFormFile> imageFiles)
         {
             try
             {
@@ -88,45 +83,42 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     return View(car);
                 }
 
-                // Görsel yükleme işlemi
-                if (imageFile != null && imageFile.Length > 0)
-                {
-                    // Dosya boyutu kontrolü (5MB)
-                    if (imageFile.Length > 5 * 1024 * 1024)
-                    {
-                        TempData["Error"] = "Görsel dosyası 5MB'dan büyük olamaz.";
-                        ViewBag.Brands = await _brandService.TGetListAsync();
-                        ViewBag.Categories = await _categoryService.TGetListAsync();
-                        ViewBag.Branches = await _branchService.TGetListAsync();
-                        return View(car);
-                    }
-
-                    // Dosya adını benzersiz yap
-                    var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
-                    var uploadPath = Path.Combine("wwwroot", "uploads", "cars", fileName);
-
-                    // Klasör yoksa oluştur
-                    var directory = Path.GetDirectoryName(uploadPath);
-                    if (!Directory.Exists(directory))
-                    {
-                        Directory.CreateDirectory(directory);
-                    }
-
-                    // Dosyayı kaydet
-                    using (var stream = new FileStream(uploadPath, FileMode.Create))
-                    {
-                        await imageFile.CopyToAsync(stream);
-                    }
-
-                    // Veritabanında saklanan yol
-                    car.ImageUrl = $"/uploads/cars/{fileName}";
-                }
-
-                // Araç bilgilerini kaydet
+                //Önce arabayı kaydet ki CarId oluşsun
                 await _carService.TInsertAsync(car);
                 await _unitOfWork.SaveAsync();
 
-                TempData["Success"] = "Araç başarıyla kaydedildi.";
+                // Fotoğrafları döngüye al ve kaydet
+                if (imageFiles != null && imageFiles.Count > 0)
+                {
+                    foreach (var file in imageFiles)
+                    {
+                        if (file.Length > 0 && file.Length <= 5 * 1024 * 1024)
+                        {
+                            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                            var uploadPath = Path.Combine("wwwroot", "uploads", "cars", fileName);
+
+                            var directory = Path.GetDirectoryName(uploadPath);
+                            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+                            using (var stream = new FileStream(uploadPath, FileMode.Create))
+                            {
+                                await file.CopyToAsync(stream);
+                            }
+
+                            // CarImage nesnesini oluştur ve veritabanına ekle
+                            var carImage = new CarImage
+                            {
+                                ImageUrl = $"/uploads/cars/{fileName}",
+                                CarId = car.CarId
+                            };
+
+                            await _carImageService.TInsertAsync(carImage);
+                        }
+                    }
+                    await _unitOfWork.SaveAsync(); // Tüm resim kayıtlarını tek seferde işle
+                }
+
+                TempData["Success"] = "Araç ve fotoğrafları başarıyla kaydedildi.";
                 return RedirectToAction("CarList");
             }
             catch (Exception ex)
@@ -134,15 +126,10 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 ViewBag.Brands = await _brandService.TGetListAsync();
                 ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.Branches = await _branchService.TGetListAsync();
-                TempData["Error"] = $"Araç kaydedilirken hata oluştu: {ex.Message}";
+                TempData["Error"] = $"Hata oluştu: {ex.Message}";
                 return View(car);
             }
         }
-
-        // ═══════════════════════════════════════════════════════════
-        // ADMİN - ARAÇ DÜZENLEME
-        // ═══════════════════════════════════════════════════════════
-
         [HttpGet]
         public async Task<IActionResult> EditCar(int id)
         {
@@ -242,10 +229,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             }
         }
 
-        // ═══════════════════════════════════════════════════════════
-        // ADMİN - ARAÇ SİLME
-        // ═══════════════════════════════════════════════════════════
-
         [HttpPost]
         public async Task<IActionResult> DeleteCar(int id)
         {
@@ -279,9 +262,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             }
         }
 
-        // ═══════════════════════════════════════════════════════════
-        // AJAX - MARKAYA GÖRE MODELLERİ GETIR
-        // ═══════════════════════════════════════════════════════════
 
         [HttpGet]
         public async Task<JsonResult> GetModelsByBrand(int brandId)
