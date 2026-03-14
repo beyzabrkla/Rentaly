@@ -22,6 +22,7 @@ builder.Services.AddScoped<ICarModelService, CarModelManager>();
 builder.Services.AddScoped<ICategoryService, CategoryManager>();
 builder.Services.AddScoped<ICustomerService, CustomerManager>();
 builder.Services.AddScoped<IRentalService, RentalManager>();
+builder.Services.AddScoped<ICarImageService, CarImageManager>();
 
 var app = builder.Build();
 

@@ -1,8 +1,18 @@
 ﻿@using Rentaly.EntityLayer.Entities
+@using Microsoft.AspNetCore.WebUtilities
 @model List<Car>
 @{
     ViewData["Title"] = "CarList";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    // URL'den filter parametrelerini al
+    string categoryFilter = Context.Request.Query["category"];
+    string seatsFilter = Context.Request.Query["seats"];
+    string fuelFilter = Context.Request.Query["fuel"];
+    string branchFilter = Context.Request.Query["branch"];
+    string searchFilter = Context.Request.Query["search"];
+    string minPriceFilter = Context.Request.Query["minPrice"];
+    string maxPriceFilter = Context.Request.Query["maxPrice"];
 }
 
 <section id="subheader" class="jarallax text-light">
@@ -29,23 +39,23 @@
                     <h4>Kategori</h4>
                     <div class="de_form">
                         <div class="de_checkbox">
-                            <input id="filter_all" name="filter_category" type="radio" value="0" checked onchange="filterCars()">
+                            <input id="filter_all" name="filter_category" type="radio" value="0" @(string.IsNullOrEmpty(categoryFilter) ? "checked" : "") onchange="filterCars()">
                             <label for="filter_all">Tüm Araçlar</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="filter_sedan" name="filter_category" type="radio" value="sedan" onchange="filterCars()">
+                            <input id="filter_sedan" name="filter_category" type="radio" value="sedan" @(categoryFilter == "sedan" ? "checked" : "") onchange="filterCars()">
                             <label for="filter_sedan">Sedan</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="filter_suv" name="filter_category" type="radio" value="suv" onchange="filterCars()">
+                            <input id="filter_suv" name="filter_category" type="radio" value="suv" @(categoryFilter == "suv" ? "checked" : "") onchange="filterCars()">
                             <label for="filter_suv">SUV</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="filter_hatchback" name="filter_category" type="radio" value="hatchback" onchange="filterCars()">
+                            <input id="filter_hatchback" name="filter_category" type="radio" value="hatchback" @(categoryFilter == "hatchback" ? "checked" : "") onchange="filterCars()">
                             <label for="filter_hatchback">Hatchback</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="filter_coupe" name="filter_category" type="radio" value="coupe" onchange="filterCars()">
+                            <input id="filter_coupe" name="filter_category" type="radio" value="coupe" @(categoryFilter == "coupe" ? "checked" : "") onchange="filterCars()">
                             <label for="filter_coupe">Coupe</label>
                         </div>
                     </div>
@@ -56,19 +66,19 @@
                     <h4>Koltuk Sayısı</h4>
                     <div class="de_form">
                         <div class="de_checkbox">
-                            <input id="seat_all" name="filter_seat" type="radio" value="0" checked onchange="filterCars()">
+                            <input id="seat_all" name="filter_seat" type="radio" value="0" @(string.IsNullOrEmpty(seatsFilter) ? "checked" : "") onchange="filterCars()">
                             <label for="seat_all">Tüm Araçlar</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="seat_2" name="filter_seat" type="radio" value="2" onchange="filterCars()">
+                            <input id="seat_2" name="filter_seat" type="radio" value="2" @(seatsFilter == "2" ? "checked" : "") onchange="filterCars()">
                             <label for="seat_2">2 koltuk</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="seat_5" name="filter_seat" type="radio" value="5" onchange="filterCars()">
+                            <input id="seat_5" name="filter_seat" type="radio" value="5" @(seatsFilter == "5" ? "checked" : "") onchange="filterCars()">
                             <label for="seat_5">5 koltuk</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="seat_7" name="filter_seat" type="radio" value="7" onchange="filterCars()">
+                            <input id="seat_7" name="filter_seat" type="radio" value="7" @(seatsFilter == "7" ? "checked" : "") onchange="filterCars()">
                             <label for="seat_7">7+ koltuk</label>
                         </div>
                     </div>
@@ -79,23 +89,23 @@
                     <h4>Yakıt Tipi</h4>
                     <div class="de_form">
                         <div class="de_checkbox">
-                            <input id="fuel_all" name="filter_fuel" type="radio" value="" checked onchange="filterCars()">
+                            <input id="fuel_all" name="filter_fuel" type="radio" value="" @(string.IsNullOrEmpty(fuelFilter) ? "checked" : "") onchange="filterCars()">
                             <label for="fuel_all">Tüm Araçlar</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="fuel_benzin" name="filter_fuel" type="radio" value="Benzin" onchange="filterCars()">
+                            <input id="fuel_benzin" name="filter_fuel" type="radio" value="Benzin" @(fuelFilter == "Benzin" ? "checked" : "") onchange="filterCars()">
                             <label for="fuel_benzin">Benzin</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="fuel_dizel" name="filter_fuel" type="radio" value="Dizel" onchange="filterCars()">
+                            <input id="fuel_dizel" name="filter_fuel" type="radio" value="Dizel" @(fuelFilter == "Dizel" ? "checked" : "") onchange="filterCars()">
                             <label for="fuel_dizel">Dizel</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="fuel_elektrik" name="filter_fuel" type="radio" value="Elektrik" onchange="filterCars()">
+                            <input id="fuel_elektrik" name="filter_fuel" type="radio" value="Elektrik" @(fuelFilter == "Elektrik" ? "checked" : "") onchange="filterCars()">
                             <label for="fuel_elektrik">Elektrik</label>
                         </div>
                         <div class="de_checkbox">
-                            <input id="fuel_hibrit" name="filter_fuel" type="radio" value="Hibrit" onchange="filterCars()">
+                            <input id="fuel_hibrit" name="filter_fuel" type="radio" value="Hibrit" @(fuelFilter == "Hibrit" ? "checked" : "") onchange="filterCars()">
                             <label for="fuel_hibrit">Hibrit</label>
                         </div>
                     </div>
@@ -107,24 +117,44 @@
                     <div class="price-input">
                         <div class="field">
                             <span>Min</span>
-                            <input type="number" class="input-min" id="minPrice" value="0" onchange="filterByPrice()">
+                            <input type="number" class="input-min" id="minPrice" value="@(string.IsNullOrEmpty(minPriceFilter) ? "0" : minPriceFilter)" onchange="filterCars()">
                         </div>
                         <div class="field">
                             <span>Max</span>
-                            <input type="number" class="input-max" id="maxPrice" value="5000" onchange="filterByPrice()">
+                            <input type="number" class="input-max" id="maxPrice" value="@(string.IsNullOrEmpty(maxPriceFilter) ? "5000" : maxPriceFilter)" onchange="filterCars()">
                         </div>
                     </div>
+                </div>
+
+                <!-- Şube Filtresi -->
+                <div class="item_filter_group">
+                    <h4>Şube</h4>
+                    <select id="filter_branch_select" name="filter_branch" class="form-control" onchange="filterCars()">
+                        <option value="">Tüm Şubeler</option>
+                        @{
+                            var branches = ViewBag.Branches as List<Rentaly.EntityLayer.Entities.Branch> ?? new List<Rentaly.EntityLayer.Entities.Branch>();
+                            foreach (var branch in branches)
+                            {
+                                bool isSelected = (branchFilter == branch.BranchId.ToString());
+
+                                <option value="@branch.BranchId" selected="@(isSelected ? "selected" : null)">
+                                    @branch.BranchName - @branch.City
+                                </option>
+                            }
+                        }
+                    </select>
                 </div>
 
                 <!-- Arama -->
                 <div class="item_filter_group">
                     <h4>Arama</h4>
-                    <input type="text" id="searchInput" placeholder="Marka, model ara..." class="form-control" onkeyup="filterCars()">
+                    <input type="text" id="searchInput" placeholder="Marka, model ara..." class="form-control" value="@searchFilter" onkeyup="filterCars()">
                 </div>
             </div>
 
             <!-- Araçlar Listesi -->
             <div class="col-lg-9">
+                <div id="filterResultContainer" style="margin-bottom: 20px; text-align: center;"></div>
                 <div class="row" id="carsList">
                     @if (Model != null && Model.Count > 0)
                     {
@@ -136,13 +166,16 @@
                                  data-category="@car.Category?.CategoryName?.ToLower()"
                                  data-fuel="@car.FuelType"
                                  data-seats="@car.SeatCount"
-                                 data-price="@car.DailyPrice">
+                                 data-price="@car.DailyPrice"
+                                 data-branch="@car.BranchId">
                                 <div class="de-item mb30">
-                                    <div class="d-img">
+                                    <div class="d-img" style="width: 100%; height: 250px; overflow: hidden; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
                                         <img src="@car.ImageUrl"
+                                             loading="lazy"
                                              class="img-fluid"
                                              alt="@car.Brand?.BrandName @car.CarModel?.ModelName"
-                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2220%22 fill=%22%23666%22 text-anchor=%22middle%22 dy=%22.3em%22%3EAraç Görseli Yok%3C/text%3E%3C/svg%3E'">
+                                             style="width: 100%; height: 100%; object-fit: cover; object-position: center;"
+                                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22250%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22250%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2218%22 fill=%22%23999%22 text-anchor=%22middle%22 dy=%22.3em%22%3EFoto Yok%3C/text%3E%3C/svg%3E'">
                                     </div>
                                     <div class="d-info">
                                         <div class="d-text">
@@ -151,6 +184,7 @@
                                                 <i class="fa fa-heart"></i><span>0</span>
                                             </div>
                                             <div class="d-atr-group">
+                                                <span class="d-atr"><i class="fa fa-map-marker"></i> @(car.Branch?.BranchName ?? "Şube " + car.BranchId)</span>
                                                 <span class="d-atr"><i class="fa fa-users"></i> @car.SeatCount</span>
                                                 <span class="d-atr"><i class="fa fa-suitcase"></i> @car.LuggageCount</span>
                                                 <span class="d-atr"><i class="fa fa-tachometer"></i> @car.Kilometer km</span>
@@ -178,88 +212,262 @@
                 </div>
             </div>
         </div>
+
+        @{
+            // Mevcut filtreleri al (page dışındakileri)
+            var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+            var filterParams = new Dictionary<string, string>();
+
+            foreach (var param in queryParams)
+            {
+                if (param.Key.ToLower() != "page")
+                {
+                    filterParams.Add(param.Key, param.Value);
+                }
+            }
+
+            // URL oluşturucu yardımcı fonksiyon
+            string GetPageUrl(int pageNumber)
+            {
+                var queryString = new Dictionary<string, string>(filterParams);
+                queryString["page"] = pageNumber.ToString();
+
+                var query = QueryString.Create(queryString);
+                return "/Car/CarList" + query.Value;
+            }
+        }
+
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="row mt-5">
+                <div class="col-12">
+                    <nav aria-label="Page navigation" style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+
+                        @if (ViewBag.CurrentPage > 1)
+                        {
+                            <a href="@GetPageUrl(1)" class="btn-pagination">◀◀ İlk</a>
+                            <a href="@GetPageUrl(ViewBag.CurrentPage - 1)" class="btn-pagination">◀ Önceki</a>
+                        }
+                        else
+                        {
+                            <span class="btn-pagination-disabled">◀◀ İlk</span>
+                            <span class="btn-pagination-disabled">◀ Önceki</span>
+                        }
+
+                        <div style="display: flex; gap: 5px;">
+                            @{
+                                int startPage = Math.Max(1, ViewBag.CurrentPage - 2);
+                                int endPage = Math.Min(ViewBag.TotalPages, ViewBag.CurrentPage + 2);
+                            }
+                            @for (int i = startPage; i <= endPage; i++)
+                            {
+                                <a href="@GetPageUrl(i)" class="btn-pagination @(i == ViewBag.CurrentPage ? "active" : "")">@i</a>
+                            }
+                        </div>
+
+                        @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                        {
+                            <a href="@GetPageUrl(ViewBag.CurrentPage + 1)" class="btn-pagination">Sonraki ▶</a>
+                            <a href="@GetPageUrl(ViewBag.TotalPages)" class="btn-pagination">Son ▶▶</a>
+                        }
+                        else
+                        {
+                            <span class="btn-pagination-disabled">Sonraki ▶</span>
+                            <span class="btn-pagination-disabled">Son ▶▶</span>
+                        }
+                    </nav>
+                </div>
+            </div>
+        }
+
     </div>
 </section>
 
+<style>
+    /* Checkbox görünümü iyileştirme */
+    .de_checkbox {
+        margin-bottom: 10px !important;
+    }
+
+        .de_checkbox input[type="radio"],
+        .de_checkbox input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px !important;
+            height: 18px !important;
+            accent-color: #cc0c0c !important;
+            margin-right: 8px !important;
+        }
+
+        .de_checkbox label {
+            cursor: pointer !important;
+            user-select: none;
+            transition: all 0.2s ease !important;
+        }
+
+        .de_checkbox input:checked + label {
+            color: #cc0c0c !important;
+            font-weight: bold !important;
+        }
+
+    /* Araç kartı boyut standardizasyonu */
+    .car-item {
+        display: flex;
+        margin-bottom: 20px !important;
+    }
+
+    .de-item {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100% !important;
+        width: 100% !important;
+        background: #1a1a1a !important;
+        border-radius: 8px !important;
+        overflow: hidden !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3) !important;
+        transition: transform 0.3s ease !important;
+    }
+
+        .de-item:hover {
+            transform: translateY(-5px) !important;
+        }
+
+        .de-item .d-img {
+            width: 100% !important;
+            height: 250px !important;
+            min-height: 250px !important;
+            max-height: 250px !important;
+            overflow: hidden !important;
+            background: #2a2a2a !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
+            border-radius: 8px 8px 0 0 !important;
+        }
+
+            .de-item .d-img img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
+                object-position: center !important;
+            }
+
+        .de-item .d-info {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 15px !important;
+        }
+
+        .de-item .d-text {
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+    /* Filtreleme sonuç stili */
+    #filterResult {
+        padding: 12px 20px !important;
+        margin-bottom: 20px !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        animation: slideDown 0.3s ease-out !important;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Row gap */
+    .row.g-4 {
+        gap: 20px !important;
+        row-gap: 20px !important;
+    }
+
+    .col-xl-4, .col-lg-6 {
+        padding-right: 10px !important;
+        padding-left: 10px !important;
+    }
+
+    .btn-pagination {
+        padding: 8px 15px;
+        border: 2px solid #cc0c0c;
+        color: #cc0c0c;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-pagination:hover {
+        background: #cc0c0c;
+        color: white;
+    }
+
+    .btn-pagination.active {
+        background: #cc0c0c;
+        color: white;
+    }
+
+    .btn-pagination-disabled {
+        padding: 8px 15px;
+        border: 2px solid #ccc;
+        color: #ccc;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: not-allowed;
+    }
+</style>
+
+
 @section Scripts {
     <script>
-        // Araçları filtrele
-        function filterCars() {
-            try {
-                const category = document.querySelector('input[name="filter_category"]:checked')?.value || '';
+            function filterCars() {
+        // Radyo butonlarından seçili olan değeri al
+                const category = document.querySelector('input[name="filter_category"]:checked')?.value || '0';
                 const seats = document.querySelector('input[name="filter_seat"]:checked')?.value || '0';
                 const fuel = document.querySelector('input[name="filter_fuel"]:checked')?.value || '';
-                const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+                const branch = document.getElementById('filter_branch_select').value;
+                const minPrice = document.getElementById('minPrice').value;
+                const maxPrice = document.getElementById('maxPrice').value;
+                const search = document.getElementById('searchInput').value;
 
-                const items = document.querySelectorAll('.car-item');
+                // URL parametrelerini oluştur
+                let url = `/Car/CarList?page=1`;
+                if (category !== '0') url += `&category=${encodeURIComponent(category)}`;
+                if (seats !== '0') url += `&seats=${seats}`;
+                if (fuel) url += `&fuel=${encodeURIComponent(fuel)}`;
+                if (branch) url += `&branch=${branch}`;
+                if (minPrice && minPrice !== '0') url += `&minPrice=${minPrice}`;
+                if (maxPrice && maxPrice !== '5000') url += `&maxPrice=${maxPrice}`;
+                if (search) url += `&search=${encodeURIComponent(search)}`;
 
-                items.forEach(item => {
-                    let show = true;
-
-                    // Kategori filtresi
-                    if (category && category !== '0') {
-                        const itemCategory = (item.getAttribute('data-category') || '').toLowerCase();
-                        if (!itemCategory.includes(category.toLowerCase())) {
-                            show = false;
-                        }
-                    }
-
-                    // Koltuk filtresi
-                    if (seats && seats !== '0') {
-                        const itemSeats = parseInt(item.getAttribute('data-seats')) || 0;
-                        if (itemSeats !== parseInt(seats)) {
-                            show = false;
-                        }
-                    }
-
-                    // Yakıt filtresi
-                    if (fuel && fuel !== '') {
-                        const itemFuel = item.getAttribute('data-fuel') || '';
-                        if (itemFuel !== fuel) {
-                            show = false;
-                        }
-                    }
-
-                    // Arama terimi
-                    if (searchTerm) {
-                        const brand = (item.getAttribute('data-brand') || '').toLowerCase();
-                        const model = (item.getAttribute('data-model') || '').toLowerCase();
-                        if (!brand.includes(searchTerm) && !model.includes(searchTerm)) {
-                            show = false;
-                        }
-                    }
-
-                    item.style.display = show ? 'block' : 'none';
-                });
-            } catch (e) {
-                console.error('Filter hatası:', e);
+                // Sayfayı yeni URL ile yenile
+                window.location.href = url;
             }
+
+        // Checkbox stillerini güncelle
+        function updateCheckboxes() {
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                const label = document.querySelector(`label[for="${radio.id}"]`);
+                if (label) {
+                    label.style.color = radio.checked ? '#cc0c0c' : 'inherit';
+                    label.style.fontWeight = radio.checked ? 'bold' : 'normal';
+                }
+            });
         }
 
-        // Fiyat aralığına göre filtrele
-        function filterByPrice() {
-            try {
-                const minPrice = parseFloat(document.getElementById('minPrice')?.value) || 0;
-                const maxPrice = parseFloat(document.getElementById('maxPrice')?.value) || 999999;
-
-                const items = document.querySelectorAll('.car-item');
-
-                items.forEach(item => {
-                    const price = parseFloat(item.getAttribute('data-price')) || 0;
-                    if (price >= minPrice && price <= maxPrice) {
-                        item.style.display = 'block';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            } catch (e) {
-                console.error('Fiyat filtresi hatası:', e);
-            }
-        }
-
-        // Sayfa yüklendiğinde
         document.addEventListener('DOMContentLoaded', function () {
-            filterCars();
+            updateCheckboxes();
         });
     </script>
 }
