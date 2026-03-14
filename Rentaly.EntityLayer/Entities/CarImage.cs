@@ -14,7 +14,7 @@ namespace Rentaly.EntityLayer.Entities
         public int CarImageId { get; set; }
 
         [Required]
-        public string ImageUrl { get; set; }
+        public string CoverImageUrl { get; set; }
 
         public int CarId { get; set; }
 

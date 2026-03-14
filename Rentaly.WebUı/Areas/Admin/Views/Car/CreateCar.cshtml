@@ -1168,16 +1168,16 @@
 
                     <!-- URL panel -->
                     <div id="urlPanel" style="display:none;">
-                        <label class="form-label" for="ImageUrl">Görsel URL'si</label>
+                        <label class="form-label" for="CoverImageUrl">Görsel URL'si</label>
                         <div style="position:relative;">
-                            <input type="url" id="ImageUrl" name="ImageUrl"
+                            <input type="url" id="CoverImageUrl" name="CoverImageUrl"
                                    class="form-control"
                                    placeholder="https://example.com/car.jpg"
                                    style="padding-right:90px;"
                                    oninput="previewUrlImg(this.value)" />
                             <button type="button"
                                     style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--primary-light);border:none;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;color:var(--primary);cursor:pointer;"
-                                    onclick="previewUrlImg(document.getElementById('ImageUrl').value)">
+                                    onclick="previewUrlImg(document.getElementById('CoverImageUrl').value)">
                                 <i class="fa-solid fa-eye me-1"></i>Önizle
                             </button>
                         </div>

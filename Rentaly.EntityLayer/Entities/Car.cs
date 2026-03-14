@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Rentaly.EntityLayer.Entities
 {
@@ -13,10 +14,10 @@ namespace Rentaly.EntityLayer.Entities
         public string VIN { get; set; } // Şase No
 
         public int BrandId { get; set; }
-        public virtual Brand Brand { get; set; } 
+        public virtual Brand Brand { get; set; }
 
         public int CarModelId { get; set; }
-        public virtual CarModel CarModel { get; set; } 
+        public virtual CarModel CarModel { get; set; }
 
         public int CategoryId { get; set; }
         public virtual Category Category { get; set; }
@@ -31,7 +32,7 @@ namespace Rentaly.EntityLayer.Entities
         public bool IsAvailable { get; set; }
         public bool IsActive { get; set; }
         public virtual ICollection<CarImage> CarImages { get; set; } = new List<CarImage>();
-        public string ImageUrl { get; set; }
+        public string CoverImageUrl { get; set; }
         public int PersonCount { get; set; }
         public int SeatCount { get; set; }
         public int LuggageCount { get; set; }

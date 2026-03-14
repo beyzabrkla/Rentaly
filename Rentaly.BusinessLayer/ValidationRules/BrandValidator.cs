@@ -29,10 +29,10 @@ namespace Rentaly.BusinessLayer.ValidationRules
                 .Must(StartWithUpperLetter)
                 .WithMessage("Marka adı büyük harfle başlamalıdır");
 
-            RuleFor(x => x.ImageUrl)
+            RuleFor(x => x.CoverImageUrl)
                 .NotNull().WithMessage("Marka görseli null olamaz");
 
-            RuleFor(x => x.ImageUrl)
+            RuleFor(x => x.CoverImageUrl)
                 .Must(BeAValidUrl)
                 .WithMessage("Geçerli bir görsel URL giriniz");
         }
