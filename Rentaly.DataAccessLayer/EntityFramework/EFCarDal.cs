@@ -54,5 +54,12 @@ namespace Rentaly.DataAccessLayer.EntityFramework
                 .Where(c => c.DailyPrice >= minPrice && c.DailyPrice <= maxPrice)
                 .ToListAsync();
 
+
+        //Araç detayları (ID'ye göre)
+        public async Task<Car> GetCarByIdWithDetailsAsync(int id)
+        {
+            return await WithAllIncludes()
+                .FirstOrDefaultAsync(c => c.CarId == id);
+        }
     }
 }

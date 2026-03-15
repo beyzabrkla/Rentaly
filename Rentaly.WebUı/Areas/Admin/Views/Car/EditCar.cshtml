@@ -1,0 +1,1096 @@
+﻿@using Rentaly.EntityLayer.Entities
+@model Car
+@{
+    ViewData["Title"] = "EditCar";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <style>
+        .form-section {
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+            .form-section:hover {
+                box-shadow: var(--shadow-md);
+            }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            background: #252525;
+        }
+
+        .section-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans',sans-serif;
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .section-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin: 0;
+            margin-top: 1px;
+        }
+
+        .section-body {
+            padding: 24px;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 7px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+            .form-label .required {
+                color: var(--danger);
+                font-size: 14px;
+                line-height: 1;
+            }
+
+        .form-control, .form-select {
+            font-family: 'DM Sans',sans-serif;
+            font-size: 13.5px;
+            color: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            background: #2a2a2a;
+            transition: var(--transition);
+            outline: none;
+            width: 100%;
+        }
+
+            .form-control:focus, .form-select:focus {
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(204,12,12,0.15);
+            }
+
+            .form-control::placeholder {
+                color: #808080;
+            }
+
+            .form-control.is-invalid, .form-select.is-invalid {
+                border-color: var(--danger);
+            }
+
+            .form-control.is-valid, .form-select.is-valid {
+                border-color: var(--success);
+            }
+
+        .invalid-feedback {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+            .invalid-feedback.show {
+                display: flex !important;
+            }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+            .input-icon-wrap .input-icon {
+                position: absolute;
+                left: 13px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 14px;
+                pointer-events: none;
+            }
+
+            .input-icon-wrap .form-control {
+                padding-left: 38px;
+            }
+
+            .input-icon-wrap:focus-within .input-icon {
+                color: var(--primary);
+            }
+
+        .input-suffix {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-left: 1px solid var(--border);
+            background: #2a2a2a;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            pointer-events: none;
+        }
+
+        .fuel-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .fuel-radio {
+            display: none;
+        }
+
+            .fuel-radio + label {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                padding: 8px 16px;
+                border: 1.5px solid var(--border);
+                border-radius: 40px;
+                font-size: 13px;
+                font-weight: 600;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: var(--transition);
+                user-select: none;
+            }
+
+                .fuel-radio + label:hover {
+                    border-color: var(--primary);
+                    color: var(--primary);
+                    background: var(--primary-light);
+                }
+
+            .fuel-radio:checked + label {
+                border-color: var(--primary);
+                background: var(--primary);
+                color: #fff;
+            }
+
+        .counter-input {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .counter-btn {
+            width: 38px;
+            height: 42px;
+            border: none;
+            background: #2a2a2a;
+            color: var(--text-muted);
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .counter-btn:hover {
+                background: var(--primary-light);
+                color: var(--primary);
+            }
+
+        .counter-val {
+            width: 52px;
+            height: 42px;
+            border: none;
+            border-left: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            text-align: center;
+            font-family: 'Plus Jakarta Sans',sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            outline: none;
+            background: #1a1a1a;
+        }
+
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .toggle-row:last-child {
+                border-bottom: none;
+                padding-bottom: 0;
+            }
+
+            .toggle-row:first-child {
+                padding-top: 0;
+            }
+
+        .toggle-label strong {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: block;
+        }
+
+        .toggle-label span {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .form-switch .form-check-input {
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+            background-color: #3a3a3a;
+            border-color: var(--border);
+        }
+
+            .form-switch .form-check-input:checked {
+                background-color: var(--primary);
+                border-color: var(--primary);
+            }
+
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: #252525;
+            position: relative;
+        }
+
+            .upload-zone:hover, .upload-zone.dragover {
+                border-color: var(--primary);
+                background: var(--primary-light);
+            }
+
+            .upload-zone input[type="file"] {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                cursor: pointer;
+                width: 100%;
+                height: 100%;
+            }
+
+        .upload-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 18px;
+            color: var(--primary);
+            transition: var(--transition);
+        }
+
+        .upload-zone:hover .upload-icon {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .upload-title {
+            font-family: 'Plus Jakarta Sans',sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .upload-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .current-image-wrap {
+            position: relative;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+            .current-image-wrap img {
+                width: 100%;
+                height: 160px;
+                object-fit: cover;
+                display: block;
+            }
+
+        .current-image-badge {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,.6);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+        }
+
+        .current-image-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: rgba(239,68,68,.85);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+            .current-image-remove:hover {
+                background: var(--danger);
+            }
+
+        .price-banner {
+            background: linear-gradient(135deg,#7f0000,#cc0c0c);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            color: #fff;
+            display: none;
+        }
+
+        .sum-row {
+            display: none;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .sum-row:last-of-type {
+                border-bottom: none;
+            }
+
+        .action-bar {
+            position: sticky;
+            bottom: 0;
+            background: #1a1a1a;
+            border-top: 1px solid var(--border);
+            padding: 14px 0;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            z-index: 100;
+            box-shadow: 0 -4px 20px rgba(0,0,0,.2);
+        }
+
+        .btn-cancel-form {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            padding: 10px 20px;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: 'DM Sans',sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+            .btn-cancel-form:hover {
+                background: #2a2a2a;
+                color: var(--text-main);
+            }
+
+        .btn-submit-car {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            padding: 10px 24px;
+            font-size: 13.5px;
+            font-weight: 700;
+            font-family: 'DM Sans',sans-serif;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+            .btn-submit-car:hover {
+                background: var(--primary-dark);
+                box-shadow: 0 4px 14px rgba(204,12,12,0.4);
+                transform: translateY(-1px);
+            }
+
+            .btn-submit-car:disabled {
+                opacity: .7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .plate-preview {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #333;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .plate-flag {
+            background: #003399;
+            color: #FFD700;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .plate-number {
+            background: #f5f5f5;
+            color: #111;
+            font-size: 18px;
+            font-weight: 900;
+            padding: 4px 12px;
+            letter-spacing: 3px;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .char-count {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        @@media (max-width:767px) {
+            .section-body {
+                padding: 14px;
+            }
+
+            .action-bar {
+                padding: 12px 0;
+            }
+        }
+    </style>
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Araç Düzenle</h1>
+        <p class="page-subtitle">
+            <strong style="color:var(--primary);">@Model.Brand?.BrandName @Model.CarModel?.ModelName</strong>
+            — @Model.PlateNumber
+        </p>
+    </div>
+    <a href="/Admin/Car/CarList" class="btn-cancel-form">
+        <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+    </a>
+</div>
+
+<form id="editCarForm" asp-action="EditCar" asp-controller="Car" asp-area="Admin"
+      asp-route-id="@Model.CarId" method="post" enctype="multipart/form-data" novalidate>
+    @Html.AntiForgeryToken()
+
+    @* CarId gizli alan *@
+    <input type="hidden" name="CarId" value="@Model.CarId" />
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+
+            @* 1 · Kimlik *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a0a;color:var(--primary);"><i class="fa-solid fa-id-card"></i></div>
+                    <div><p class="section-title">Araç Kimlik Bilgileri</p><p class="section-subtitle">Plaka ve şasi numarası</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="PlateNumber">Plaka <span class="required">*</span></label>
+                            <div class="input-icon-wrap">
+                                <input type="text" id="PlateNumber" name="PlateNumber"
+                                       class="form-control @(Model.PlateNumber != null ? "is-valid" : "")"
+                                       value="@Model.PlateNumber"
+                                       placeholder="34 ABC 123" maxlength="15" autocomplete="off"
+                                       style="font-weight:700;letter-spacing:2px;font-family:'Plus Jakarta Sans',sans-serif;"
+                                       oninput="this.value=this.value.toUpperCase();updatePlatePreview();validatePlateInput(this)" />
+                                <i class="fa-solid fa-hashtag input-icon"></i>
+                            </div>
+                            <div class="invalid-feedback" id="plateError"><i class="fa-solid fa-circle-exclamation"></i> Geçerli bir plaka giriniz.</div>
+                            <div id="platePreviewWrap" style="margin-top:10px; @(Model.PlateNumber != null ? "" : "display:none;")">
+                                <div class="plate-preview">
+                                    <div class="plate-flag"><span>🇹🇷</span><small>TR</small></div>
+                                    <div class="plate-number" id="platePreviewText">@(Model.PlateNumber ?? "— — —")</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="VIN">Şasi No (VIN) <span class="required">*</span></label>
+                            <div class="input-icon-wrap">
+                                <input type="text" id="VIN" name="VIN"
+                                       class="form-control @(Model.VIN != null ? "is-valid" : "")"
+                                       value="@Model.VIN"
+                                       placeholder="WBA5A5C5XED123456" maxlength="50" autocomplete="off"
+                                       style="font-family:monospace;letter-spacing:1px;font-size:13px;"
+                                       oninput="this.value=this.value.toUpperCase();updateVinCount();liveValidate(this)" />
+                                <i class="fa-solid fa-barcode input-icon"></i>
+                            </div>
+                            <div class="d-flex justify-content-between mt-1">
+                                <div class="invalid-feedback" id="vinError"><i class="fa-solid fa-circle-exclamation"></i> VIN zorunludur.</div>
+                                <div class="char-count ms-auto"><span id="vinCount">@(Model.VIN?.Length ?? 0)</span>/50</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* 2 · Sınıflandırma *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d2d0a;color:var(--accent);"><i class="fa-solid fa-layer-group"></i></div>
+                    <div><p class="section-title">Sınıflandırma</p><p class="section-subtitle">Marka, model, kategori ve şube</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="BrandId">Marka <span class="required">*</span></label>
+                            <select id="BrandId" name="BrandId" class="form-select is-valid"
+                                    onchange="loadModels(this.value);liveValidate(this)">
+                                <option value="">— Marka Seçin —</option>
+                                @foreach (var b in ViewBag.Brands as List<Brand> ?? new List<Brand>())
+                                {
+                                    <option value="@b.BrandId" @(Model.BrandId == b.BrandId ? "selected" : "")>@b.BrandName</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="brandError"><i class="fa-solid fa-circle-exclamation"></i> Marka seçimi zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="CarModelId">Model <span class="required">*</span></label>
+                            <select id="CarModelId" name="CarModelId" class="form-select is-valid"
+                                    onchange="liveValidate(this)">
+                                <option value="">— Model Seçin —</option>
+                                @if (ViewBag.Models != null)
+                                {
+                                    foreach (var m in ViewBag.Models as List<CarModel> ?? new List<CarModel>())
+                                    {
+                                        <option value="@m.CarModelId" @(Model.CarModelId == m.CarModelId ? "selected" : "")>@m.ModelName</option>
+                                    }
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="modelError"><i class="fa-solid fa-circle-exclamation"></i> Model seçimi zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="CategoryId">Kategori <span class="required">*</span></label>
+                            <select id="CategoryId" name="CategoryId" class="form-select is-valid" onchange="liveValidate(this)">
+                                <option value="">— Kategori Seçin —</option>
+                                @foreach (var c in ViewBag.Categories as List<Category> ?? new List<Category>())
+                                {
+                                    <option value="@c.CategoryId" @(Model.CategoryId == c.CategoryId ? "selected" : "")>@c.CategoryName</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="categoryError"><i class="fa-solid fa-circle-exclamation"></i> Kategori seçimi zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="BranchId">Şube <span class="required">*</span></label>
+                            <select id="BranchId" name="BranchId" class="form-select is-valid" onchange="liveValidate(this)">
+                                <option value="">— Şube Seçin —</option>
+                                @foreach (var br in ViewBag.Branches as List<Branch> ?? new List<Branch>())
+                                {
+                                    <option value="@br.BranchId" @(Model.BranchId == br.BranchId ? "selected" : "")>@br.BranchName - @br.City</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="branchError"><i class="fa-solid fa-circle-exclamation"></i> Şube seçimi zorunludur.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* 3 · Teknik *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d0a;color:#10b981;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                    <div><p class="section-title">Teknik Detaylar</p><p class="section-subtitle">Yıl, kilometre, yakıt ve koltuk</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label" for="Year">Model Yılı <span class="required">*</span></label>
+                            <div class="input-icon-wrap">
+                                <input type="number" id="Year" name="Year" class="form-control is-valid"
+                                       value="@Model.Year" placeholder="2024" min="1990" max="2030"
+                                       oninput="liveValidate(this)" />
+                                <i class="fa-solid fa-calendar input-icon"></i>
+                            </div>
+                            <div class="invalid-feedback" id="yearError"><i class="fa-solid fa-circle-exclamation"></i> Yıl zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label" for="Kilometer">Kilometre <span class="required">*</span></label>
+                            <div class="input-icon-wrap" style="position:relative;">
+                                <input type="number" id="Kilometer" name="Kilometer" class="form-control is-valid"
+                                       value="@Model.Kilometer" placeholder="0" min="0"
+                                       style="padding-right:50px;"
+                                       oninput="liveValidate(this)" />
+                                <i class="fa-solid fa-road input-icon"></i>
+                                <span class="input-suffix">km</span>
+                            </div>
+                            <div class="invalid-feedback" id="kmError"><i class="fa-solid fa-circle-exclamation"></i> Kilometre zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <label class="form-label" for="Transmission">Vites <span class="required">*</span></label>
+                            <select id="Transmission" name="Transmission" class="form-select is-valid" onchange="liveValidate(this)">
+                                <option value="">— Seçin —</option>
+                                @foreach (var t in new[] { "Otomatik", "Manuel", "Yarı Otomatik", "CVT" })
+                                {
+                                    <option value="@t" @(Model.Transmission == t ? "selected" : "")>@t</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" id="transError"><i class="fa-solid fa-circle-exclamation"></i> Vites tipi zorunludur.</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Yakıt Tipi <span class="required">*</span></label>
+                            <div class="fuel-options">
+                                @foreach (var f in new[] { ("Benzin", "fa-gas-pump", "fuel_benzin"), ("Dizel", "fa-fill-drip", "fuel_dizel"), ("Elektrik", "fa-bolt", "fuel_elektrik"), ("Hibrit", "fa-leaf", "fuel_hibrit"), ("LPG", "fa-fire-flame-curved", "fuel_lpg") })
+                                {
+                                    <input type="radio" class="fuel-radio" name="FuelType" id="@f.Item3"
+                                           value="@f.Item1" @(Model.FuelType == f.Item1 ? "checked" : "") />
+                                    <label for="@f.Item3"><i class="fa-solid @f.Item2"></i> @f.Item1</label>
+                                }
+                            </div>
+                            <div class="invalid-feedback" id="fuelError"><i class="fa-solid fa-circle-exclamation"></i> Yakıt tipi zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label">Koltuk Sayısı <span class="required">*</span></label>
+                            <div class="counter-input">
+                                <button type="button" class="counter-btn" onclick="adjustCounter('SeatCount',-1)"><i class="fa-solid fa-minus"></i></button>
+                                <input type="number" id="SeatCount" name="SeatCount" class="counter-val"
+                                       value="@Model.SeatCount" min="1" max="20" readonly />
+                                <button type="button" class="counter-btn" onclick="adjustCounter('SeatCount',1)"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <p class="form-hint"><i class="fa-solid fa-circle-info me-1" style="color:var(--primary);"></i>Sürücü dahil</p>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label">Yolcu Kapasitesi <span class="required">*</span></label>
+                            <div class="counter-input">
+                                <button type="button" class="counter-btn" onclick="adjustCounter('PersonCount',-1)"><i class="fa-solid fa-minus"></i></button>
+                                <input type="number" id="PersonCount" name="PersonCount" class="counter-val"
+                                       value="@Model.PersonCount" min="1" max="20" readonly />
+                                <button type="button" class="counter-btn" onclick="adjustCounter('PersonCount',1)"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <p class="form-hint"><i class="fa-solid fa-circle-info me-1" style="color:var(--primary);"></i>Sürücü hariç</p>
+                        </div>
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label">Bagaj Kapasitesi <span class="required">*</span></label>
+                            <div class="counter-input">
+                                <button type="button" class="counter-btn" onclick="adjustCounter('LuggageCount',-1)"><i class="fa-solid fa-minus"></i></button>
+                                <input type="number" id="LuggageCount" name="LuggageCount" class="counter-val"
+                                       value="@Model.LuggageCount" min="0" max="10" readonly />
+                                <button type="button" class="counter-btn" onclick="adjustCounter('LuggageCount',1)"><i class="fa-solid fa-plus"></i></button>
+                            </div>
+                            <p class="form-hint"><i class="fa-solid fa-circle-info me-1" style="color:var(--primary);"></i>Orta boy valiz</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* 4 · Fiyatlandırma *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d2d0a;color:#d97706;"><i class="fa-solid fa-turkish-lira-sign"></i></div>
+                    <div><p class="section-title">Fiyatlandırma</p><p class="section-subtitle">Günlük ücret ve depozito</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="DailyPrice">Günlük Ücret <span class="required">*</span></label>
+                            <div class="input-icon-wrap" style="position:relative;">
+                                <input type="number" id="DailyPrice" name="DailyPrice" class="form-control is-valid"
+                                       value="@Model.DailyPrice" placeholder="0.00" min="0" step="0.01"
+                                       style="padding-right:42px;"
+                                       oninput="updatePriceBanner();liveValidate(this)" />
+                                <i class="fa-solid fa-turkish-lira-sign input-icon"></i>
+                                <span class="input-suffix">₺</span>
+                            </div>
+                            <div class="invalid-feedback" id="priceError"><i class="fa-solid fa-circle-exclamation"></i> Günlük fiyat zorunludur.</div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="DepositAmount">Depozito <span class="required">*</span></label>
+                            <div class="input-icon-wrap" style="position:relative;">
+                                <input type="number" id="DepositAmount" name="DepositAmount" class="form-control is-valid"
+                                       value="@Model.DepositAmount" placeholder="0.00" min="0" step="0.01"
+                                       style="padding-right:42px;"
+                                       oninput="updatePriceBanner();liveValidate(this)" />
+                                <i class="fa-solid fa-shield-halved input-icon"></i>
+                                <span class="input-suffix">₺</span>
+                            </div>
+                            <div class="invalid-feedback" id="depositError"><i class="fa-solid fa-circle-exclamation"></i> Depozito zorunludur.</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="price-banner" id="priceBanner">
+                                <div class="row g-2 text-center">
+                                    <div class="col-4"><div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Günlük</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;" id="bannerDaily">—</div></div>
+                                    <div class="col-4"><div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Haftalık</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;" id="bannerWeekly">—</div></div>
+                                    <div class="col-4"><div style="font-size:10px;opacity:.75;font-weight:600;text-transform:uppercase;margin-bottom:4px;">Aylık</div><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;" id="bannerMonthly">—</div></div>
+                                </div>
+                                <div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.2);font-size:12.5px;opacity:.85;display:flex;align-items:center;gap:6px;">
+                                    <i class="fa-solid fa-shield-halved"></i> Depozito: <strong id="bannerDeposit">—</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* 5 · Açıklama *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a1a2d;color:#3b82f6;"><i class="fa-solid fa-align-left"></i></div>
+                    <div><p class="section-title">Açıklama</p><p class="section-subtitle">İsteğe bağlı</p></div>
+                </div>
+                <div class="section-body">
+                    <textarea id="Description" name="Description" class="form-control"
+                              placeholder="Araç özellikleri, ekipmanlar, özel notlar…" maxlength="1000"
+                              oninput="document.getElementById('descCount').textContent=this.value.length">@Model.Description</textarea>
+                    <div class="char-count"><span id="descCount">@(Model.Description?.Length ?? 0)</span>/1000</div>
+                </div>
+            </div>
+
+        </div>
+
+        @* SAĞ KOLON *@
+        <div class="col-12 col-xl-4">
+
+            @* Görsel *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a2d;color:#9333ea;"><i class="fa-solid fa-image"></i></div>
+                    <div><p class="section-title">Araç Görseli</p><p class="section-subtitle">Yeni görsel seçilirse eskisi değiştirilir</p></div>
+                </div>
+                <div class="section-body">
+                    @* Mevcut görsel *@
+                    @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+                    {
+                        <div class="current-image-wrap" id="currentImageWrap">
+                            <img src="@Model.CoverImageUrl" alt="Mevcut görsel"
+                                 onerror="this.src='https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok'" />
+                            <span class="current-image-badge"><i class="fa-solid fa-image me-1"></i>Mevcut</span>
+                            <button type="button" class="current-image-remove" onclick="removeCurrentImage()" title="Görseli kaldır">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" id="CoverImageUrl" name="CoverImageUrl" value="@Model.CoverImageUrl" />
+                    }
+                    else
+                    {
+                        <input type="hidden" id="CoverImageUrl" name="CoverImageUrl" value="" />
+                    }
+
+                    @* Yeni görsel yükleme *@
+                    <div class="upload-zone" id="uploadZone"
+                         ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+                        <input type="file" id="imageFile" name="imageFile" accept="image/*"
+                               onchange="handleFileSelect(event)" />
+                        <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                        <div class="upload-title">Yeni görsel seçin</div>
+                        <div class="upload-sub">JPG, PNG, WEBP — maks. 5 MB</div>
+                    </div>
+
+                    <div id="newImgPreviewWrap" style="display:none;margin-top:12px;">
+                        <img id="newImgPreview" src="" alt="Yeni görsel önizleme"
+                             style="width:100%;height:150px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);" />
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
+                            <span id="newImgFileName" style="font-size:12px;color:var(--text-muted);"></span>
+                            <button type="button" onclick="clearNewImage()"
+                                    style="border:none;background:none;color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;">
+                                <i class="fa-solid fa-xmark me-1"></i>Kaldır
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Durum *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d0a;color:#10b981;"><i class="fa-solid fa-toggle-on"></i></div>
+                    <div><p class="section-title">Durum Ayarları</p><p class="section-subtitle">Kiralama ve sistem durumu</p></div>
+                </div>
+                <div class="section-body" style="padding:16px 24px;">
+                    <div class="toggle-row">
+                        <div class="toggle-label"><strong><i class="fa-solid fa-circle-check me-2" style="color:#10b981;"></i>Müsait</strong><span>Kiralamaya açık olsun</span></div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" id="IsAvailable"
+                                   name="IsAvailable" value="true" @(Model.IsAvailable ? "checked" : "") />
+                            <input type="hidden" name="IsAvailable" value="false" />
+                        </div>
+                    </div>
+                    <div class="toggle-row">
+                        <div class="toggle-label"><strong><i class="fa-solid fa-power-off me-2" style="color:var(--primary);"></i>Aktif</strong><span>Sistemde görünsün</span></div>
+                        <div class="form-check form-switch mb-0">
+                            <input class="form-check-input" type="checkbox" id="IsActive"
+                                   name="IsActive" value="true" @(Model.IsActive ? "checked" : "") />
+                            <input type="hidden" name="IsActive" value="false" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Özet *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a0a;color:var(--primary);"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <div><p class="section-title">Kayıt Bilgileri</p><p class="section-subtitle">Araç kimlik özeti</p></div>
+                </div>
+                <div class="section-body" style="padding:14px 24px;">
+                    <div style="font-size:13px;">
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+                            <span style="color:var(--text-muted);">Araç ID</span>
+                            <strong style="color:var(--primary);">#@Model.CarId</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+                            <span style="color:var(--text-muted);">Marka / Model</span>
+                            <strong>@Model.Brand?.BrandName @Model.CarModel?.ModelName</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
+                            <span style="color:var(--text-muted);">Yıl</span>
+                            <strong>@Model.Year</strong>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;">
+                            <span style="color:var(--text-muted);">Durum</span>
+                            <span class="badge @(Model.IsAvailable ? "bg-success" : "bg-warning text-dark")">
+                                @(Model.IsAvailable ? "Müsait" : "Kirada")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <div style="font-size:13px;color:var(--text-muted);">
+            <i class="fa-solid fa-circle-exclamation me-1" style="color:var(--accent);"></i>
+            <span style="color:var(--danger);">*</span> zorunlu alanlar
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/Admin/Car/CarList" class="btn-cancel-form"><i class="fa-solid fa-xmark"></i> Vazgeç</a>
+            <button type="submit" class="btn-submit-car" id="submitBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Değişiklikleri Kaydet
+            </button>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts {
+    <script>
+        // ═══ MODEL AJAX (marka değişince) ═══
+        async function loadModels(brandId) {
+            const sel = document.getElementById('CarModelId');
+            if (!brandId) { sel.innerHTML = '<option value="">— Önce marka seçin —</option>'; return; }
+            sel.innerHTML = '<option value="">Yükleniyor…</option>';
+            try {
+                const res  = await fetch(`/Admin/Car/GetModelsByBrand?brandId=${brandId}`);
+                const json = await res.json();
+                sel.innerHTML = '<option value="">— Model Seçin —</option>';
+                if (json.success && json.data?.length > 0) {
+                    json.data.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value       = m.carModelId ?? m.modelId ?? m.id;
+                        opt.textContent = m.modelName  ?? m.name;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (e) { sel.innerHTML = '<option value="">Model yüklenemedi</option>'; }
+        }
+
+        // ═══ PLAKA ═══
+        function updatePlatePreview() {
+            const val = document.getElementById('PlateNumber').value.trim();
+            document.getElementById('platePreviewWrap').style.display = val.length >= 2 ? 'block' : 'none';
+            document.getElementById('platePreviewText').textContent = val || '— — —';
+        }
+
+        function validatePlateInput(el) {
+            const val    = el.value.trim();
+            const errEl  = document.getElementById('plateError');
+            if (!val) {
+                el.classList.add('is-invalid'); el.classList.remove('is-valid');
+                errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Plaka zorunludur.';
+                errEl.style.display = 'flex';
+            } else if (!validatePlateNumber(val)) {
+                el.classList.add('is-invalid'); el.classList.remove('is-valid');
+                errEl.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Geçerli bir plaka giriniz. (Örn: 34 ABC 123)';
+                errEl.style.display = 'flex';
+            } else {
+                el.classList.remove('is-invalid'); el.classList.add('is-valid');
+                errEl.style.display = 'none';
+            }
+        }
+
+        // ═══ VIN SAYACI ═══
+        function updateVinCount() { document.getElementById('vinCount').textContent = document.getElementById('VIN').value.length; }
+
+        // ═══ SAYAÇ ═══
+        function adjustCounter(id, delta) {
+            const el = document.getElementById(id);
+            el.value = Math.max(parseInt(el.min)||0, Math.min(parseInt(el.max)||99, parseInt(el.value)+delta));
+        }
+
+        // ═══ FİYAT BANNER ═══
+        function updatePriceBanner() {
+            const daily = parseFloat(document.getElementById('DailyPrice').value) || 0;
+            const dep   = parseFloat(document.getElementById('DepositAmount').value) || 0;
+            const b     = document.getElementById('priceBanner');
+            if (daily > 0) {
+                b.style.display = 'block';
+                document.getElementById('bannerDaily').textContent   = '₺' + daily.toLocaleString('tr-TR');
+                document.getElementById('bannerWeekly').textContent  = '₺' + (daily*7).toLocaleString('tr-TR');
+                document.getElementById('bannerMonthly').textContent = '₺' + (daily*30).toLocaleString('tr-TR');
+                document.getElementById('bannerDeposit').textContent = dep > 0 ? '₺'+dep.toLocaleString('tr-TR') : '—';
+            } else { b.style.display = 'none'; }
+        }
+
+        // ═══ ALANLARI DOĞRULA ═══
+        function liveValidate(el) {
+            el.classList.toggle('is-invalid', !el.value || el.value === '');
+            el.classList.toggle('is-valid',   !!(el.value && el.value !== ''));
+        }
+
+        // ═══ GÖRSEL YÖNETİMİ ═══
+        function removeCurrentImage() {
+            document.getElementById('currentImageWrap')?.remove();
+            document.getElementById('CoverImageUrl').value = '';
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5*1024*1024) { alert('Dosya 5MB\'dan büyük olamaz.'); return; }
+            const reader = new FileReader();
+            reader.onload = ev => {
+                document.getElementById('newImgPreview').src = ev.target.result;
+                document.getElementById('newImgFileName').textContent = file.name;
+                document.getElementById('newImgPreviewWrap').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearNewImage() {
+            document.getElementById('imageFile').value = '';
+            document.getElementById('newImgPreviewWrap').style.display = 'none';
+        }
+
+        function handleDragOver(e)  { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+        function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+        function handleDrop(e) {
+            e.preventDefault(); e.currentTarget.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file?.type.startsWith('image/')) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                document.getElementById('imageFile').files = dt.files;
+                handleFileSelect({ target: { files: dt.files } });
+            }
+        }
+
+        // ═══ FORM SUBMIT ═══
+        document.getElementById('editCarForm').addEventListener('submit', function(e) {
+            const required = ['PlateNumber','VIN','BrandId','CarModelId','CategoryId','BranchId','Year','Kilometer','DailyPrice','DepositAmount','Transmission'];
+            let valid = true;
+
+            required.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el || !el.value || el.value === '') { el?.classList.add('is-invalid'); valid = false; }
+                else { el.classList.remove('is-invalid'); el.classList.add('is-valid'); }
+            });
+
+            // Plaka format kontrolü
+            const plateEl  = document.getElementById('PlateNumber');
+            const plateErr = document.getElementById('plateError');
+            if (plateEl.value && !validatePlateNumber(plateEl.value)) {
+                plateEl.classList.add('is-invalid');
+                plateErr.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Geçerli bir plaka giriniz. (Örn: 34 ABC 123)';
+                plateErr.style.display = 'flex';
+                valid = false;
+            }
+
+            const fuel    = document.querySelector('input[name="FuelType"]:checked');
+            const fuelErr = document.getElementById('fuelError');
+            if (!fuel) { fuelErr.classList.add('show'); valid = false; }
+            else        { fuelErr.classList.remove('show'); }
+
+            if (!valid) {
+                e.preventDefault();
+                document.querySelector('.is-invalid')?.scrollIntoView({ behavior:'smooth', block:'center' });
+                return;
+            }
+
+            const btn     = document.getElementById('submitBtn');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kaydediliyor…';
+            btn.disabled  = true;
+        });
+
+        // Sayfa yüklenince fiyat banner'ı güncelle
+        document.addEventListener('DOMContentLoaded', () => updatePriceBanner());
+    </script>
+}

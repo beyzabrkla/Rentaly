@@ -112,6 +112,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             }
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCar(Car car, List<IFormFile> imageFiles)
@@ -185,17 +186,24 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 return View(car);
             }
         }
+
+
         [HttpGet]
         public async Task<IActionResult> EditCar(int id)
         {
             try
             {
-                var car = await _carService.TGetByIdAsync(id);
+                var car = await _carService.GetCarByIdWithDetailsAsync(id);
                 if (car == null) return NotFound("Araç bulunamadı.");
 
                 ViewBag.Brands = await _brandService.TGetListAsync();
                 ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.Branches = await _branchService.TGetListAsync();
+
+                // Seçili modelleri view'a aktar (marka değişince AJAX yükleyecek)
+                if (car.BrandId > 0)
+                    ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
+
                 return View(car);
             }
             catch (Exception ex)
@@ -205,6 +213,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             }
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCar(int id, Car car, IFormFile? imageFile)
@@ -213,11 +222,20 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             {
                 if (id != car.CarId) return BadRequest("Araç ID eşleşmiyor.");
 
+                // Navigation property'ler formdan gelmiyor, sadece ID'ler geliyor
+                ModelState.Remove("Brand");
+                ModelState.Remove("CarModel");
+                ModelState.Remove("Category");
+                ModelState.Remove("Branch");
+                ModelState.Remove("CarImages");
+
                 if (!ModelState.IsValid)
                 {
                     ViewBag.Brands = await _brandService.TGetListAsync();
                     ViewBag.Categories = await _categoryService.TGetListAsync();
                     ViewBag.Branches = await _branchService.TGetListAsync();
+                    if (car.BrandId > 0)
+                        ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
                     return View(car);
                 }
 
@@ -229,15 +247,19 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         ViewBag.Brands = await _brandService.TGetListAsync();
                         ViewBag.Categories = await _categoryService.TGetListAsync();
                         ViewBag.Branches = await _branchService.TGetListAsync();
+                        if (car.BrandId > 0)
+                            ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
                         return View(car);
                     }
 
+                    // Eski görseli sil
                     if (!string.IsNullOrEmpty(car.CoverImageUrl))
                     {
                         var oldPath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
                         if (System.IO.File.Exists(oldPath)) System.IO.File.Delete(oldPath);
                     }
 
+                    // Yeni görseli kaydet
                     var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
                     var uploadPath = Path.Combine("wwwroot", "uploads", "cars", fileName);
                     var directory = Path.GetDirectoryName(uploadPath)!;
@@ -261,10 +283,13 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 ViewBag.Brands = await _brandService.TGetListAsync();
                 ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.Branches = await _branchService.TGetListAsync();
+                if (car.BrandId > 0)
+                    ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
                 TempData["Error"] = $"Hata: {ex.Message}";
                 return View(car);
             }
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -291,6 +316,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 return Json(new { success = false, message = $"Hata: {ex.Message}" });
             }
         }
+
 
         // AJAX — Model listesi (marka bazlı)
         [HttpGet]

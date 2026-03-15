@@ -11,5 +11,6 @@ namespace Rentaly.DataAccessLayer.Abstract
         Task<List<Car>> GetCarsByPriceRangeAsync(decimal minPrice, decimal maxPrice);
         Task<List<Car>> GetAllWithDetailsAsync();
         Task<List<Car>> GetAvailableWithDetailsAsync();
+        Task<Car> GetCarByIdWithDetailsAsync(int id);
     }
 }
