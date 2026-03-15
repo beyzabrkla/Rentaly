@@ -18,57 +18,53 @@ namespace Rentaly.WebUI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> CarList(
-            int page = 1, string category = null, int? branch = null,
-            string fuel = null, int? seats = null, string search = null, // search parametresini ekledik
-            decimal? minPrice = null, decimal? maxPrice = null)
+            int page = 1,
+            string? category = null,
+            int? branch = null,
+            string? fuel = null,
+            int? seats = null,
+            string? search = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null)
         {
             try
             {
-                // Veriyi çek
-                var data = await _carService.GetAvailableCarsAsync();
+                var data = await _carService.GetAvailableWithDetailsAsync();
                 var query = data.AsQueryable();
 
-
-                // Kategori Filtresi
                 if (!string.IsNullOrEmpty(category) && category != "0")
-                {
-                    // Her iki tarafı da küçük harfe çevirerek eşleştirme yapıyoruz
                     query = query.Where(c => c.Category != null &&
-                                             c.Category.CategoryName.ToLower() == category.ToLower());
-                }
-                
-                // Şube Filtresi
+                                             c.Category.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase));
+
                 if (branch.HasValue && branch.Value > 0)
                     query = query.Where(c => c.BranchId == branch.Value);
 
-                // Yakıt Filtresi
                 if (!string.IsNullOrEmpty(fuel))
-                    query = query.Where(c => c.FuelType == fuel);
+                    query = query.Where(c => c.FuelType != null &&
+                                             c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
 
-                // Koltuk Sayısı Filtresi (EKSİKTİ, EKLENDİ)
                 if (seats.HasValue && seats.Value > 0)
-                    query = query.Where(c => c.SeatCount == seats.Value);
+                {
+                    if (seats.Value == 7)
+                        query = query.Where(c => c.SeatCount >= 7);
+                    else
+                        query = query.Where(c => c.SeatCount == seats.Value);
+                }
 
-                // Arama Filtresi (Marka veya Model içeriyorsa)
                 if (!string.IsNullOrEmpty(search))
-                    query = query.Where(c => (c.Brand != null && c.Brand.BrandName.Contains(search)) ||
-                                             (c.CarModel != null && c.CarModel.ModelName.Contains(search)));
+                    query = query.Where(c =>
+                        (c.Brand != null && c.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                        (c.CarModel != null && c.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
 
-                // Fiyat Filtreleri
                 if (minPrice.HasValue) query = query.Where(c => c.DailyPrice >= minPrice.Value);
                 if (maxPrice.HasValue) query = query.Where(c => c.DailyPrice <= maxPrice.Value);
 
-                //Sayfalama 
                 int totalCars = query.Count();
                 int totalPages = (int)Math.Ceiling(totalCars / (double)PAGE_SIZE);
-
-                // Sayfa doğrulama
                 page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
 
-                // Skip ve Take
                 var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
 
-                // Viewbag atamaları
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalCars = totalCars;
@@ -78,8 +74,11 @@ namespace Rentaly.WebUI.Controllers
             }
             catch (Exception ex)
             {
-                // Loglama yapılabilir (ex)
                 TempData["Error"] = "Araçlar yüklenirken bir hata oluştu.";
+                ViewBag.CurrentPage = 1;
+                ViewBag.TotalPages = 0;
+                ViewBag.TotalCars = 0;
+                ViewBag.Branches = new List<Branch>();
                 return View(new List<Car>());
             }
         }
@@ -91,14 +90,11 @@ namespace Rentaly.WebUI.Controllers
             {
                 var car = await _carService.TGetByIdAsync(id);
                 if (car == null)
-                {
                     return NotFound("Araç bulunamadı.");
-                }
 
                 if (!car.IsActive)
-                {
                     return NotFound("Bu araç şu anda mevcut değildir.");
-                }
+
                 return View(car);
             }
             catch (Exception ex)

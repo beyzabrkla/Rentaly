@@ -652,10 +652,15 @@ function performFinalValidation() {
     });
 
     // Plaka doğrulama
-    const plateVal = document.getElementById('PlateNumber').value;
-    if (plateVal && !validatePlateNumber(plateVal)) {
-        showToast('Lütfen geçerli bir plaka numarası giriniz.', 'danger');
-        allValid = false;
+    // Plaka format kontrolü — validatePlateNumber script.js'de tanımlı
+    const plateEl = document.getElementById('PlateNumber');
+    const plateErr = document.getElementById('plateError');
+    if (plateEl.value && !validatePlateNumber(plateEl.value)) {
+        plateEl.classList.add('is-invalid');
+        plateEl.classList.remove('is-valid');
+        plateErr.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Geçerli bir plaka giriniz. (Örn: 34 ABC 123)';
+        plateErr.style.display = 'flex';
+        valid = false;
     }
 
     // VIN doğrulama

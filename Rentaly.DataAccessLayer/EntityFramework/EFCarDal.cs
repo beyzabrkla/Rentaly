@@ -1,67 +1,58 @@
-﻿using Rentaly.DataAccessLayer.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using Rentaly.DataAccessLayer.Abstract;
 using Rentaly.DataAccessLayer.Concrete;
 using Rentaly.DataAccessLayer.RepositoryDesignPattern;
 using Rentaly.EntityLayer.Entities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Rentaly.DataAccessLayer.EntityFramework
 {
     public class EFCarDal : GenericRepository<Car>, ICarDal
     {
-        private readonly RentalyContext _rentalyContext;
+        private readonly RentalyContext _context;
 
-        public EFCarDal(RentalyContext rentalyContext) : base(rentalyContext)
+        public EFCarDal(RentalyContext context) : base(context)
         {
-            _rentalyContext = rentalyContext;
+            _context = context;
         }
 
-        // Müsait araçları getir (IsAvailable = true ve IsActive = true)
-        public async Task<List<Car>> GetAvailableCarsAsync()
+        // Tüm navigation property'leri içeren merkezi sorgu
+        private IQueryable<Car> WithAllIncludes()
         {
-            return await _rentalyContext.Cars
+            return _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.CarModel)
+                .Include(c => c.Category)
+                .Include(c => c.Branch)
+                .Include(c => c.CarImages);
+        }
+
+        /// Admin: Tüm araçlar, filtre yok
+        public async Task<List<Car>> GetAllWithDetailsAsync()
+            => await WithAllIncludes().ToListAsync();
+
+        /// Müşteri: sadece müsait+aktif araçlar
+        public async Task<List<Car>> GetAvailableWithDetailsAsync()
+            => await WithAllIncludes()
                 .Where(c => c.IsAvailable && c.IsActive)
-                .Include(c => c.Brand)
-                .Include(c => c.CarModel)
-                .Include(c => c.Category)
-                .Include(c => c.Branch)
                 .ToListAsync();
-        }
 
-        // Markaya göre araçları getir
+        //Markaya göre araçlar
         public async Task<List<Car>> GetCarsByBrandAsync(int brandId)
-        {
-            return await _rentalyContext.Cars
-                .Where(c => c.BrandId == brandId && c.IsActive)
-                .Include(c => c.Brand)
-                .Include(c => c.CarModel)
-                .Include(c => c.Category)
-                .Include(c => c.Branch)
+            => await WithAllIncludes()
+                .Where(c => c.BrandId == brandId)
                 .ToListAsync();
-        }
 
-        // Kategoriye göre araçları getir
+        // Modeline göre araçlar
         public async Task<List<Car>> GetCarsByCategoryAsync(int categoryId)
-        {
-            return await _rentalyContext.Cars
-                .Where(c => c.CategoryId == categoryId && c.IsActive)
-                .Include(c => c.Brand)
-                .Include(c => c.CarModel)
-                .Include(c => c.Category)
-                .Include(c => c.Branch)
+            => await WithAllIncludes()
+                .Where(c => c.CategoryId == categoryId)
                 .ToListAsync();
-        }
 
-        // Fiyat aralığına göre araçları getir
+        // Fiyat aralığına göre araçlar
         public async Task<List<Car>> GetCarsByPriceRangeAsync(decimal minPrice, decimal maxPrice)
-        {
-            return await _rentalyContext.Cars
-                .Where(c => c.DailyPrice >= minPrice && c.DailyPrice <= maxPrice && c.IsActive)
-                .Include(c => c.Brand)
-                .Include(c => c.CarModel)
-                .Include(c => c.Category)
-                .Include(c => c.Branch)
-                .OrderBy(c => c.DailyPrice)
+            => await WithAllIncludes()
+                .Where(c => c.DailyPrice >= minPrice && c.DailyPrice <= maxPrice)
                 .ToListAsync();
-        }
+
     }
 }

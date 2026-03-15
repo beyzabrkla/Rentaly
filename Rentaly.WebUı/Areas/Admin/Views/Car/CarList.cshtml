@@ -1,10 +1,17 @@
-﻿@{
+﻿@using Rentaly.EntityLayer.Entities
+@using Microsoft.AspNetCore.WebUtilities
+@model List<Car>
+@{
     ViewData["Title"] = "CarList";
     Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    string brandFilter = Context.Request.Query["brand"];
+    string statusFilter = Context.Request.Query["status"];
+    string fuelFilter = Context.Request.Query["fuel"];
+    string searchFilter = Context.Request.Query["search"];
 }
 
-
-<!-- Page Header -->
+@* Page Header *@
 <div class="page-header">
     <div>
         <h1 class="page-title">Araç Listesi</h1>
@@ -15,84 +22,329 @@
     </a>
 </div>
 
-<!-- Stats strip -->
+@* Stat Kartları *@
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--text-main);" id="totalCount">10</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--text-main);">@ViewBag.TotalCars</div>
             <div style="font-size:12.5px;color:var(--text-muted);">Toplam Araç</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#10b981;" id="availableCount">7</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#10b981;">@ViewBag.AvailableCount</div>
             <div style="font-size:12.5px;color:var(--text-muted);">Müsait</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--accent);" id="rentedCount">3</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--accent);">@ViewBag.RentedCount</div>
             <div style="font-size:12.5px;color:var(--text-muted);">Kirada</div>
         </div>
     </div>
     <div class="col-6 col-md-3">
         <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--primary);" id="visibleCount">10</div>
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--primary);">@Model.Count</div>
             <div style="font-size:12.5px;color:var(--text-muted);">Gösterilen</div>
         </div>
     </div>
 </div>
 
-<!-- Toolbar -->
+@* Toolbar *@
 <div class="toolbar-card">
     <div class="search-wrap">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" id="searchInput" placeholder="Araç ara (marka, model, yıl...)" oninput="filterVehicles()" />
+        <input type="text" id="searchInput" placeholder="Araç ara..."
+               value="@searchFilter"
+               onkeypress="if(event.key==='Enter') filterCars()" />
     </div>
-    <select class="filter-select" id="brandFilter" onchange="filterVehicles()">
+    <select class="filter-select" id="brandFilter" onchange="filterCars()">
         <option value="">Tüm Markalar</option>
-        <option value="BMW">BMW</option>
-        <option value="Mercedes">Mercedes</option>
-        <option value="Toyota">Toyota</option>
-        <option value="Audi">Audi</option>
-        <option value="Volkswagen">Volkswagen</option>
-        <option value="Ford">Ford</option>
-        <option value="Volvo">Volvo</option>
-        <option value="Hyundai">Hyundai</option>
-        <option value="Tesla">Tesla</option>
+        @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
+        {
+            <option value="@brand.BrandId" @(brandFilter == brand.BrandId.ToString() ? "selected" : "")>
+                @brand.BrandName
+            </option>
+        }
     </select>
-    <select class="filter-select" id="statusFilter" onchange="filterVehicles()">
+    <select class="filter-select" id="statusFilter" onchange="filterCars()">
         <option value="">Tüm Durumlar</option>
-        <option value="Müsait">Müsait</option>
-        <option value="Kirada">Kirada</option>
+        <option value="Müsait" @(statusFilter == "Müsait" ? "selected" : "")>Müsait</option>
+        <option value="Kirada" @(statusFilter == "Kirada" ? "selected" : "")>Kirada</option>
     </select>
-    <select class="filter-select" id="fuelFilter" onchange="filterVehicles()">
+    <select class="filter-select" id="fuelFilter" onchange="filterCars()">
         <option value="">Tüm Yakıt Tipleri</option>
-        <option value="Benzin">Benzin</option>
-        <option value="Dizel">Dizel</option>
-        <option value="Elektrik">Elektrik</option>
-        <option value="Hibrit">Hibrit</option>
+        @foreach (var fuel in new[] { "Benzin", "Dizel", "Elektrik", "Hibrit" })
+        {
+            <option value="@fuel" @(fuelFilter == fuel ? "selected" : "")>@fuel</option>
+        }
     </select>
-    <button class="btn-action btn-detail" onclick="resetFilters()" style="flex:none;padding:9px 14px;font-size:13px;">
+    <button class="btn-action btn-detail" onclick="resetFilters()">
         <i class="fa-solid fa-rotate-left"></i> Sıfırla
     </button>
 </div>
 
-<!-- Results info -->
-<p class="results-count" id="resultsText">
-    Toplam <strong>10</strong> araç listeleniyor
+@* Sonuç Bilgisi *@
+<p class="results-count mb-3">
+    Toplam <strong>@ViewBag.TotalCars</strong> araçtan
+    <strong>@Model.Count</strong> tanesi gösteriliyor.
+    @if ((int)ViewBag.TotalPages > 1)
+    {
+        <text>Sayfa <strong>@ViewBag.CurrentPage</strong> / <strong>@ViewBag.TotalPages</strong></text>
+    }
 </p>
 
-<!-- Vehicle Grid -->
-<div class="row g-4" id="vehicleGrid">
-    <!-- Cards injected by JS -->
+@* Araç Grid — id="carGrid" (vehicleGrid DEĞİL — JS müdahalesini önlemek için) *@
+<div class="row g-4" id="carGrid">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-car-side fa-3x mb-3" style="color:var(--text-muted);opacity:.4;"></i>
+            <p style="color:var(--text-muted);">Araç bulunamadı.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var car in Model)
+        {
+            <div class="col-12 col-sm-6 col-xl-4 vehicle-col">
+                <div class="vehicle-card">
+
+                    @* Görsel *@
+                    <div class="vehicle-img-wrap">
+                        @if (!string.IsNullOrEmpty(car.CoverImageUrl))
+                        {
+                            <img src="@car.CoverImageUrl"
+                                 alt="@(car.Brand?.BrandName) @(car.CarModel?.ModelName)"
+                                 loading="lazy"
+                                 onerror="this.src='https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok'" />
+                        }
+                        else
+                        {
+                            <img src="https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok"
+                                 alt="Fotoğraf yok" />
+                        }
+                        <span class="vehicle-status @(car.IsAvailable ? "status-available" : "status-rented")">
+                            <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
+                            @(car.IsAvailable ? "Müsait" : "Kirada")
+                        </span>
+                        @if (!string.IsNullOrEmpty(car.FuelType))
+                        {
+                            <span class="vehicle-fuel">
+                                <i class="fa-solid @(car.FuelType == "Elektrik" ? "fa-bolt" : car.FuelType == "Hibrit" ? "fa-leaf" : car.FuelType == "Dizel" ? "fa-fill-drip" : "fa-gas-pump")"></i>
+                                @car.FuelType
+                            </span>
+                        }
+                    </div>
+
+                    @* Kart Gövdesi *@
+                    <div class="vehicle-body">
+                        <div class="vehicle-brand">@(car.Brand?.BrandName ?? "—")</div>
+                        <div class="vehicle-name">@(car.CarModel?.ModelName ?? "—")</div>
+
+                        <div class="vehicle-specs">
+                            <div class="spec-item">
+                                <i class="fa-solid fa-road"></i>
+                                <span>@car.Kilometer.ToString("N0") km</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-gears"></i>
+                                <span>@(car.Transmission ?? "—")</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-tag"></i>
+                                <span>@(car.Category?.CategoryName ?? "—")</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-users"></i>
+                                <span>@car.SeatCount koltuk</span>
+                            </div>
+                        </div>
+
+                        <div class="vehicle-price-row">
+                            <div class="vehicle-price">
+                                <span class="price-amount">₺@car.DailyPrice.ToString("N0")</span>
+                                <span class="price-label">/ günlük</span>
+                            </div>
+                            <span class="vehicle-year-badge">@car.Year</span>
+                        </div>
+                    </div>
+
+                    @* Aksiyonlar *@
+                    <div class="vehicle-actions">
+                        <a href="/Admin/Car/EditCar/@car.CarId" class="btn-action btn-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                        </a>
+                        <button class="btn-action btn-delete" onclick="confirmDelete(@car.CarId)">
+                            <i class="fa-solid fa-trash-can"></i> Sil
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        }
+    }
 </div>
 
-<!-- Empty state -->
-<div id="emptyState" class="text-center py-5" style="display:none!important;">
-    <div style="font-size:56px;color:var(--border);margin-bottom:16px;"><i class="fa-solid fa-car-burst"></i></div>
-    <h5 style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;">Araç Bulunamadı</h5>
-    <p style="color:var(--text-muted);font-size:14px;">Arama veya filtre kriterlerinizi değiştirmeyi deneyin.</p>
-    <button class="btn-primary-custom" onclick="resetFilters()"><i class="fa-solid fa-rotate-left"></i> Filtreleri Temizle</button>
+@* Pagination *@
+@{
+    var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+    var filterParams = new Dictionary<string, string>();
+    foreach (var param in queryParams)
+    {
+        if (param.Key.ToLower() != "page")
+            filterParams[param.Key] = param.Value.ToString();
+    }
+
+    string GetPageUrl(int pageNumber)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = pageNumber.ToString() };
+        return "/Admin/Car/CarList" + QueryString.Create(qs).Value;
+    }
+}
+
+@if ((int)ViewBag.TotalPages > 1)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Sayfa navigasyonu"
+                 style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+
+                @if ((int)ViewBag.CurrentPage > 1)
+                {
+                    <a href="@GetPageUrl(1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">
+                        <i class="fa-solid fa-angles-left"></i> İlk
+                    </a>
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage - 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">
+                        <i class="fa-solid fa-angle-left"></i> Önceki
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        <i class="fa-solid fa-angles-left"></i> İlk
+                    </span>
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        <i class="fa-solid fa-angle-left"></i> Önceki
+                    </span>
+                }
+
+                <div style="display:flex;gap:6px;">
+                    @{
+                        int start = Math.Max(1, (int)ViewBag.CurrentPage - 2);
+                        int end = Math.Min((int)ViewBag.TotalPages, (int)ViewBag.CurrentPage + 2);
+                    }
+                    @for (int i = start; i <= end; i++)
+                    {
+                        if (i == (int)ViewBag.CurrentPage)
+                        {
+                            <span class="btn-action btn-delete" style="flex:unset;padding:8px 14px;cursor:default;">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@GetPageUrl(i)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">@i</a>
+                        }
+                    }
+                </div>
+
+                @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                {
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage + 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">
+                        Sonraki <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                    <a href="@GetPageUrl((int)ViewBag.TotalPages)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">
+                        Son <i class="fa-solid fa-angles-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        Sonraki <i class="fa-solid fa-angle-right"></i>
+                    </span>
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        Son <i class="fa-solid fa-angles-right"></i>
+                    </span>
+                }
+            </nav>
+        </div>
+    </div>
+}
+
+@* Silme Onay Modal *@
+<div id="deleteModal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+        <i class="fa-solid fa-triangle-exclamation fa-2x mb-3" style="color:var(--warning);"></i>
+        <h5 class="mb-2" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--text-main);">Araç Silinecek</h5>
+        <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:24px;">Bu aracı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button class="btn-action btn-detail" style="flex:unset;padding:9px 20px;" onclick="closeDeleteModal()">
+                <i class="fa-solid fa-xmark"></i> İptal
+            </button>
+            <button class="btn-action btn-delete" style="flex:unset;padding:9px 20px;" id="confirmDeleteBtn">
+                <i class="fa-solid fa-trash-can"></i> Evet, Sil
+            </button>
+        </div>
+    </div>
 </div>
 
+@section Scripts {
+    <script>
+        // Filtrele — server-side
+        function filterCars() {
+            const search = document.getElementById('searchInput').value;
+            const brand  = document.getElementById('brandFilter').value;
+            const fuel   = document.getElementById('fuelFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            window.location.href =
+                `/Admin/Car/CarList?page=1` +
+                `&search=${encodeURIComponent(search)}` +
+                `&brand=${brand}` +
+                `&fuel=${encodeURIComponent(fuel)}` +
+                `&status=${encodeURIComponent(status)}`;
+        }
+
+        function resetFilters() {
+            window.location.href = '/Admin/Car/CarList';
+        }
+
+        // Silme modal
+        let pendingDeleteId = null;
+
+        function confirmDelete(id) {
+            pendingDeleteId = id;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            pendingDeleteId = null;
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
+            if (!pendingDeleteId) return;
+            try {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+                const res   = await fetch('/Admin/Car/DeleteCar', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body:    `id=${pendingDeleteId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                });
+                const data = await res.json();
+                closeDeleteModal();
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.message ?? 'Bir hata oluştu.');
+                }
+            } catch (e) {
+                alert('Silme işlemi sırasında hata oluştu.');
+            }
+        });
+
+        // ESC ile modal kapat
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeDeleteModal();
+        });
+    </script>
+}
