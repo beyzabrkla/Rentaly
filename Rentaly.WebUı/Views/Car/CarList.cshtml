@@ -132,7 +132,7 @@
                     <select id="filter_branch_select" name="filter_branch" class="form-control" onchange="filterCars()">
                         <option value="">Tüm Şubeler</option>
                         @{
-                            var branches = ViewBag.Branches as List<Rentaly.EntityLayer.Entities.Branch> ?? new List<Rentaly.EntityLayer.Entities.Branch>();
+                            var branches = ViewBag.Branches as List<Branch> ?? new List<Branch>();
                             foreach (var branch in branches)
                             {
                                 bool isSelected = (branchFilter == branch.BranchId.ToString());

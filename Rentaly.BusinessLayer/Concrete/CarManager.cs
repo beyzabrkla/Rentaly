@@ -1,10 +1,7 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
 using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
@@ -18,10 +15,14 @@ namespace Rentaly.BusinessLayer.Concrete
             _unitOfWork = unitOfWork;
         }
 
-        // Car'a özel metotlar
-        public async Task<List<Car>> GetAvailableCarsAsync()
+        public async Task<List<Car>> GetAllWithDetailsAsync()
         {
-            return await _unitOfWork.CarDal.GetAvailableCarsAsync();
+            return await _unitOfWork.CarDal.GetAllWithDetailsAsync();
+        }
+
+        public async Task<List<Car>> GetAvailableWithDetailsAsync()
+        {
+            return await _unitOfWork.CarDal.GetAvailableWithDetailsAsync();
         }
 
         public async Task<List<Car>> GetCarsByBrandAsync(int brandId)
@@ -38,5 +39,6 @@ namespace Rentaly.BusinessLayer.Concrete
         {
             return await _unitOfWork.CarDal.GetCarsByPriceRangeAsync(minPrice, maxPrice);
         }
+
     }
 }

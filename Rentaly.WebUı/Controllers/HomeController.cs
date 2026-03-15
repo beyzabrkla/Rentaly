@@ -29,16 +29,14 @@ namespace Rentaly.WebUI.Controllers
         {
             try
             {
-                // Ana sayfa için gerekli veriler
-                var cars = await _carService.GetAvailableCarsAsync();
-                var branches = await _branchService.TGetListAsync();
+                var cars       = await _carService.GetAvailableWithDetailsAsync();
+                var branches   = await _branchService.TGetListAsync();
                 var categories = await _categoryService.TGetListAsync();
 
-                // ViewBag'lere ekle
-                ViewBag.TotalCars = cars.Count;
-                ViewBag.TotalBranches = branches.Count;
-                ViewBag.Branches = branches;
-                ViewBag.Categories = categories;
+                ViewBag.TotalCars      = cars.Count;
+                ViewBag.TotalBranches  = branches.Count;
+                ViewBag.Branches       = branches;
+                ViewBag.Categories     = categories;
 
                 return View();
             }
@@ -49,31 +47,25 @@ namespace Rentaly.WebUI.Controllers
             }
         }
 
-        // Araç Arama 
         [HttpPost]
-        public async Task<IActionResult> SearchCars(string carType, string pickupLocation,
-            string dropoffLocation, DateTime pickUpDate, string pickUpTime,
+        public async Task<IActionResult> SearchCars(
+            string carType, string pickupLocation, string dropoffLocation,
+            DateTime pickUpDate, string pickUpTime,
             string collectionDate, string collectionTime)
         {
             try
             {
-                // Tüm müsait araçları getir
-                var cars = await _carService.GetAvailableCarsAsync();
+                var cars = await _carService.GetAvailableWithDetailsAsync();
 
-                // Kategori filtrelemesi
                 if (!string.IsNullOrEmpty(carType))
                 {
-                    // carType'a göre kategori ID'si bul ve filtrele
                     cars = cars
                         .Where(c => c.Category != null &&
-                                   c.Category.CategoryName.ToLower().Contains(carType.ToLower()))
+                                    c.Category.CategoryName.Contains(carType, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                 }
 
-                // TempData'ya arama parametrelerini kaydet
                 TempData["SearchParams"] = $"Tür: {carType}, Alış: {pickupLocation}, Dönüş: {dropoffLocation}";
-
-                // Araç listesi sayfasına yönlendir
                 return RedirectToAction("CarList", "Car");
             }
             catch (Exception ex)
@@ -84,10 +76,7 @@ namespace Rentaly.WebUI.Controllers
             }
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        public IActionResult Privacy() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
