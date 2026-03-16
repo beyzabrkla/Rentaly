@@ -647,6 +647,28 @@
                 padding: 12px 0;
             }
         }
+
+        .current-image-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            background: rgba(239,68,68,.85);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+            .current-image-remove:hover {
+                background: var(--danger);
+            }
     </style>
 }
 
@@ -667,7 +689,7 @@
     <div class="row g-4">
         <div class="col-12 col-xl-8">
 
-            @* 1 · Kimlik *@
+            @* Kimlik *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d0a0a;color:var(--primary);"><i class="fa-solid fa-id-card"></i></div>
@@ -710,7 +732,7 @@
                 </div>
             </div>
 
-            @* 2 · Sınıflandırma *@
+            @* Sınıflandırma *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d2d0a;color:var(--accent);"><i class="fa-solid fa-layer-group"></i></div>
@@ -774,7 +796,7 @@
                 </div>
             </div>
 
-            @* 3 · Teknik *@
+            @* Teknik *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#0a2d0a;color:#10b981;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
@@ -852,7 +874,7 @@
                 </div>
             </div>
 
-            @* 4 · Fiyatlandırma *@
+            @* Fiyatlandırma *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d2d0a;color:#d97706;"><i class="fa-solid fa-turkish-lira-sign"></i></div>
@@ -894,7 +916,7 @@
                 </div>
             </div>
 
-            @* 5 · Açıklama *@
+            @* Açıklama *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#0a1a2d;color:#3b82f6;"><i class="fa-solid fa-align-left"></i></div>
@@ -910,39 +932,107 @@
 
         <div class="col-12 col-xl-4">
 
-            @* Görsel *@
+            @* KAPAK GÖRSELİ *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d0a2d;color:#9333ea;"><i class="fa-solid fa-image"></i></div>
-                    <div><p class="section-title">Araç Görselleri</p><p class="section-subtitle">Birden fazla görsel yükleyebilirsiniz</p></div>
+                    <div><p class="section-title">Kapak Görseli</p><p class="section-subtitle">Link veya dosya yükle</p></div>
                 </div>
                 <div class="section-body">
-                    <div class="img-tabs">
-                        <button type="button" class="img-tab-btn active" id="tabUpload" onclick="switchImgTab('upload')"><i class="fa-solid fa-upload me-1"></i>Dosya</button>
-                        <button type="button" class="img-tab-btn" id="tabUrl" onclick="switchImgTab('url')"><i class="fa-solid fa-link me-1"></i>URL</button>
+                    @* Sekmeler *@
+                    <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--border);">
+                        <button type="button" class="img-tab-btn active" data-tab="file" onclick="switchImageTab('file', event)">
+                            <i class="fa-solid fa-upload"></i> Dosya Yükle
+                        </button>
+                        <button type="button" class="img-tab-btn" data-tab="url" onclick="switchImageTab('url', event)">
+                            <i class="fa-solid fa-link"></i> Link Ekle
+                        </button>
                     </div>
-                    <div id="uploadPanel">
-                        <div class="upload-zone" id="uploadZone" ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
-                            <input type="file" id="imageFiles" name="imageFiles" accept="image/*" multiple onchange="handleFileSelect(event)" />
+
+                    <input type="hidden" id="CoverImageUrl" name="CoverImageUrl" value="" />
+                    <input type="hidden" id="ImageSourceType" name="ImageSourceType" value="" />
+
+                    @* Dosya Yükleme *@
+                    <div id="fileTab" class="image-tab-content" style="display:block;">
+                        <div class="upload-zone" id="uploadZone"
+                             ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
+                            <input type="file" id="imageFile" name="imageFile" accept="image/*"
+                                   onchange="handleFileSelect(event)" style="display:none;" />
                             <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                            <div class="upload-title">Görseli sürükleyin veya seçin</div>
-                            <div class="upload-sub">JPG, PNG, WEBP — çoklu — maks. 5 MB</div>
+                            <div class="upload-title">Dosyayı sürükle veya tıkla</div>
+                            <div class="upload-sub">JPG, PNG, WEBP — maks. 5 MB</div>
                         </div>
-                        <div id="imgPreviewWrap" style="display:none;">
-                            <div id="imgPreviewGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;"></div>
-                            <button type="button" onclick="clearImages()" style="margin-top:8px;border:none;background:none;color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;"><i class="fa-solid fa-xmark me-1"></i>Tümünü Kaldır</button>
+
+                        <div id="newImgPreviewWrap" style="display:none;margin-top:12px;">
+                            <img id="newImgPreview" src="" alt="Yeni görsel önizleme"
+                                 style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);" />
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+                                <span id="newImgFileName" style="font-size:12px;color:var(--text-muted);font-weight:500;"></span>
+                                <button type="button" onclick="clearNewImage()"
+                                        style="border:none;background:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;">
+                                    <i class="fa-solid fa-xmark me-1"></i>Kaldır
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div id="urlPanel" style="display:none;">
-                        <label class="form-label" for="CoverImageUrl">Kapak Görseli URL</label>
-                        <input type="url" id="CoverImageUrl" name="CoverImageUrl" class="form-control" placeholder="https://…" oninput="previewUrlImg(this.value)" />
-                        <div id="urlPreviewWrap" style="display:none;margin-top:10px;">
-                            <img id="urlImgPreview" src="" alt="" style="width:100%;max-height:180px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);" onerror="this.parentElement.style.display='none'" />
+
+                    @* Link Ekleme *@
+                    <div id="urlTab" class="image-tab-content" style="display:none;">
+                        <label class="form-label" for="CoverImageUrlInput">Görsel Link</label>
+                        <input type="url" id="CoverImageUrlInput" class="form-control"
+                               placeholder="https://example.com/image.jpg"
+                               oninput="previewUrlImage(this.value)" />
+                        <small style="color:var(--text-muted);display:block;margin-top:8px;">
+                            <i class="fa-solid fa-circle-info me-1"></i>Tam URL giriniz (https:// ile başlamalı)
+                        </small>
+
+                        <div id="urlImgPreviewWrap" style="display:none;margin-top:12px;">
+                            <img id="urlImgPreview" src="" alt="URL önizlemesi"
+                                 style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);" />
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+                                <span id="urlImgStatus" style="font-size:12px;color:#10b981;"><i class="fa-solid fa-check me-1"></i>Başarılı</span>
+                                <button type="button" onclick="clearUrlImage()"
+                                        style="border:none;background:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;">
+                                    <i class="fa-solid fa-xmark me-1"></i>Kaldır
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            @* DİĞER GÖRSELLER *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d2d;color:#14b8a6;"><i class="fa-solid fa-images"></i></div>
+                    <div><p class="section-title">Araç Görselleri</p><p class="section-subtitle">Ek görsel yükle (tekrarlı)</p></div>
+                </div>
+                <div class="section-body">
+                    <label style="font-weight:600;font-size:13px;color:var(--text-primary);margin-bottom:8px;display:block;">
+                        <i class="fa-solid fa-plus me-1" style="color:#14b8a6;"></i>Görseller Ekle
+                    </label>
+                    <div class="multiple-upload-zone" id="multipleUploadZone"
+                         ondragover="handleMultipleDragOver(event)" ondrop="handleMultipleDrop(event)" ondragleave="handleMultipleDragLeave(event)"
+                         style="border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:#252525;">
+                        <input type="file" id="carImageFiles" name="carImageFiles" accept="image/*" multiple
+                               onchange="handleMultipleFileSelect(event)" style="display:none;" />
+                        <div style="font-size:28px;color:var(--text-muted);margin-bottom:8px;"><i class="fa-solid fa-images"></i></div>
+                        <div style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">Birden çok dosya seç</div>
+                        <div style="font-size:12px;color:var(--text-muted);">JPG, PNG, WEBP — Her biri maks. 5 MB</div>
+                    </div>
+
+                    <div id="multipleImgPreviewWrap" style="display:none;margin-top:12px;">
+                        <label style="font-weight:600;font-size:12px;color:var(--text-primary);margin-bottom:8px;display:block;">
+                            Seçilen Görseller (<span id="newImagesCount">0</span>)
+                        </label>
+                        <div id="newImagesPreviewGrid" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;"></div>
+                        <button type="button" onclick="clearMultipleNewImages()"
+                                style="margin-top:12px;border:none;background:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;">
+                            <i class="fa-solid fa-xmark me-1"></i>Tümünü Kaldır
+                        </button>
+                    </div>
+                </div>
+            </div>
             @* Durum *@
             <div class="form-section">
                 <div class="section-header">
@@ -1284,54 +1374,185 @@
             updateSummary();
         }
 
-        function switchImgTab(tab) {
-            const u = tab === 'upload';
-            document.getElementById('uploadPanel').style.display = u ? 'block' : 'none';
-            document.getElementById('urlPanel').style.display    = u ? 'none'  : 'block';
-            document.getElementById('tabUpload').classList.toggle('active', u);
-            document.getElementById('tabUrl').classList.toggle('active', !u);
+        // ═══════════════════════════════════════════════════════════
+        // KAPAK GÖRSELİ - DOSYA + LINK DESTEĞİ (EditCar stili)
+        // ═══════════════════════════════════════════════════════════
+
+        function switchImageTab(tab, event) {
+            document.querySelectorAll('.image-tab-content').forEach(el => el.style.display = 'none');
+            document.getElementById(tab + 'Tab').style.display = 'block';
+
+            document.querySelectorAll('.img-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const activeBtn = event?.target?.closest('.img-tab-btn');
+            if (activeBtn) activeBtn.classList.add('active');
         }
 
-        function handleFileSelect(e) { showFilePreviews(Array.from(e.target.files)); }
-        function handleDragOver(e)   { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
-        function handleDragLeave(e)  { e.currentTarget.classList.remove('dragover'); }
-        function handleDrop(e) {
-            e.preventDefault(); e.currentTarget.classList.remove('dragover');
-            showFilePreviews(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+        // Kapak — Dosya seçme
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { alert('Lütfen bir görsel dosyası seçiniz.'); return; }
+            if (file.size > 5 * 1024 * 1024) { alert('Dosya boyutu 5MB\'dan büyük olamaz.'); return; }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('newImgPreview').src = e.target.result;
+                document.getElementById('newImgFileName').textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
+                document.getElementById('newImgPreviewWrap').style.display = 'block';
+                document.getElementById('ImageSourceType').value = 'file';
+            };
+            reader.readAsDataURL(file);
         }
-        function showFilePreviews(files) {
-            const grid = document.getElementById('imgPreviewGrid');
-            const wrap = document.getElementById('imgPreviewWrap');
-            grid.innerHTML = '';
+
+        function clearNewImage() {
+            document.getElementById('imageFile').value = '';
+            document.getElementById('newImgPreviewWrap').style.display = 'none';
+            document.getElementById('ImageSourceType').value = '';
+        }
+
+        // Kapak — Drag & Drop
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('uploadZone').style.borderColor = 'var(--primary)';
+            document.getElementById('uploadZone').style.backgroundColor = 'var(--primary-light)';
+        }
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('uploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('uploadZone').style.backgroundColor = '#252525';
+        }
+        function handleDrop(e) {
+            e.preventDefault();
+            document.getElementById('uploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('uploadZone').style.backgroundColor = '#252525';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('imageFile').files = files;
+                handleFileSelect({ target: { files: files } });
+            }
+        }
+
+        // Kapak — URL
+        function previewUrlImage(url) {
+            if (!url.trim()) {
+                document.getElementById('urlImgPreviewWrap').style.display = 'none';
+                document.getElementById('CoverImageUrl').value = '';
+                document.getElementById('ImageSourceType').value = '';
+                return;
+            }
+            try { new URL(url); } catch(e) { document.getElementById('urlImgPreviewWrap').style.display = 'none'; return; }
+
+            const img = new Image();
+            img.onload = function() {
+                document.getElementById('urlImgPreview').src = url;
+                document.getElementById('urlImgPreviewWrap').style.display = 'block';
+                document.getElementById('CoverImageUrl').value = url;
+                document.getElementById('ImageSourceType').value = 'url';
+                document.getElementById('urlImgStatus').innerHTML = '<i class="fa-solid fa-check me-1"></i>Başarılı';
+            };
+            img.onerror = function() {
+                document.getElementById('urlImgStatus').innerHTML = '<i class="fa-solid fa-exclamation me-1" style="color:#ef4444;"></i>Yüklenemedi';
+                document.getElementById('urlImgPreviewWrap').style.display = 'block';
+            };
+            img.src = url;
+        }
+
+        function clearUrlImage() {
+            document.getElementById('CoverImageUrlInput').value = '';
+            document.getElementById('urlImgPreviewWrap').style.display = 'none';
+            document.getElementById('CoverImageUrl').value = '';
+            document.getElementById('ImageSourceType').value = '';
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DİĞER GÖRSELLER - ÇOKLU YÖNETİMİ (EditCar stili)
+        // ═══════════════════════════════════════════════════════════
+
+        function handleMultipleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            if (!files.length) return;
+            const validFiles = files.filter(f => {
+                if (!f.type.startsWith('image/')) { alert(f.name + ' bir görsel değil.'); return false; }
+                if (f.size > 5 * 1024 * 1024) { alert(f.name + ' 5MB\'dan büyük.'); return false; }
+                return true;
+            });
+            displayMultipleImagePreviews(validFiles);
+        }
+
+        function displayMultipleImagePreviews(files) {
+            const container = document.getElementById('newImagesPreviewGrid');
+            container.innerHTML = '';
             files.forEach(file => {
-                if (file.size > 5*1024*1024) return;
                 const reader = new FileReader();
-                reader.onload = ev => {
+                reader.onload = function(e) {
                     const div = document.createElement('div');
-                    div.style.cssText = 'border-radius:8px;overflow:hidden;';
-                    div.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:90px;object-fit:cover;"/><div style="font-size:11px;color:var(--text-muted);padding:3px 2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${file.name}</div>`;
-                    grid.appendChild(div);
+                    div.className = 'new-image-item';
+                    div.style.cssText = 'position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);height:120px;';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" />
+                        <button type="button" onclick="removeImagePreview(this)"
+                                style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(239,68,68,0.9);color:white;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>`;
+                    container.appendChild(div);
                 };
                 reader.readAsDataURL(file);
             });
-            wrap.style.display = files.length > 0 ? 'block' : 'none';
+            document.getElementById('multipleImgPreviewWrap').style.display = 'block';
+            document.getElementById('newImagesCount').textContent = files.length;
         }
-        function clearImages() {
-            document.getElementById('imageFiles').value = '';
-            document.getElementById('imgPreviewGrid').innerHTML = '';
-            document.getElementById('imgPreviewWrap').style.display = 'none';
+
+        function removeImagePreview(btn) {
+            btn.closest('.new-image-item').remove();
+            const remaining = document.querySelectorAll('.new-image-item').length;
+            if (remaining === 0) {
+                document.getElementById('carImageFiles').value = '';
+                document.getElementById('multipleImgPreviewWrap').style.display = 'none';
+            } else {
+                document.getElementById('newImagesCount').textContent = remaining;
+            }
         }
-        function previewUrlImg(url) {
-            if (!url) return;
-            document.getElementById('urlPreviewWrap').style.display = 'block';
-            document.getElementById('urlImgPreview').src = url;
+
+        function clearMultipleNewImages() {
+            document.getElementById('carImageFiles').value = '';
+            document.getElementById('newImagesPreviewGrid').innerHTML = '';
+            document.getElementById('multipleImgPreviewWrap').style.display = 'none';
         }
+
+        // Çoklu — Drag & Drop
+        function handleMultipleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('multipleUploadZone').style.borderColor = 'var(--primary)';
+            document.getElementById('multipleUploadZone').style.backgroundColor = 'rgba(20,184,166,0.05)';
+        }
+        function handleMultipleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('multipleUploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('multipleUploadZone').style.backgroundColor = '#252525';
+        }
+        function handleMultipleDrop(e) {
+            e.preventDefault();
+            document.getElementById('multipleUploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('multipleUploadZone').style.backgroundColor = '#252525';
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') && f.size <= 5*1024*1024);
+            displayMultipleImagePreviews(files);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // YAKÎT TİPİ
+        // ═══════════════════════════════════════════════════════════
 
         document.querySelectorAll('input[name="FuelType"]').forEach(r => {
             r.addEventListener('change', () => { document.getElementById('fuelError').classList.remove('show'); updateSummary(); });
         });
 
-        // ═══ FORM SUBMIT ═══
+        // ═══════════════════════════════════════════════════════════
+        // FORM SUBMIT
+        // ═══════════════════════════════════════════════════════════
+
         document.getElementById('carForm').addEventListener('submit', function(e) {
             const required = ['PlateNumber','VIN','BrandId','CarModelId','CategoryId','BranchId','Year','Kilometer','DailyPrice','DepositAmount','Transmission'];
             let valid = true;
@@ -1342,7 +1563,7 @@
                 else { el.classList.remove('is-invalid'); el.classList.add('is-valid'); }
             });
 
-            // Plaka format kontrolü — validatePlateNumber script.js'de tanımlı
+            // Plaka format kontrolü
             const plateEl  = document.getElementById('PlateNumber');
             const plateErr = document.getElementById('plateError');
             if (plateEl.value && !validatePlateNumber(plateEl.value)) {
@@ -1358,17 +1579,36 @@
             if (!fuel) { fuelErr.classList.add('show'); valid = false; }
             else        { fuelErr.classList.remove('show'); }
 
-            // Validation başarısız → dur, butona dokunma
+            // ImageSourceType: URL girilmişse ama type boşsa tamamla
+            if (!document.getElementById('ImageSourceType').value && document.getElementById('CoverImageUrl').value) {
+                document.getElementById('ImageSourceType').value = 'url';
+            }
+
             if (!valid) {
                 e.preventDefault();
                 document.querySelector('.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
 
-            // Validation geçti → spinner göster
             const btn     = document.getElementById('submitBtn');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kaydediliyor…';
             btn.disabled  = true;
+        });
+
+        // ═══════════════════════════════════════════════════════════
+        // SAYFA YÜKLEME
+        // ═══════════════════════════════════════════════════════════
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Kapak görseli upload zone tıklanabilir
+            document.getElementById('uploadZone')?.addEventListener('click', () => {
+                document.getElementById('imageFile').click();
+            });
+
+            // Çoklu görsel upload zone tıklanabilir
+            document.getElementById('multipleUploadZone')?.addEventListener('click', () => {
+                document.getElementById('carImageFiles').click();
+            });
         });
     </script>
 }

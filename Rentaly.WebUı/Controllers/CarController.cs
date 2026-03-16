@@ -18,14 +18,14 @@ namespace Rentaly.WebUI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> CarList(
-            int page = 1,
-            string? category = null,
-            int? branch = null,
-            string? fuel = null,
-            int? seats = null,
-            string? search = null,
-            decimal? minPrice = null,
-            decimal? maxPrice = null)
+                    int page = 1,
+                    string? category = null,
+                    int? branch = null,
+                    string? fuel = null,
+                    int? seats = null,
+                    string? search = null,
+                    decimal? minPrice = null,
+                    decimal? maxPrice = null)
         {
             try
             {
@@ -33,52 +33,57 @@ namespace Rentaly.WebUI.Controllers
                 var query = data.AsQueryable();
 
                 if (!string.IsNullOrEmpty(category) && category != "0")
+                {
                     query = query.Where(c => c.Category != null &&
-                                             c.Category.CategoryName.Equals(category, StringComparison.OrdinalIgnoreCase));
+                          c.Category.CategoryName.Trim().Equals(category.Trim(), StringComparison.OrdinalIgnoreCase));
+                }
 
                 if (branch.HasValue && branch.Value > 0)
                     query = query.Where(c => c.BranchId == branch.Value);
 
                 if (!string.IsNullOrEmpty(fuel))
                     query = query.Where(c => c.FuelType != null &&
-                                             c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
+                          c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
 
                 if (seats.HasValue && seats.Value > 0)
-                {
-                    if (seats.Value == 7)
-                        query = query.Where(c => c.SeatCount >= 7);
-                    else
-                        query = query.Where(c => c.SeatCount == seats.Value);
-                }
+                    query = (seats.Value >= 7) ? query.Where(c => c.SeatCount >= 7) : query.Where(c => c.SeatCount == seats.Value);
 
                 if (!string.IsNullOrEmpty(search))
+                {
+                    search = search.ToLower();
                     query = query.Where(c =>
-                        (c.Brand != null && c.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
-                        (c.CarModel != null && c.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                        (c.Brand != null && c.Brand.BrandName.ToLower().Contains(search)) ||
+                        (c.CarModel != null && c.CarModel.ModelName.ToLower().Contains(search)));
+                }
 
                 if (minPrice.HasValue) query = query.Where(c => c.DailyPrice >= minPrice.Value);
                 if (maxPrice.HasValue) query = query.Where(c => c.DailyPrice <= maxPrice.Value);
 
+                //Sayfalama Hesaplamaları
                 int totalCars = query.Count();
                 int totalPages = (int)Math.Ceiling(totalCars / (double)PAGE_SIZE);
-                page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
+
+                // Sayfa sınırlarını kontrol et
+                page = page < 1 ? 1 : (totalPages > 0 && page > totalPages ? totalPages : page);
 
                 var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
 
+                //View'a gidecek ek veriler
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalCars = totalCars;
                 ViewBag.Branches = await _branchService.TGetListAsync();
 
+                //Aktif filtreleri View'da tutmak için (URL'leri bozmamak adına)
+                ViewBag.SelectedCategory = category;
+                ViewBag.SelectedBranch = branch;
+
                 return View(pagedCars);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Araçlar yüklenirken bir hata oluştu.";
-                ViewBag.CurrentPage = 1;
-                ViewBag.TotalPages = 0;
-                ViewBag.TotalCars = 0;
-                ViewBag.Branches = new List<Branch>();
+                // Hata günlüğü tutulabilir: _logger.LogError(ex, "CarList error");
+                TempData["Error"] = "Araçlar yüklenirken teknik bir sorun oluştu.";
                 return View(new List<Car>());
             }
         }
@@ -86,36 +91,24 @@ namespace Rentaly.WebUI.Controllers
         [HttpGet]
         public async Task<IActionResult> CarDetail(int id)
         {
-            try
-            {
-                var car = await _carService.TGetByIdAsync(id);
-                if (car == null)
-                    return NotFound("Araç bulunamadı.");
+            if (id <= 0) return RedirectToAction("CarList");
 
-                if (!car.IsActive)
-                    return NotFound("Bu araç şu anda mevcut değildir.");
+            var car = await _carService.TGetByIdAsync(id);
 
-                return View(car);
-            }
-            catch (Exception ex)
+            if (car == null || !car.IsActive)
             {
-                TempData["Error"] = "Araç detayları yüklenirken hata oluştu.";
+                TempData["Warning"] = "Aradığınız araç şu anda kiralamaya kapalıdır.";
                 return RedirectToAction("CarList");
             }
+
+            return View(car);
         }
 
         [HttpGet]
-        public async Task<JsonResult> GetCarsByCategory(int categoryId)
+        public async Task<IActionResult> GetCarsByCategory(int categoryId)
         {
-            try
-            {
-                var cars = await _carService.GetCarsByCategoryAsync(categoryId);
-                return Json(new { success = true, data = cars });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message });
-            }
+            var cars = await _carService.GetCarsByCategoryAsync(categoryId);
+            return Json(new { success = true, count = cars.Count, data = cars });
         }
 
         [HttpGet]

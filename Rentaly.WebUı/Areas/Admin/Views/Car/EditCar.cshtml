@@ -556,7 +556,7 @@
     <div class="row g-4">
         <div class="col-12 col-xl-8">
 
-            @* 1 · Kimlik *@
+            @*Kimlik *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d0a0a;color:var(--primary);"><i class="fa-solid fa-id-card"></i></div>
@@ -603,7 +603,7 @@
                 </div>
             </div>
 
-            @* 2 · Sınıflandırma *@
+            @* Sınıflandırma *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d2d0a;color:var(--accent);"><i class="fa-solid fa-layer-group"></i></div>
@@ -664,7 +664,7 @@
                 </div>
             </div>
 
-            @* 3 · Teknik *@
+            @* Teknik *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#0a2d0a;color:#10b981;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
@@ -751,7 +751,7 @@
                 </div>
             </div>
 
-            @* 4 · Fiyatlandırma *@
+            @* Fiyatlandırma *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d2d0a;color:#d97706;"><i class="fa-solid fa-turkish-lira-sign"></i></div>
@@ -763,7 +763,8 @@
                             <label class="form-label" for="DailyPrice">Günlük Ücret <span class="required">*</span></label>
                             <div class="input-icon-wrap" style="position:relative;">
                                 <input type="number" id="DailyPrice" name="DailyPrice" class="form-control is-valid"
-                                       value="@Model.DailyPrice" placeholder="0.00" min="0" step="0.01"
+                                       value="@Model.DailyPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                       placeholder="0.00" min="0" step="0.01"
                                        style="padding-right:42px;"
                                        oninput="updatePriceBanner();liveValidate(this)" />
                                 <i class="fa-solid fa-turkish-lira-sign input-icon"></i>
@@ -775,7 +776,8 @@
                             <label class="form-label" for="DepositAmount">Depozito <span class="required">*</span></label>
                             <div class="input-icon-wrap" style="position:relative;">
                                 <input type="number" id="DepositAmount" name="DepositAmount" class="form-control is-valid"
-                                       value="@Model.DepositAmount" placeholder="0.00" min="0" step="0.01"
+                                       value="@Model.DepositAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                       placeholder="0.00" min="0" step="0.01"
                                        style="padding-right:42px;"
                                        oninput="updatePriceBanner();liveValidate(this)" />
                                 <i class="fa-solid fa-shield-halved input-icon"></i>
@@ -799,7 +801,7 @@
                 </div>
             </div>
 
-            @* 5 · Açıklama *@
+            @* Açıklama *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#0a1a2d;color:#3b82f6;"><i class="fa-solid fa-align-left"></i></div>
@@ -815,24 +817,37 @@
 
         </div>
 
-        @* SAĞ KOLON *@
         <div class="col-12 col-xl-4">
-
-            @* Görsel *@
+            @* KAPAK GÖRSELI *@
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#2d0a2d;color:#9333ea;"><i class="fa-solid fa-image"></i></div>
-                    <div><p class="section-title">Araç Görseli</p><p class="section-subtitle">Yeni görsel seçilirse eskisi değiştirilir</p></div>
+                    <div><p class="section-title">Kapak Görseli</p><p class="section-subtitle">Link veya dosya yükle</p></div>
                 </div>
                 <div class="section-body">
-                    @* Mevcut görsel *@
+                    @* Sekmeler *@
+                    <div style="display:flex;gap:8px;margin-bottom:16px;border-bottom:1px solid var(--border);">
+                        <button type="button" class="img-tab-btn active" data-tab="file" onclick="switchImageTab('file')"
+                                style="flex:1;padding:10px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);border-bottom:2px solid transparent;transition:all 0.2s;">
+                            <i class="fa-solid fa-upload"></i> Dosya Yükle
+                        </button>
+                        <button type="button" class="img-tab-btn" data-tab="url" onclick="switchImageTab('url')"
+                                style="flex:1;padding:10px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);border-bottom:2px solid transparent;transition:all 0.2s;">
+                            <i class="fa-solid fa-link"></i> Link Ekle
+                        </button>
+                    </div>
+
+                    @* Mevcut kapak görseli *@
                     @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
                     {
-                        <div class="current-image-wrap" id="currentImageWrap">
-                            <img src="@Model.CoverImageUrl" alt="Mevcut görsel"
+                        <div class="current-image-wrap" id="currentImageWrap" style="margin-bottom:16px;position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);">
+                            <img src="@Model.CoverImageUrl" alt="Mevcut görsel" style="width:100%;height:180px;object-fit:cover;"
                                  onerror="this.src='https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok'" />
-                            <span class="current-image-badge"><i class="fa-solid fa-image me-1"></i>Mevcut</span>
-                            <button type="button" class="current-image-remove" onclick="removeCurrentImage()" title="Görseli kaldır">
+                            <span class="current-image-badge" style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,0.7);color:white;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;">
+                                <i class="fa-solid fa-image me-1"></i>Mevcut
+                            </span>
+                            <button type="button" class="current-image-remove" onclick="removeCurrentImage()" title="Görseli kaldır"
+                                    style="position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(239,68,68,0.9);color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
@@ -842,32 +857,128 @@
                     {
                         <input type="hidden" id="CoverImageUrl" name="CoverImageUrl" value="" />
                     }
+                    <input type="hidden" id="ImageSourceType" name="ImageSourceType" value="" />
 
-                    @* Yeni görsel yükleme *@
-                    <div class="upload-zone" id="uploadZone"
-                         ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)">
-                        <input type="file" id="imageFile" name="imageFile" accept="image/*"
-                               onchange="handleFileSelect(event)" />
-                        <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                        <div class="upload-title">Yeni görsel seçin</div>
-                        <div class="upload-sub">JPG, PNG, WEBP — maks. 5 MB</div>
+                    @* Dosya Yükleme *@
+                    <div id="fileTab" class="image-tab-content active" style="display:block;">
+                        <div class="upload-zone" id="uploadZone"
+                             ondragover="handleDragOver(event)" ondrop="handleDrop(event)" ondragleave="handleDragLeave(event)"
+                             style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--color-background-secondary);">
+                            <input type="file" id="imageFile" name="imageFile" accept="image/*"
+                                   onchange="handleFileSelect(event)" style="display:none;" />
+                            <div class="upload-icon" style="font-size:32px;color:var(--text-muted);margin-bottom:8px;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                            <div class="upload-title" style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">Dosyayı sürükle veya tıkla</div>
+                            <div class="upload-sub" style="font-size:12px;color:var(--text-muted);">JPG, PNG, WEBP — maks. 5 MB</div>
+                        </div>
+
+                        <div id="newImgPreviewWrap" style="display:none;margin-top:12px;">
+                            <img id="newImgPreview" src="" alt="Yeni görsel önizleme"
+                                 style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);" />
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+                                <span id="newImgFileName" style="font-size:12px;color:var(--text-muted);font-weight:500;"></span>
+                                <button type="button" onclick="clearNewImage()"
+                                        style="border:none;background:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;">
+                                    <i class="fa-solid fa-xmark me-1"></i>Kaldır
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="newImgPreviewWrap" style="display:none;margin-top:12px;">
-                        <img id="newImgPreview" src="" alt="Yeni görsel önizleme"
-                             style="width:100%;height:150px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);" />
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;">
-                            <span id="newImgFileName" style="font-size:12px;color:var(--text-muted);"></span>
-                            <button type="button" onclick="clearNewImage()"
-                                    style="border:none;background:none;color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;">
-                                <i class="fa-solid fa-xmark me-1"></i>Kaldır
-                            </button>
+                    @*  Link Ekleme *@
+                    <div id="urlTab" class="image-tab-content" style="display:none;">
+                        <div>
+                            <label class="form-label" for="CoverImageUrlInput" style="font-weight:600;margin-bottom:8px;">Görsel Link</label>
+                            <input type="url" id="CoverImageUrlInput" class="form-control"
+                                   placeholder="https://example.com/image.jpg"
+                                   value="@(Model.CoverImageUrl?.StartsWith("/") == false ? Model.CoverImageUrl : "")"
+                                   oninput="previewUrlImage(this.value)"
+                                   style="border:1px solid var(--border);border-radius:6px;padding:10px;font-size:13px;" />
+                            <small style="color:var(--text-muted);display:block;margin-top:8px;">
+                                <i class="fa-solid fa-circle-info me-1"></i>Tam URL giriniz (https:// ile başlamalı)
+                            </small>
+                        </div>
+
+                        <div id="urlImgPreviewWrap" style="display:none;margin-top:12px;">
+                            <img id="urlImgPreview" src="" alt="URL önizlemesi"
+                                 style="width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);" />
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;">
+                                <span id="urlImgStatus" style="font-size:12px;color:#10b981;"><i class="fa-solid fa-check me-1"></i>Başarılı</span>
+                                <button type="button" onclick="clearUrlImage()"
+                                        style="border:none;background:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;">
+                                    <i class="fa-solid fa-xmark me-1"></i>Kaldır
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            @* Durum *@
+            @* DİĞER GÖRSELLER *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d2d;color:#14b8a6;"><i class="fa-solid fa-images"></i></div>
+                    <div><p class="section-title">Araç Görselleri</p><p class="section-subtitle">Ek görsel yükle (tekrarlı)</p></div>
+                </div>
+                <div class="section-body">
+                    @* Mevcut görseller listesi *@
+                    @if (Model.CarImages != null && Model.CarImages.Count > 0)
+                    {
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:600;font-size:13px;color:var(--text-primary);margin-bottom:8px;display:block;">
+                                <i class="fa-solid fa-folder-open me-1" style="color:#14b8a6;"></i>Yüklü Görseller (@Model.CarImages.Count)
+                            </label>
+                            <div id="existingImagesGrid" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;">
+                                @foreach (var img in Model.CarImages)
+                                {
+                                    <div class="existing-image-item" data-image-id="@img.CarImageId"
+                                         style="position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);height:120px;">
+                                        <img src="@img.CoverImageUrl" alt="Görsel @img.CarImageId"
+                                             style="width:100%;height:100%;object-fit:cover;"
+                                             onerror="this.src='https://placehold.co/120x120/1a1a1a/555?text=Hata'" />
+                                        <button type="button" class="delete-image-btn"
+                                                onclick="deleteExistingImage(@img.CarImageId, this)"
+                                                style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(239,68,68,0.9);color:white;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                        <input type="hidden" class="deleted-image-id" value="" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+
+                    @* Yeni görseller yükleme *@
+                    <label style="font-weight:600;font-size:13px;color:var(--text-primary);margin-bottom:8px;display:block;">
+                        <i class="fa-solid fa-plus me-1" style="color:#14b8a6;"></i>Yeni Görseller Ekle
+                    </label>
+                    <div class="multiple-upload-zone" id="multipleUploadZone"
+                         ondragover="handleMultipleDragOver(event)" ondrop="handleMultipleDrop(event)" ondragleave="handleMultipleDragLeave(event)"
+                         style="border:2px dashed var(--border);border-radius:8px;padding:20px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--color-background-secondary);">
+                        <input type="file" id="carImageFiles" name="carImageFiles" accept="image/*" multiple
+                               onchange="handleMultipleFileSelect(event)" style="display:none;" />
+                        <div style="font-size:28px;color:var(--text-muted);margin-bottom:8px;"><i class="fa-solid fa-images"></i></div>
+                        <div style="font-weight:600;color:var(--text-primary);margin-bottom:4px;">Birden çok dosya seç</div>
+                        <div style="font-size:12px;color:var(--text-muted);">JPG, PNG, WEBP — Her biri maks. 5 MB</div>
+                    </div>
+
+                    @* Seçilen yeni görseller önizlemesi *@
+                    <div id="multipleImgPreviewWrap" style="display:none;margin-top:12px;">
+                        <label style="font-weight:600;font-size:12px;color:var(--text-primary);margin-bottom:8px;display:block;">
+                            Seçilen Yeni Görseller (<span id="newImagesCount">0</span>)
+                        </label>
+                        <div id="newImagesPreviewGrid" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;">
+                            <!-- Dinamik olarak doldurulur -->
+                        </div>
+                        <button type="button" onclick="clearMultipleNewImages()"
+                                style="margin-top:12px;border:none;background:none;color:#ef4444;font-size:12px;font-weight:600;cursor:pointer;">
+                            <i class="fa-solid fa-xmark me-1"></i>Tümünü Kaldır
+                        </button>
+                    </div>
+
+                    @* Silinecek görseller listesi (gizli) *@
+                    <div id="deletedImagesContainer"></div>
+                </div>
+            </div>
             <div class="form-section">
                 <div class="section-header">
                     <div class="section-icon" style="background:#0a2d0a;color:#10b981;"><i class="fa-solid fa-toggle-on"></i></div>
@@ -922,7 +1033,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -943,6 +1053,7 @@
 
 @section Scripts {
     <script>
+
         // ═══ MODEL AJAX (marka değişince) ═══
         async function loadModels(brandId) {
             const sel = document.getElementById('CarModelId');
@@ -998,16 +1109,31 @@
 
         // ═══ FİYAT BANNER ═══
         function updatePriceBanner() {
-            const daily = parseFloat(document.getElementById('DailyPrice').value) || 0;
-            const dep   = parseFloat(document.getElementById('DepositAmount').value) || 0;
+            const dailyEl = document.getElementById('DailyPrice');
+            const depEl   = document.getElementById('DepositAmount');
+
+            if (!dailyEl || !depEl) return;
+
+            const daily = parseFloat(dailyEl.value) || 0;
+            const dep   = parseFloat(depEl.value) || 0;
             const b     = document.getElementById('priceBanner');
-            if (daily > 0) {
-                b.style.display = 'block';
-                document.getElementById('bannerDaily').textContent   = '₺' + daily.toLocaleString('tr-TR');
-                document.getElementById('bannerWeekly').textContent  = '₺' + (daily*7).toLocaleString('tr-TR');
-                document.getElementById('bannerMonthly').textContent = '₺' + (daily*30).toLocaleString('tr-TR');
-                document.getElementById('bannerDeposit').textContent = dep > 0 ? '₺'+dep.toLocaleString('tr-TR') : '—';
-            } else { b.style.display = 'none'; }
+
+            if (b) {
+                if (daily > 0) {
+                    b.style.display = 'block';
+                    const bannerDaily = document.getElementById('bannerDaily');
+                    const bannerWeekly = document.getElementById('bannerWeekly');
+                    const bannerMonthly = document.getElementById('bannerMonthly');
+                    const bannerDeposit = document.getElementById('bannerDeposit');
+
+                    if (bannerDaily) bannerDaily.textContent   = '₺' + daily.toLocaleString('tr-TR');
+                    if (bannerWeekly) bannerWeekly.textContent  = '₺' + (daily*7).toLocaleString('tr-TR');
+                    if (bannerMonthly) bannerMonthly.textContent = '₺' + (daily*30).toLocaleString('tr-TR');
+                    if (bannerDeposit) bannerDeposit.textContent = dep > 0 ? '₺'+dep.toLocaleString('tr-TR') : '—';
+                } else {
+                    b.style.display = 'none';
+                }
+            }
         }
 
         // ═══ ALANLARI DOĞRULA ═══
@@ -1016,21 +1142,50 @@
             el.classList.toggle('is-valid',   !!(el.value && el.value !== ''));
         }
 
-        // ═══ GÖRSEL YÖNETİMİ ═══
-        function removeCurrentImage() {
-            document.getElementById('currentImageWrap')?.remove();
-            document.getElementById('CoverImageUrl').value = '';
+        // ═══════════════════════════════════════════════════════════
+        // KAPAK GÖRSELI - DOSYA + LINK DESTEĞI
+        // ═══════════════════════════════════════════════════════════
+
+        // Sekme Geçişi
+        function switchImageTab(tab) {
+            document.querySelectorAll('.image-tab-content').forEach(el => el.style.display = 'none');
+            document.getElementById(tab + 'Tab').style.display = 'block';
+
+            document.querySelectorAll('.img-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.style.borderBottomColor = 'transparent';
+                btn.style.color = 'var(--text-muted)';
+            });
+
+            const activeBtn = event.target.closest('.img-tab-btn');
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+                activeBtn.style.borderBottomColor = 'var(--primary)';
+                activeBtn.style.color = 'var(--primary)';
+            }
         }
 
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
+        // Dosya Seçme
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
             if (!file) return;
-            if (file.size > 5*1024*1024) { alert('Dosya 5MB\'dan büyük olamaz.'); return; }
+
+            if (!file.type.startsWith('image/')) {
+                alert('Lütfen bir görsel dosyası seçiniz.');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Dosya boyutu 5MB\'dan büyük olamaz.');
+                return;
+            }
+
             const reader = new FileReader();
-            reader.onload = ev => {
-                document.getElementById('newImgPreview').src = ev.target.result;
-                document.getElementById('newImgFileName').textContent = file.name;
+            reader.onload = function(e) {
+                document.getElementById('newImgPreview').src = e.target.result;
+                document.getElementById('newImgFileName').textContent = file.name + ' (' + (file.size / 1024).toFixed(0) + ' KB)';
                 document.getElementById('newImgPreviewWrap').style.display = 'block';
+                document.getElementById('ImageSourceType').value = 'file';
             };
             reader.readAsDataURL(file);
         }
@@ -1038,23 +1193,197 @@
         function clearNewImage() {
             document.getElementById('imageFile').value = '';
             document.getElementById('newImgPreviewWrap').style.display = 'none';
+            document.getElementById('ImageSourceType').value = '';
         }
 
-        function handleDragOver(e)  { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
-        function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+        // Drag & Drop
+        function handleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('uploadZone').style.borderColor = 'var(--primary)';
+            document.getElementById('uploadZone').style.backgroundColor = 'rgba(147, 51, 234, 0.05)';
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('uploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('uploadZone').style.backgroundColor = 'var(--color-background-secondary)';
+        }
+
         function handleDrop(e) {
-            e.preventDefault(); e.currentTarget.classList.remove('dragover');
-            const file = e.dataTransfer.files[0];
-            if (file?.type.startsWith('image/')) {
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                document.getElementById('imageFile').files = dt.files;
-                handleFileSelect({ target: { files: dt.files } });
+            e.preventDefault();
+            document.getElementById('uploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('uploadZone').style.backgroundColor = 'var(--color-background-secondary)';
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('imageFile').files = files;
+                handleFileSelect({ target: { files: files } });
             }
         }
 
-        // ═══ FORM SUBMIT ═══
-        document.getElementById('editCarForm').addEventListener('submit', function(e) {
+        // Link Ekleme
+        function previewUrlImage(url) {
+            if (!url.trim()) {
+                document.getElementById('urlImgPreviewWrap').style.display = 'none';
+                document.getElementById('CoverImageUrl').value = '';
+                document.getElementById('ImageSourceType').value = '';
+                return;
+            }
+
+            try {
+                new URL(url);
+            } catch (e) {
+                document.getElementById('urlImgPreviewWrap').style.display = 'none';
+                return;
+            }
+
+            const img = new Image();
+            img.onload = function() {
+                document.getElementById('urlImgPreview').src = url;
+                document.getElementById('urlImgPreviewWrap').style.display = 'block';
+                document.getElementById('CoverImageUrl').value = url;
+                document.getElementById('ImageSourceType').value = 'url';
+                document.getElementById('urlImgStatus').innerHTML = '<i class="fa-solid fa-check me-1"></i>Başarılı';
+            };
+            img.onerror = function() {
+                document.getElementById('urlImgStatus').innerHTML = '<i class="fa-solid fa-exclamation me-1" style="color:#ef4444;"></i>Yüklenemedi';
+                document.getElementById('urlImgPreviewWrap').style.display = 'block';
+            };
+            img.src = url;
+        }
+
+        function clearUrlImage() {
+            document.getElementById('CoverImageUrlInput').value = '';
+            document.getElementById('urlImgPreviewWrap').style.display = 'none';
+            document.getElementById('CoverImageUrl').value = '';
+            document.getElementById('ImageSourceType').value = '';
+        }
+
+        // Mevcut Görseli Kaldır
+        function removeCurrentImage() {
+            if (!confirm('Mevcut görseli kaldırmak istediğinize emin misiniz?')) return;
+
+            const wrap = document.getElementById('currentImageWrap');
+            if (wrap) wrap.style.display = 'none';
+            document.getElementById('CoverImageUrl').value = '';
+            document.getElementById('ImageSourceType').value = 'remove';
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // DİĞER GÖRSELLER - ÇOKLU YÖNETİMİ
+        // ═══════════════════════════════════════════════════════════
+
+        // Çoklu Dosya Seçme
+        function handleMultipleFileSelect(event) {
+            const files = Array.from(event.target.files);
+
+            if (files.length === 0) return;
+
+            let validFiles = [];
+
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) {
+                    alert(`${file.name} bir görsel dosyası değildir.`);
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`${file.name} 5MB\'dan büyüktür.`);
+                    return;
+                }
+                validFiles.push(file);
+            });
+
+            displayMultipleImagePreviews(validFiles);
+        }
+
+        function displayMultipleImagePreviews(files) {
+            const container = document.getElementById('newImagesPreviewGrid');
+            container.innerHTML = '';
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'new-image-item';
+                    previewDiv.style.cssText = 'position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);height:120px;';
+                    previewDiv.innerHTML = `
+                        <img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;" />
+                        <button type="button" onclick="removeImagePreview(this)"
+                                style="position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(239,68,68,0.9);color:white;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    container.appendChild(previewDiv);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            document.getElementById('multipleImgPreviewWrap').style.display = 'block';
+            document.getElementById('newImagesCount').textContent = files.length;
+        }
+
+        function removeImagePreview(btn) {
+            btn.closest('.new-image-item').remove();
+
+            const remainingCount = document.querySelectorAll('.new-image-item').length;
+            if (remainingCount === 0) {
+                document.getElementById('carImageFiles').value = '';
+                document.getElementById('multipleImgPreviewWrap').style.display = 'none';
+            } else {
+                document.getElementById('newImagesCount').textContent = remainingCount;
+            }
+        }
+
+        function clearMultipleNewImages() {
+            document.getElementById('carImageFiles').value = '';
+            document.getElementById('newImagesPreviewGrid').innerHTML = '';
+            document.getElementById('multipleImgPreviewWrap').style.display = 'none';
+        }
+
+        // Çoklu Drag & Drop
+        function handleMultipleDragOver(e) {
+            e.preventDefault();
+            document.getElementById('multipleUploadZone').style.borderColor = 'var(--primary)';
+            document.getElementById('multipleUploadZone').style.backgroundColor = 'rgba(20, 184, 166, 0.05)';
+        }
+
+        function handleMultipleDragLeave(e) {
+            e.preventDefault();
+            document.getElementById('multipleUploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('multipleUploadZone').style.backgroundColor = 'var(--color-background-secondary)';
+        }
+
+        function handleMultipleDrop(e) {
+            e.preventDefault();
+            document.getElementById('multipleUploadZone').style.borderColor = 'var(--border)';
+            document.getElementById('multipleUploadZone').style.backgroundColor = 'var(--color-background-secondary)';
+
+            const files = Array.from(e.dataTransfer.files);
+            if (files.length > 0) {
+                const validFiles = files.filter(f => f.type.startsWith('image/') && f.size <= 5 * 1024 * 1024);
+                displayMultipleImagePreviews(validFiles);
+            }
+        }
+
+        // Mevcut Görseli Sil
+        function deleteExistingImage(imageId, btn) {
+            if (!confirm('Bu görseli silmek istediğinize emin misiniz?')) return;
+
+            btn.closest('.existing-image-item').style.display = 'none';
+
+            const container = document.getElementById('deletedImagesContainer');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'deletedImageIds';
+            input.value = imageId;
+            container.appendChild(input);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // FORM SUBMIT
+        // ═══════════════════════════════════════════════════════════
+
+        document.getElementById('editCarForm')?.addEventListener('submit', function(e) {
             const required = ['PlateNumber','VIN','BrandId','CarModelId','CategoryId','BranchId','Year','Kilometer','DailyPrice','DepositAmount','Transmission'];
             let valid = true;
 
@@ -1067,7 +1396,7 @@
             // Plaka format kontrolü
             const plateEl  = document.getElementById('PlateNumber');
             const plateErr = document.getElementById('plateError');
-            if (plateEl.value && !validatePlateNumber(plateEl.value)) {
+            if (plateEl && plateEl.value && !validatePlateNumber(plateEl.value)) {
                 plateEl.classList.add('is-invalid');
                 plateErr.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Geçerli bir plaka giriniz. (Örn: 34 ABC 123)';
                 plateErr.style.display = 'flex';
@@ -1076,8 +1405,13 @@
 
             const fuel    = document.querySelector('input[name="FuelType"]:checked');
             const fuelErr = document.getElementById('fuelError');
-            if (!fuel) { fuelErr.classList.add('show'); valid = false; }
-            else        { fuelErr.classList.remove('show'); }
+            if (!fuel) { fuelErr?.classList.add('show'); valid = false; }
+            else        { fuelErr?.classList.remove('show'); }
+
+            // ImageSourceType ayarla
+            if (!document.getElementById('ImageSourceType').value && document.getElementById('CoverImageUrl').value) {
+                document.getElementById('ImageSourceType').value = 'keep';
+            }
 
             if (!valid) {
                 e.preventDefault();
@@ -1085,12 +1419,43 @@
                 return;
             }
 
-            const btn     = document.getElementById('submitBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kaydediliyor…';
-            btn.disabled  = true;
+            const btn = document.getElementById('submitBtn');
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Kaydediliyor…';
+                btn.disabled = true;
+            }
         });
 
-        // Sayfa yüklenince fiyat banner'ı güncelle
-        document.addEventListener('DOMContentLoaded', () => updatePriceBanner());
+        // ═══════════════════════════════════════════════════════════
+        // SAYFA YÜKLEME - FİYAT BANNER'I GÜNCELLE
+        // ═══════════════════════════════════════════════════════════
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Fiyat banner'ını güncelle (form dolduysa göster)
+            setTimeout(() => {
+                updatePriceBanner();
+            }, 200);
+
+            // Kapak görseli
+            const urlInput = document.getElementById('CoverImageUrlInput');
+            if (urlInput && urlInput.value) {
+                previewUrlImage(urlInput.value);
+            }
+
+            // Upload zone tıklanabilir hale getir
+            const multiZone = document.getElementById('multipleUploadZone');
+            if (multiZone) {
+                multiZone.addEventListener('click', function() {
+                    document.getElementById('carImageFiles').click();
+                });
+            }
+
+            const uploadZone = document.getElementById('uploadZone');
+            if (uploadZone) {
+                uploadZone.addEventListener('click', function() {
+                    document.getElementById('imageFile').click();
+                });
+            }
+        });
     </script>
 }

@@ -7,6 +7,7 @@
 
     string brandFilter = Context.Request.Query["brand"];
     string statusFilter = Context.Request.Query["status"];
+    string activeFilter = Context.Request.Query["active"];
     string fuelFilter = Context.Request.Query["fuel"];
     string searchFilter = Context.Request.Query["search"];
 }
@@ -300,7 +301,7 @@
                 `&search=${encodeURIComponent(search)}` +
                 `&brand=${brand}` +
                 `&fuel=${encodeURIComponent(fuel)}` +
-                `&status=${encodeURIComponent(status)}`;
+                `&status=${encodeURIComponent(status)}` ;
         }
 
         function resetFilters() {
