@@ -2,7 +2,7 @@
 @model Car
 @{
     ViewData["Title"] = "CreateCar";
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 @section Styles {
@@ -677,7 +677,7 @@
         <h1 class="page-title">Yeni Araç Ekle</h1>
         <p class="page-subtitle">Filoya yeni bir araç kaydı oluşturun.</p>
     </div>
-    <a href="/Admin/Car/CarList" class="btn-cancel-form">
+    <a href="@Url.Action("CarList", "Car", new { area = "Admin" })" class="btn-cancel-form">
         <i class="fa-solid fa-arrow-left"></i> Listeye Dön
     </a>
 </div>
@@ -807,7 +807,7 @@
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Year">Model Yılı <span class="required">*</span></label>
                             <div class="input-icon-wrap">
-                                <input type="number" id="Year" name="Year" class="form-control" placeholder="2024" min="1990" max="2030" oninput="liveValidate(this);updateSummary()" />
+                                <input type="number" id="Year" name="Year" class="form-control" lang="en" placeholder="2024" min="1990" max="2030" oninput="liveValidate(this);updateSummary()" />
                                 <i class="fa-solid fa-calendar input-icon"></i>
                             </div>
                             <div class="invalid-feedback" id="yearError"><i class="fa-solid fa-circle-exclamation"></i> Yıl zorunludur.</div>
@@ -815,7 +815,7 @@
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Kilometer">Kilometre <span class="required">*</span></label>
                             <div class="input-icon-wrap" style="position:relative;">
-                                <input type="number" id="Kilometer" name="Kilometer" class="form-control" placeholder="0" min="0" style="padding-right:50px;" oninput="liveValidate(this)" />
+                                <input type="number" id="Kilometer" name="Kilometer" class="form-control" lang="en" placeholder="0" min="0" style="padding-right:50px;" oninput="liveValidate(this)" />
                                 <i class="fa-solid fa-road input-icon"></i>
                                 <span class="input-suffix">km</span>
                             </div>
@@ -1085,7 +1085,9 @@
             <span style="color:var(--danger);">*</span> zorunlu alanlar
         </div>
         <div class="d-flex gap-2">
-            <a href="/Admin/Car/CarList" class="btn-cancel-form"><i class="fa-solid fa-xmark"></i> Vazgeç</a>
+            <a href="@Url.Action("CarList", "Car", new { area = "Admin" })" class="btn-cancel-form">
+                <i class="fa-solid fa-xmark"></i> Vazgeç
+            </a>
             <button type="submit" class="btn-submit-car" id="submitBtn"><i class="fa-solid fa-check"></i> Aracı Kaydet</button>
         </div>
     </div>
@@ -1164,7 +1166,7 @@
     <script>
         const _token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
 
-        // ═══ MODAL ═══
+        // MODAL
         function openModal(type) {
             if (type === 'model') {
                 const brandId   = document.getElementById('BrandId').value;
@@ -1203,7 +1205,7 @@
             input.addEventListener('keydown', e => { if (e.key === 'Enter') quickSave(input.closest('.quick-modal-backdrop').id.replace('modal-', '')); });
         });
 
-        // ═══ QUICK SAVE ═══
+        //QUICK SAVE
         async function quickSave(type) {
             const btn   = document.getElementById(`q${cap(type)}SaveBtn`);
             const errEl = document.getElementById(`q${cap(type)}Error`);
@@ -1275,7 +1277,7 @@
             sel.dispatchEvent(new Event('change'));
         }
 
-        // ═══ MODEL AJAX ═══
+        // MODEL AJAX
         async function loadModels(brandId) {
             const sel = document.getElementById('CarModelId');
             sel.innerHTML = '<option value="">Yükleniyor…</option>';
@@ -1298,7 +1300,7 @@
             updateSummary();
         }
 
-        // ═══ YARDIMCILAR ═══
+        //YARDIMCILAR
         function updatePlatePreview() {
             const val = document.getElementById('PlateNumber').value.trim();
             document.getElementById('platePreviewWrap').style.display = val.length >= 2 ? 'block' : 'none';
@@ -1374,10 +1376,7 @@
             updateSummary();
         }
 
-        // ═══════════════════════════════════════════════════════════
         // KAPAK GÖRSELİ - DOSYA + LINK DESTEĞİ (EditCar stili)
-        // ═══════════════════════════════════════════════════════════
-
         function switchImageTab(tab, event) {
             document.querySelectorAll('.image-tab-content').forEach(el => el.style.display = 'none');
             document.getElementById(tab + 'Tab').style.display = 'block';
@@ -1467,10 +1466,7 @@
             document.getElementById('ImageSourceType').value = '';
         }
 
-        // ═══════════════════════════════════════════════════════════
         // DİĞER GÖRSELLER - ÇOKLU YÖNETİMİ (EditCar stili)
-        // ═══════════════════════════════════════════════════════════
-
         function handleMultipleFileSelect(event) {
             const files = Array.from(event.target.files);
             if (!files.length) return;
@@ -1541,18 +1537,12 @@
             displayMultipleImagePreviews(files);
         }
 
-        // ═══════════════════════════════════════════════════════════
         // YAKÎT TİPİ
-        // ═══════════════════════════════════════════════════════════
-
         document.querySelectorAll('input[name="FuelType"]').forEach(r => {
             r.addEventListener('change', () => { document.getElementById('fuelError').classList.remove('show'); updateSummary(); });
         });
 
-        // ═══════════════════════════════════════════════════════════
         // FORM SUBMIT
-        // ═══════════════════════════════════════════════════════════
-
         document.getElementById('carForm').addEventListener('submit', function(e) {
             const required = ['PlateNumber','VIN','BrandId','CarModelId','CategoryId','BranchId','Year','Kilometer','DailyPrice','DepositAmount','Transmission'];
             let valid = true;
@@ -1595,10 +1585,7 @@
             btn.disabled  = true;
         });
 
-        // ═══════════════════════════════════════════════════════════
         // SAYFA YÜKLEME
-        // ═══════════════════════════════════════════════════════════
-
         document.addEventListener('DOMContentLoaded', () => {
             // Kapak görseli upload zone tıklanabilir
             document.getElementById('uploadZone')?.addEventListener('click', () => {
@@ -1612,3 +1599,5 @@
         });
     </script>
 }
+
+

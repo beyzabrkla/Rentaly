@@ -2,7 +2,7 @@
 @model Car
 @{
     ViewData["Title"] = "EditCar";
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
 @section Styles {
@@ -541,7 +541,7 @@
             — @Model.PlateNumber
         </p>
     </div>
-    <a href="/Admin/Car/CarList" class="btn-cancel-form">
+    <a href="@Url.Action("CarList", "Car", new { area = "Admin" })" class="btn-cancel-form">
         <i class="fa-solid fa-arrow-left"></i> Listeye Dön
     </a>
 </div>
@@ -675,7 +675,7 @@
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Year">Model Yılı <span class="required">*</span></label>
                             <div class="input-icon-wrap">
-                                <input type="number" id="Year" name="Year" class="form-control is-valid"
+                                <input type="number" id="Year"  lang="en" name="Year" class="form-control is-valid"
                                        value="@Model.Year" placeholder="2024" min="1990" max="2030"
                                        oninput="liveValidate(this)" />
                                 <i class="fa-solid fa-calendar input-icon"></i>
@@ -685,7 +685,7 @@
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Kilometer">Kilometre <span class="required">*</span></label>
                             <div class="input-icon-wrap" style="position:relative;">
-                                <input type="number" id="Kilometer" name="Kilometer" class="form-control is-valid"
+                                <input type="number" id="Kilometer" lang="en" name="Kilometer" class="form-control is-valid"
                                        value="@Model.Kilometer" placeholder="0" min="0"
                                        style="padding-right:50px;"
                                        oninput="liveValidate(this)" />
@@ -763,7 +763,7 @@
                             <label class="form-label" for="DailyPrice">Günlük Ücret <span class="required">*</span></label>
                             <div class="input-icon-wrap" style="position:relative;">
                                 <input type="number" id="DailyPrice" name="DailyPrice" class="form-control is-valid"
-                                       value="@Model.DailyPrice.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                       value="@Model.DailyPrice.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
                                        placeholder="0.00" min="0" step="0.01"
                                        style="padding-right:42px;"
                                        oninput="updatePriceBanner();liveValidate(this)" />
@@ -776,7 +776,7 @@
                             <label class="form-label" for="DepositAmount">Depozito <span class="required">*</span></label>
                             <div class="input-icon-wrap" style="position:relative;">
                                 <input type="number" id="DepositAmount" name="DepositAmount" class="form-control is-valid"
-                                       value="@Model.DepositAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                       value="@Model.DepositAmount.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)"
                                        placeholder="0.00" min="0" step="0.01"
                                        style="padding-right:42px;"
                                        oninput="updatePriceBanner();liveValidate(this)" />
@@ -1042,7 +1042,9 @@
             <span style="color:var(--danger);">*</span> zorunlu alanlar
         </div>
         <div class="d-flex gap-2">
-            <a href="/Admin/Car/CarList" class="btn-cancel-form"><i class="fa-solid fa-xmark"></i> Vazgeç</a>
+            <a href="@Url.Action("CarList", "Car", new { area = "Admin" })" class="btn-cancel-form">
+                <i class="fa-solid fa-xmark"></i> Vazgeç
+            </a>        
             <button type="submit" class="btn-submit-car" id="submitBtn">
                 <i class="fa-solid fa-floppy-disk"></i> Değişiklikleri Kaydet
             </button>
@@ -1459,3 +1461,5 @@
         });
     </script>
 }
+
+
