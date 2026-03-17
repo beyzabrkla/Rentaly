@@ -1,0 +1,261 @@
+﻿@using Rentaly.EntityLayer.Entities
+@using Microsoft.AspNetCore.WebUtilities
+@model List<Branch>
+@{
+    ViewData["Title"] = "Şube Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var carCounts = ViewBag.CarCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    
+    // Filtre değerlerini URL'den alıyoruz
+    string statusFilter = Context.Request.Query["status"];
+    string searchFilter = Context.Request.Query["search"];
+}
+
+<style>
+    /* Modal ve Badge Tasarımları */
+    .custom-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Şube Yönetimi</h1>
+        <p class="page-subtitle">Hizmet noktalarını ve araç dağılımlarını yönetin.</p>
+    </div>
+    <button class="btn-primary-custom" onclick="openBranchModal(0)">
+        <i class="fa-solid fa-plus"></i> Yeni Şube Ekle
+    </button>
+</div>
+
+@* Üst Stat Kartları (Aktif/Pasif) *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:var(--text-main);">@ViewBag.TotalCount</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Toplam Şube</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:#10b981;">@ViewBag.ActiveCount</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Aktif</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:#ef4444;">@ViewBag.PassiveCount</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Pasif</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:var(--primary);">@carCounts.Values.Sum()</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Toplam Araç</div>
+        </div>
+    </div>
+</div>
+
+@* Filtreleme Alanı *@
+<div class="toolbar-card mb-4">
+    <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Şube veya şehir ara..." value="@searchFilter" onkeypress="if(event.key==='Enter') filterBranches()" />
+    </div>
+    <select class="filter-select" id="statusFilter" onchange="filterBranches()">
+        <option value="">Tüm Durumlar</option>
+        <option value="True" @(statusFilter == "True" ? "selected" : "")>Aktif</option>
+        <option value="False" @(statusFilter == "False" ? "selected" : "")>Pasif</option>
+    </select>
+    <button class="btn-action btn-detail" onclick="window.location.href='/Admin/Branch/BranchList'">
+        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+    </button>
+</div>
+
+@* Sonuç Özeti *@
+<p class="results-count mb-3">
+    Toplam <strong>@ViewBag.TotalCount</strong> şubeden
+    <strong>@Model.Count</strong> tanesi gösteriliyor.
+    @if ((int)ViewBag.TotalPages > 1)
+    {
+        <text>Sayfa <strong>@ViewBag.CurrentPage</strong> / <strong>@ViewBag.TotalPages</strong></text>
+    }
+</p>
+
+@* Liste *@
+<div class="row g-4">
+    @if (!Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-building-circle-exclamation fa-3x mb-3" style="color:var(--text-muted);opacity:.4;"></i>
+            <p class="text-muted">Aranan kriterlere uygun şube bulunamadı.</p>
+        </div>
+    }
+    @foreach (var branch in Model)
+    {
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="vehicle-card">
+                <div class="vehicle-img-wrap" style="height: 140px; background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: center; position: relative;">
+                    <i class="fa-solid fa-building-circle-check fa-3x" style="color: var(--primary); opacity: 0.2;"></i>
+                    
+                    @* Aktif/Pasif Rozeti (CarList Stili) *@
+                    <span class="vehicle-status @(branch.IsActive ? "status-available" : "status-rented")">
+                        <i class="fa-solid @(branch.IsActive ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
+                        @(branch.IsActive ? "Aktif" : "Pasif")
+                    </span>
+                </div>
+
+                <div class="vehicle-body">
+                    <div class="vehicle-brand">@branch.City</div>
+                    <div class="vehicle-name">@branch.BranchName</div>
+                    <div class="vehicle-specs">
+                        <div class="spec-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span class="text-truncate">@branch.Address</span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-car"></i>
+                            <span>@(carCounts.ContainsKey(branch.BranchId) ? carCounts[branch.BranchId] : 0) Kayıtlı Araç</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vehicle-actions">
+                    <a href="/Admin/Branch/BranchDetail/@branch.BranchId" class="btn-action btn-detail" style="flex:1">
+                        <i class="fa-solid fa-eye"></i> Detay
+                    </a>
+                    <button onclick="handleEdit('@branch.BranchId', '@Html.Raw(branch.BranchName)', '@Html.Raw(branch.City)', '@Html.Raw(branch.Address)', '@branch.IsActive')" class="btn-action btn-edit">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button onclick="confirmDelete(@branch.BranchId)" class="btn-action btn-delete">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Gelişmiş Pagination *@
+@{
+    var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+    var filterParams = new Dictionary<string, string>();
+    foreach (var param in queryParams) { if (param.Key.ToLower() != "page") filterParams[param.Key] = param.Value.ToString(); }
+    string GetPageUrl(int n)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = n.ToString() };
+        return Url.Action("BranchList", "Branch", new { area = "Admin" }) + QueryString.Create(qs).Value;
+    }
+}
+
+@if ((int)ViewBag.TotalPages > 1)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+                @if ((int)ViewBag.CurrentPage > 1)
+                {
+                    <a href="@GetPageUrl(1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;"><i class="fa-solid fa-angles-left"></i> İlk</a>
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage - 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;"><i class="fa-solid fa-angle-left"></i> Önceki</a>
+                }
+                <div style="display:flex;gap:6px;">
+                    @{
+                        int start = Math.Max(1, (int)ViewBag.CurrentPage - 2); int end = Math.Min((int)ViewBag.TotalPages, (int)ViewBag.CurrentPage + 2);
+                    }
+                    @for (int i = start; i <= end; i++)
+                    {
+                        if (i == (int)ViewBag.CurrentPage)
+                        {
+                            <span class="btn-action btn-delete" style="flex:unset;padding:8px 14px;">@i</span>
+                        }
+                        else
+                        {
+
+                            <a href="@GetPageUrl(i)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">@i</a>
+                        }
+                    }
+                </div>
+                @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                {
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage + 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">Sonraki <i class="fa-solid fa-angle-right"></i></a>
+                    <a href="@GetPageUrl((int)ViewBag.TotalPages)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">Son <i class="fa-solid fa-angles-right"></i></a>
+                }
+            </nav>
+        </div>
+    </div>
+}
+
+@* Şube Ekle/Düzenle Modal *@
+<div id="branchModal" class="custom-modal-backdrop">
+    <div class="custom-modal-content" style="background: #1a1a1a; border: 1px solid #282828; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px;">
+        <h4 id="modalTitle" class="mb-4 text-white" style="font-weight:800;">Şube Bilgileri</h4>
+        <form id="branchForm" method="post">
+            <input type="hidden" name="BranchId" id="modalBranchId" />
+            <div class="mb-3">
+                <label class="form-label text-muted small">Şube Adı</label>
+                <input type="text" name="BranchName" id="modalBranchName" class="filter-select w-100" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted small">Şehir</label>
+                <input type="text" name="City" id="modalCity" class="filter-select w-100" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-muted small">Durum</label>
+                <select name="IsActive" id="modalIsActive" class="filter-select w-100">
+                    <option value="true">Aktif</option>
+                    <option value="false">Pasif</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label text-muted small">Adres</label>
+                <textarea name="Address" id="modalAddress" class="filter-select w-100" style="height:80px;" required></textarea>
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn-action btn-detail" onclick="closeModals()">İptal</button>
+                <button type="submit" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterBranches() {
+            const search = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            window.location.href = `?page=1&search=${encodeURIComponent(search)}&status=${status}`;
+        }
+
+        function openBranchModal(id) {
+            document.getElementById('branchForm').reset();
+            document.getElementById('modalBranchId').value = id;
+            document.getElementById('modalTitle').innerText = "Yeni Şube Ekle";
+            document.getElementById('branchForm').action = "/Admin/Branch/CreateBranch";
+            document.getElementById('branchModal').style.display = 'flex';
+        }
+
+        function handleEdit(id, name, city, address, isActive) {
+            document.getElementById('modalBranchId').value = id;
+            document.getElementById('modalBranchName').value = name;
+            document.getElementById('modalCity').value = city;
+            document.getElementById('modalAddress').value = address;
+            document.getElementById('modalIsActive').value = isActive.toLowerCase();
+            document.getElementById('modalTitle').innerText = "Şubeyi Düzenle";
+            document.getElementById('branchForm').action = "/Admin/Branch/EditBranch";
+            document.getElementById('branchModal').style.display = 'flex';
+        }
+
+        function closeModals() { document.getElementById('branchModal').style.display = 'none'; }
+        window.onclick = e => { if (e.target.id === 'branchModal') closeModals(); }
+    </script>
+}

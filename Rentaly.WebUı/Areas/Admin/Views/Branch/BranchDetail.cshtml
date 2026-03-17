@@ -1,0 +1,117 @@
+﻿@using Rentaly.EntityLayer.Entities
+@model List<Car>
+@{
+    var branch = ViewBag.Branch as Branch;
+    ViewData["Title"] = branch?.BranchName + " Araçları";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div class="d-flex align-items-center gap-3">
+        <a href="@Url.Action("BranchList", "Branch", new { area = "Admin" })"
+               class="btn-action btn-detail"
+               style="width:45px; height:45px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;">
+            <i class="fa-solid fa-arrow-left m-0"></i>
+        </a>
+        <div>
+            <h1 class="page-title" style="color:#ffffff;">@branch?.BranchName - Araçlar</h1>
+            <p class="page-subtitle">@branch?.City şubesindeki aktif filo listesi.</p>
+        </div>
+    </div>
+</div>
+
+@* Stat Kartları *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#ffffff;">@ViewBag.TotalCars</div>
+            <div style="font-size:12px; color:var(--text-muted);">Toplam Araç</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:#10b981;">@ViewBag.AvailableCount</div>
+            <div style="font-size:12px; color:var(--text-muted);">Müsait</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans'; font-size:24px; font-weight:800; color:var(--accent);">@ViewBag.RentedCount</div>
+            <div style="font-size:12px; color:var(--text-muted);">Kirada</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <div style="color:var(--text-muted); opacity:0.5;">
+                <i class="fa-solid fa-car" style="font-size:48px; display:block; margin-bottom:16px;"></i>
+                <p style="font-size:15px;">Bu şubede henüz araç bulunmuyor.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var car in Model)
+        {
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="vehicle-card h-100">
+                    <div class="vehicle-img-wrap">
+                        <img src="@(string.IsNullOrEmpty(car.CoverImageUrl) ? "https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok" : car.CoverImageUrl)"
+                             alt="@car.CarModel?.ModelName" />
+                        <span class="vehicle-status @(car.IsAvailable ? "status-available" : "status-rented")">
+                            <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
+                            @(car.IsAvailable ? "Müsait" : "Kirada")
+                        </span>
+                        <span class="vehicle-fuel">
+                            <i class="fa-solid fa-gas-pump"></i> @car.FuelType
+                        </span>
+                    </div>
+
+                    <div class="vehicle-body">
+                        <div class="vehicle-brand">@car.Brand?.BrandName</div>
+                        <div class="vehicle-name">@car.CarModel?.ModelName</div>
+
+                        <div class="vehicle-specs">
+                            <div class="spec-item">
+                                <i class="fa-solid fa-road"></i>
+                                <span>@car.Kilometer.ToString("N0") km</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-gears"></i>
+                                <span>@car.Transmission</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-users"></i>
+                                <span>@car.SeatCount kişi</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-suitcase"></i>
+                                <span>@car.LuggageCount bagaj</span>
+                            </div>
+                        </div>
+
+                        <div class="vehicle-price-row">
+                            <div class="vehicle-price">
+                                <span class="price-amount">₺@car.DailyPrice.ToString("N0")</span>
+                                <span class="price-label">/ gün</span>
+                            </div>
+                            <span class="vehicle-year-badge">@car.Year</span>
+                        </div>
+                    </div>
+
+                    <div class="vehicle-actions">
+                        <a href="/Admin/Car/EditCar/@car.CarId" class="btn-action btn-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                        </a>
+                        <a href="/Admin/Car/CarDetail/@car.CarId" class="btn-action btn-detail">
+                            <i class="fa-solid fa-eye"></i> Detay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

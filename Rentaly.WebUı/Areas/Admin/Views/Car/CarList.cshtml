@@ -12,10 +12,8 @@
     string searchFilter = Context.Request.Query["search"];
 }
 
-@* Silme AJAX için token zorunlu *@
 @Html.AntiForgeryToken()
 
-@* Page Header *@
 <div class="page-header">
     <div>
         <h1 class="page-title">Araç Listesi</h1>
@@ -54,7 +52,6 @@
     </div>
 </div>
 
-@* Toolbar *@
 <div class="toolbar-card">
     <div class="search-wrap">
         <i class="fa-solid fa-magnifying-glass"></i>
@@ -88,7 +85,6 @@
     </button>
 </div>
 
-@* Sonuç Bilgisi *@
 <p class="results-count mb-3">
     Toplam <strong>@ViewBag.TotalCars</strong> araçtan
     <strong>@Model.Count</strong> tanesi gösteriliyor.
@@ -293,7 +289,6 @@
 
 @section Scripts {
     <script>
-        // Razor tarafından üretilen güvenli URL'ler
         const urlCarList   = '@Url.Action("CarList", "Car", new { area = "Admin" })';
         const urlDeleteCar = '@Url.Action("DeleteCar", "Car", new { area = "Admin" })';
 
