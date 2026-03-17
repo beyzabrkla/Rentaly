@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
-using Rentaly.EntityLayer.Entities; 
+using Rentaly.DataAccessLayer.UnitOfWork;
+using Rentaly.EntityLayer.Entities;
 
 namespace Rentaly.WebUI.Areas.Admin.Controllers
 {
@@ -8,16 +9,27 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(ICategoryService categoryService, IUnitOfWork unitOfWork)
         {
             _categoryService = categoryService;
+            _unitOfWork = unitOfWork;
         }
 
+        [HttpGet]
         public async Task<IActionResult> CategoryList()
         {
-            var values = await _categoryService.TGetListAsync();
-            return View(values);
+            try
+            {
+                var values = await _categoryService.TGetListAsync();
+                return View(values);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Kategoriler yüklenirken bir hata oluştu.";
+                return View(new List<Category>());
+            }
         }
 
         [HttpGet]
@@ -27,39 +39,86 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateCategory(Category category)
         {
-            if (!string.IsNullOrEmpty(category.CategoryName))
+            try
             {
+                if (!ModelState.IsValid)
+                    return View(category);
+
                 await _categoryService.TInsertAsync(category);
+                await _unitOfWork.SaveAsync();
+
+                TempData["Success"] = "Kategori başarıyla eklendi.";
+                return RedirectToAction("CategoryList");
             }
-            return RedirectToAction("CategoryList");
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Hata oluştu: {ex.Message}";
+                return View(category);
+            }
         }
 
         [HttpGet]
-        public async Task<IActionResult> Update(int id)
+        public async Task<IActionResult> EditCategory(int id)
         {
-            var value = await _categoryService.TGetByIdAsync(id);
-            if (value == null) return NotFound();
+            try
+            {
+                var value = await _categoryService.TGetByIdAsync(id);
+                if (value == null)
+                    return NotFound("Kategori bulunamadı.");
 
-            return View(value);
+                return View(value);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Kategori yüklenirken hata oluştu.";
+                return RedirectToAction("CategoryList");
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateCategory(Category category)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditCategory(Category category)
         {
-            if (category.CategoryId > 0 && !string.IsNullOrEmpty(category.CategoryName))
+            try
             {
+                if (!ModelState.IsValid)
+                    return View(category);
+
                 await _categoryService.TUpdateAsync(category);
+                await _unitOfWork.SaveAsync();
+
+                TempData["Success"] = "Kategori başarıyla güncellendi.";
+                return RedirectToAction("CategoryList");
             }
-            return RedirectToAction("CategoryList");
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Hata: {ex.Message}";
+                return View(category);
+            }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            await _categoryService.TDeleteAsync(id);
+            try
+            {
+                var category = await _categoryService.TGetByIdAsync(id);
+                if (category == null)
+                    return Json(new { success = false, message = "Kategori bulunamadı." });
 
-            return RedirectToAction("CategoryList");
+                await _categoryService.TDeleteAsync(id);
+                await _unitOfWork.SaveAsync();
+
+                return Json(new { success = true, message = "Kategori silindi." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Hata: {ex.Message}" });
+            }
         }
     }
 }

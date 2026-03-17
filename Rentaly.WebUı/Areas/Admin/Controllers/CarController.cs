@@ -134,7 +134,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 await _carService.TInsertAsync(car);
                 await _unitOfWork.SaveAsync();
 
-                // === KAPAK GÖRSELİ ===
+                // KAPAK GÖRSELİ
                 if (imageSourceType == "file" && imageFile != null && imageFile.Length > 0)
                 {
                     if (imageFile.Length <= 5 * 1024 * 1024)
@@ -160,7 +160,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     await _unitOfWork.SaveAsync();
                 }
 
-                // === DİĞER GÖRSELLER ===
+                //  DİĞER GÖRSELLER 
                 if (carImageFiles != null && carImageFiles.Count > 0)
                 {
                     foreach (var file in carImageFiles)
@@ -257,7 +257,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     return View(car);
                 }
 
-                // === KAPAK GÖRSELİ ===
+                //  KAPAK GÖRSELİ 
                 if (imageSourceType == "remove")
                 {
                     if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
@@ -301,7 +301,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     car.CoverImageUrl = $"/uploads/cars/{fileName}";
                 }
 
-                // === SİLİNECEK DİĞER GÖRSELLER ===
+                //  SİLİNECEK DİĞER GÖRSELLER 
                 if (deletedImageIds != null && deletedImageIds.Count > 0)
                 {
                     foreach (var imageId in deletedImageIds)
@@ -323,7 +323,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     }
                 }
 
-                // === YENİ DİĞER GÖRSELLER ===
+                //  YENİ DİĞER GÖRSELLER 
                 if (carImageFiles != null && carImageFiles.Count > 0)
                 {
                     foreach (var file in carImageFiles)

@@ -1100,16 +1100,16 @@
             }
         }
 
-        // ═══ VIN SAYACI ═══
+        // VIN SAYACI
         function updateVinCount() { document.getElementById('vinCount').textContent = document.getElementById('VIN').value.length; }
 
-        // ═══ SAYAÇ ═══
+        //SAYAÇ
         function adjustCounter(id, delta) {
             const el = document.getElementById(id);
             el.value = Math.max(parseInt(el.min)||0, Math.min(parseInt(el.max)||99, parseInt(el.value)+delta));
         }
 
-        // ═══ FİYAT BANNER ═══
+        // FİYAT BANNER
         function updatePriceBanner() {
             const dailyEl = document.getElementById('DailyPrice');
             const depEl   = document.getElementById('DepositAmount');
@@ -1138,16 +1138,13 @@
             }
         }
 
-        // ═══ ALANLARI DOĞRULA ═══
+        // ALANLARI DOĞRULA 
         function liveValidate(el) {
             el.classList.toggle('is-invalid', !el.value || el.value === '');
             el.classList.toggle('is-valid',   !!(el.value && el.value !== ''));
         }
 
-        // ═══════════════════════════════════════════════════════════
         // KAPAK GÖRSELI - DOSYA + LINK DESTEĞI
-        // ═══════════════════════════════════════════════════════════
-
         // Sekme Geçişi
         function switchImageTab(tab) {
             document.querySelectorAll('.image-tab-content').forEach(el => el.style.display = 'none');
@@ -1271,10 +1268,7 @@
             document.getElementById('ImageSourceType').value = 'remove';
         }
 
-        // ═══════════════════════════════════════════════════════════
         // DİĞER GÖRSELLER - ÇOKLU YÖNETİMİ
-        // ═══════════════════════════════════════════════════════════
-
         // Çoklu Dosya Seçme
         function handleMultipleFileSelect(event) {
             const files = Array.from(event.target.files);
@@ -1381,10 +1375,7 @@
             container.appendChild(input);
         }
 
-        // ═══════════════════════════════════════════════════════════
         // FORM SUBMIT
-        // ═══════════════════════════════════════════════════════════
-
         document.getElementById('editCarForm')?.addEventListener('submit', function(e) {
             const required = ['PlateNumber','VIN','BrandId','CarModelId','CategoryId','BranchId','Year','Kilometer','DailyPrice','DepositAmount','Transmission'];
             let valid = true;
@@ -1428,10 +1419,7 @@
             }
         });
 
-        // ═══════════════════════════════════════════════════════════
         // SAYFA YÜKLEME - FİYAT BANNER'I GÜNCELLE
-        // ═══════════════════════════════════════════════════════════
-
         document.addEventListener('DOMContentLoaded', () => {
             // Fiyat banner'ını güncelle (form dolduysa göster)
             setTimeout(() => {
