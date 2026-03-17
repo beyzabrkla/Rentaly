@@ -9,12 +9,12 @@ namespace Rentaly.EntityLayer.Entities
         public string Surname { get; set; }
 
         [EmailAddress]
-        public string Email { get; set; }
-        public string Phone { get; set; }
+        public string? Email { get; set; }
+        public string? Phone { get; set; }
 
         [Required, StringLength(11)]
-        public string IdentityNumber { get; set; } // TC Kimlik
-        public string DrivingLicenseNumber { get; set; }
+        public string IdentityNumber { get; set; }
+        public string? DrivingLicenseNumber { get; set; }
         public DateTime DrivingLicenseDate { get; set; }
     }
 }

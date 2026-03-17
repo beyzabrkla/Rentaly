@@ -36,7 +36,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CarList(int page = 1, string? search = null, int? brand = null,string? fuel = null, string? status = null, string? active = null,
+        public async Task<IActionResult> CarList(int page = 1, string? search = null, int? brand = null, string? fuel = null, string? status = null, string? active = null,
                     decimal? minPrice = null, decimal? maxPrice = null)
         {
             try
@@ -48,35 +48,28 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
                 var query = allCars.AsQueryable();
 
-                // ARAMA
                 if (!string.IsNullOrEmpty(search))
                     query = query.Where(c =>
                         (c.Brand != null && c.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
                         (c.CarModel != null && c.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
 
-                // MARKA FİLTRESİ
                 if (brand.HasValue && brand.Value > 0)
                     query = query.Where(c => c.BrandId == brand.Value);
 
-                // YAKIT FİLTRESİ
                 if (!string.IsNullOrEmpty(fuel))
                     query = query.Where(c =>
                         !string.IsNullOrEmpty(c.FuelType) &&
                         c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
 
-                // MÜSAIT/KİRADA FİLTRESİ
                 if (!string.IsNullOrEmpty(status))
                     query = query.Where(c => status == "Müsait" ? c.IsAvailable : !c.IsAvailable);
 
-                // AKTİF/İNAKTİF FİLTRESİ (YENİ) ← ←
                 if (!string.IsNullOrEmpty(active))
                     query = query.Where(c => active == "Aktif" ? c.IsActive : !c.IsActive);
 
-                // FİYAT ARALIĞI
                 if (minPrice.HasValue) query = query.Where(c => c.DailyPrice >= minPrice.Value);
                 if (maxPrice.HasValue) query = query.Where(c => c.DailyPrice <= maxPrice.Value);
 
-                // PAGİNASYON
                 int totalFiltered = query.Count();
                 int totalPages = (int)Math.Ceiling(totalFiltered / (double)PAGE_SIZE);
                 page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
@@ -141,7 +134,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 await _carService.TInsertAsync(car);
                 await _unitOfWork.SaveAsync();
 
-                // === KAPAK GÖRSELI ===
+                // === KAPAK GÖRSELİ ===
                 if (imageSourceType == "file" && imageFile != null && imageFile.Length > 0)
                 {
                     if (imageFile.Length <= 5 * 1024 * 1024)
@@ -185,11 +178,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         using (var stream = new FileStream(uploadPath, FileMode.Create))
                             await file.CopyToAsync(stream);
 
-                        var imageUrl = $"/uploads/cars/{fileName}";
-
                         await _carImageService.TInsertAsync(new CarImage
                         {
-                            CoverImageUrl = imageUrl,
+                            CoverImageUrl = $"/uploads/cars/{fileName}",
                             CarId = car.CarId
                         });
                     }
@@ -198,7 +189,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 }
 
                 TempData["Success"] = "Araç başarıyla kaydedildi.";
-                return RedirectToAction("CarList");
+                return RedirectToAction("CarList", "Car", new { area = "Admin" });
             }
             catch (Exception ex)
             {
@@ -231,7 +222,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = "Araç yüklenirken hata oluştu.";
-                return RedirectToAction("CarList");
+                return RedirectToAction("CarList", "Car", new { area = "Admin" });
             }
         }
 
@@ -266,7 +257,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     return View(car);
                 }
 
-                // === KAPAK GÖRSELI ===
+                // === KAPAK GÖRSELİ ===
                 if (imageSourceType == "remove")
                 {
                     if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
@@ -281,7 +272,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 {
                     if (imageFile.Length > 5 * 1024 * 1024)
                     {
-                        ModelState.AddModelError("", "Görsel 5MB\'dan büyük olamaz.");
+                        ModelState.AddModelError("", "Görsel 5MB'dan büyük olamaz.");
                         ViewBag.Brands = await _brandService.TGetListAsync();
                         ViewBag.Categories = await _categoryService.TGetListAsync();
                         ViewBag.Branches = await _branchService.TGetListAsync();
@@ -290,7 +281,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         return View(car);
                     }
 
-                    // Eski kapak görseli sil
                     if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
                     {
                         var oldPath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
@@ -316,21 +306,18 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 {
                     foreach (var imageId in deletedImageIds)
                     {
-                        if (int.TryParse(imageId, out int id_parsed))
+                        if (int.TryParse(imageId, out int idParsed))
                         {
-                            var img = await _carImageService.TGetByIdAsync(id_parsed);
+                            var img = await _carImageService.TGetByIdAsync(idParsed);
                             if (img != null)
                             {
-                                // Dosyayı sil
                                 if (!string.IsNullOrEmpty(img.CoverImageUrl) && img.CoverImageUrl.StartsWith("/"))
                                 {
                                     var path = Path.Combine("wwwroot", img.CoverImageUrl.TrimStart('/'));
                                     if (System.IO.File.Exists(path))
                                         System.IO.File.Delete(path);
                                 }
-
-                                // DB'den sil
-                                await _carImageService.TDeleteAsync(id_parsed);
+                                await _carImageService.TDeleteAsync(idParsed);
                             }
                         }
                     }
@@ -354,11 +341,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         using (var stream = new FileStream(uploadPath, FileMode.Create))
                             await file.CopyToAsync(stream);
 
-                        var imageUrl = $"/uploads/cars/{fileName}";
-
                         await _carImageService.TInsertAsync(new CarImage
                         {
-                            CoverImageUrl = imageUrl,
+                            CoverImageUrl = $"/uploads/cars/{fileName}",
                             CarId = car.CarId
                         });
                     }
@@ -368,7 +353,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 await _unitOfWork.SaveAsync();
 
                 TempData["Success"] = "Araç güncellendi.";
-                return RedirectToAction("CarList");
+                return RedirectToAction("CarList", "Car", new { area = "Admin" });
             }
             catch (Exception ex)
             {
@@ -392,7 +377,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 if (car == null)
                     return Json(new { success = false, message = "Araç bulunamadı." });
 
-                // Kapak görseli sil
                 if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
                 {
                     var imagePath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
@@ -400,7 +384,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         System.IO.File.Delete(imagePath);
                 }
 
-                // Diğer görselleri sil
                 if (car.CarImages != null && car.CarImages.Count > 0)
                 {
                     foreach (var img in car.CarImages)
@@ -450,7 +433,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
                 var brand = new Brand { BrandName = brandName.Trim() };
                 await _brandService.TInsertAsync(brand);
-
+                await _unitOfWork.SaveAsync();
                 return Json(new { success = true, id = brand.BrandId, name = brand.BrandName });
             }
             catch (Exception ex)
@@ -473,7 +456,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
                 var model = new CarModel { ModelName = modelName.Trim(), BrandId = brandId };
                 await _carModelService.TInsertAsync(model);
-
+                await _unitOfWork.SaveAsync();
                 return Json(new { success = true, id = model.CarModelId, name = model.ModelName });
             }
             catch (Exception ex)
@@ -493,7 +476,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
                 var category = new Category { CategoryName = categoryName.Trim() };
                 await _categoryService.TInsertAsync(category);
-
+                await _unitOfWork.SaveAsync();
                 return Json(new { success = true, id = category.CategoryId, name = category.CategoryName });
             }
             catch (Exception ex)
@@ -522,7 +505,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 };
 
                 await _branchService.TInsertAsync(branch);
-
+                await _unitOfWork.SaveAsync();
                 return Json(new
                 {
                     success = true,

@@ -1,0 +1,149 @@
+﻿@using Rentaly.EntityLayer.Entities
+@model List<Category>
+@{
+    ViewData["Title"] = "Kategori Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .custom-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .custom-modal-content {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 30px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+</style>
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Araç Kategorileri</h1>
+        <p class="page-subtitle">@Model.Count kategori tanımlı.</p>
+    </div>
+    <button class="btn-primary-custom" onclick="openCreateModal()">
+        <i class="fa-solid fa-plus"></i> Yeni Kategori Ekle
+    </button>
+</div>
+
+<div class="row g-3" id="categoryGrid">
+    @foreach (var item in Model)
+    {
+        <div class="col-12 col-md-6 col-lg-4 category-item">
+            <div class="vehicle-card" style="padding: 20px;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="category-icon-box" style="width:45px; height:45px; background:rgba(var(--primary-rgb), 0.1); border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--primary);">
+                            <i class="fa-solid fa-tag"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">ID: #@item.CategoryId</div>
+                            <div class="vehicle-name" style="margin: 0; font-size: 1.1rem;">@item.CategoryName</div>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn-action btn-edit" style="width:38px; height:38px; flex:none;" 
+                                onclick="openEditModal(@item.CategoryId, '@item.CategoryName')">
+                            <i class="fa-solid fa-pen-to-square m-0"></i>
+                        </button>
+                        <button class="btn-action btn-delete" style="width:38px; height:38px; flex:none;" 
+                                onclick="confirmDelete(@item.CategoryId, '@item.CategoryName')">
+                            <i class="fa-solid fa-trash-can m-0"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+
+@* Ekleme & Düzenleme Modalı  *@
+<div id="categoryModal" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-content">
+        <h4 id="modalTitle" style="font-weight:800; margin-bottom:20px; color:var(--text-main);">Kategori Ekle</h4>
+        <form id="categoryForm" method="post">
+            <input type="hidden" name="CategoryId" id="modalCategoryId" />
+            <div class="mb-4">
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Kategori Adı</label>
+                <input type="text" name="CategoryName" id="modalCategoryName" class="filter-select w-100" 
+                       placeholder="Örn: SUV, Sedan..." required style="height:45px; border-radius:8px;" />
+            </div>
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn-action btn-detail" onclick="closeModals()">İptal</button>
+                <button type="submit" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* Silme Onay Modalı *@
+<div id="deleteModal" class="custom-modal-backdrop" style="display:none;">
+    <div class="custom-modal-content text-center" style="max-width:380px;">
+        <i class="fa-solid fa-circle-exclamation fa-3x mb-3" style="color:var(--warning);"></i>
+        <h4 style="font-weight:800; color:var(--text-main);">Siliniyor...</h4>
+        <p id="deleteModalText" style="color:var(--text-muted); font-size:14px; margin-bottom:25px;"></p>
+        <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn-action btn-detail" onclick="closeModals()">Vazgeç</button>
+            <a id="confirmDeleteBtn" href="#" class="btn-action btn-delete" style="padding:10px 25px; flex:none;">Evet, Sil</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const categoryModal = document.getElementById('categoryModal');
+        const deleteModal = document.getElementById('deleteModal');
+        const categoryForm = document.getElementById('categoryForm');
+        
+        function openCreateModal() {
+            document.getElementById('modalTitle').innerText = "Yeni Kategori Ekle";
+            document.getElementById('modalCategoryId').value = "0";
+            document.getElementById('modalCategoryName').value = "";
+            categoryForm.action = "/Admin/Category/CreateCategory";
+            categoryModal.style.display = 'flex';
+        }
+
+        function openEditModal(id, name) {
+            document.getElementById('modalTitle').innerText = "Kategoriyi Düzenle";
+            document.getElementById('modalCategoryId').value = id;
+            document.getElementById('modalCategoryName').value = name;
+            categoryForm.action = "/Admin/Category/UpdateCategory";
+            categoryModal.style.display = 'flex';
+        }
+
+        function confirmDelete(id, name) {
+            document.getElementById('deleteModalText').innerText = `"${name}" kategorisini silmek istediğinizden emin misiniz?`;
+            document.getElementById('confirmDeleteBtn').href = `/Admin/Category/DeleteCategory/${id}`;
+            deleteModal.style.display = 'flex';
+        }
+
+        function closeModals() {
+            categoryModal.style.display = 'none';
+            deleteModal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == categoryModal || event.target == deleteModal) closeModals();
+        }
+    </script>
+}

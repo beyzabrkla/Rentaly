@@ -3,7 +3,7 @@
 @model List<Car>
 @{
     ViewData["Title"] = "CarList";
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 
     string brandFilter = Context.Request.Query["brand"];
     string statusFilter = Context.Request.Query["status"];
@@ -12,13 +12,16 @@
     string searchFilter = Context.Request.Query["search"];
 }
 
+@* Silme AJAX için token zorunlu *@
+@Html.AntiForgeryToken()
+
 @* Page Header *@
 <div class="page-header">
     <div>
         <h1 class="page-title">Araç Listesi</h1>
         <p class="page-subtitle">Filodaki tüm araçları görüntüleyin ve yönetin.</p>
     </div>
-    <a href="/Admin/Car/CreateCar" class="btn-primary-custom">
+    <a href ="@Url.Action("CreateCar", "Car", new { area = "Admin" })" class="btn-primary-custom">
         <i class="fa-solid fa-plus"></i> Yeni Araç Ekle
     </a>
 </div>
@@ -121,8 +124,7 @@
                         }
                         else
                         {
-                            <img src="https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok"
-                                 alt="Fotoğraf yok" />
+                            <img src="https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok" alt="Fotoğraf yok" />
                         }
                         <span class="vehicle-status @(car.IsAvailable ? "status-available" : "status-rented")">
                             <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
@@ -172,10 +174,11 @@
 
                     @* Aksiyonlar *@
                     <div class="vehicle-actions">
-                        <a href="/Admin/Car/EditCar/@car.CarId" class="btn-action btn-edit">
+                        <a href="@Url.Action("EditCar", "Car", new { area = "Admin", id = car.CarId })" class="btn-action btn-edit">
                             <i class="fa-solid fa-pen-to-square"></i> Düzenle
                         </a>
-                        <button class="btn-action btn-delete" onclick="confirmDelete(@car.CarId)">
+                        <button type="button" class="btn-action btn-delete"
+                                onclick="confirmDelete(@car.CarId)">
                             <i class="fa-solid fa-trash-can"></i> Sil
                         </button>
                     </div>
@@ -199,7 +202,7 @@
     string GetPageUrl(int pageNumber)
     {
         var qs = new Dictionary<string, string>(filterParams) { ["page"] = pageNumber.ToString() };
-        return "/Admin/Car/CarList" + QueryString.Create(qs).Value;
+        return Url.Action("CarList", "Car", new { area = "Admin" }) + QueryString.Create(qs).Value;
     }
 }
 
@@ -278,10 +281,10 @@
         <h5 class="mb-2" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--text-main);">Araç Silinecek</h5>
         <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:24px;">Bu aracı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
         <div style="display:flex;gap:10px;justify-content:center;">
-            <button class="btn-action btn-detail" style="flex:unset;padding:9px 20px;" onclick="closeDeleteModal()">
+            <button type="button" class="btn-action btn-detail" style="flex:unset;padding:9px 20px;" onclick="closeDeleteModal()">
                 <i class="fa-solid fa-xmark"></i> İptal
             </button>
-            <button class="btn-action btn-delete" style="flex:unset;padding:9px 20px;" id="confirmDeleteBtn">
+            <button type="button" class="btn-action btn-delete" style="flex:unset;padding:9px 20px;" id="confirmDeleteBtn">
                 <i class="fa-solid fa-trash-can"></i> Evet, Sil
             </button>
         </div>
@@ -290,25 +293,27 @@
 
 @section Scripts {
     <script>
-        // Filtrele — server-side
+        // Razor tarafından üretilen güvenli URL'ler
+        const urlCarList   = '@Url.Action("CarList", "Car", new { area = "Admin" })';
+        const urlDeleteCar = '@Url.Action("DeleteCar", "Car", new { area = "Admin" })';
+
         function filterCars() {
             const search = document.getElementById('searchInput').value;
             const brand  = document.getElementById('brandFilter').value;
             const fuel   = document.getElementById('fuelFilter').value;
             const status = document.getElementById('statusFilter').value;
             window.location.href =
-                `/Admin/Car/CarList?page=1` +
-                `&search=${encodeURIComponent(search)}` +
-                `&brand=${brand}` +
-                `&fuel=${encodeURIComponent(fuel)}` +
-                `&status=${encodeURIComponent(status)}` ;
+                urlCarList + '?page=1' +
+                '&search=' + encodeURIComponent(search) +
+                '&brand='  + brand +
+                '&fuel='   + encodeURIComponent(fuel) +
+                '&status=' + encodeURIComponent(status);
         }
 
         function resetFilters() {
-            window.location.href = '/Admin/Car/CarList';
+            window.location.href = urlCarList;
         }
 
-        // Silme modal
         let pendingDeleteId = null;
 
         function confirmDelete(id) {
@@ -323,9 +328,9 @@
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
             if (!pendingDeleteId) return;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
             try {
-                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
-                const res   = await fetch('/Admin/Car/DeleteCar', {
+                const res  = await fetch(urlDeleteCar, {
                     method:  'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body:    `id=${pendingDeleteId}&__RequestVerificationToken=${encodeURIComponent(token)}`
@@ -342,7 +347,6 @@
             }
         });
 
-        // ESC ile modal kapat
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') closeDeleteModal();
         });
