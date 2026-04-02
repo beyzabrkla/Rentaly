@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
+using Rentaly.BusinessLayer.ValidationRules.CarValidator;
 using Rentaly.DataAccessLayer.UnitOfWork;
+using Rentaly.DTOLayer.CarDTOs;
 using Rentaly.EntityLayer.Entities;
 
 namespace Rentaly.WebUI.Areas.Admin.Controllers
@@ -16,6 +20,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         private readonly IBranchService _branchService;
         private readonly IUnitOfWork _unitOfWork;
         private const int PAGE_SIZE = 9;
+        private readonly IMapper _mapper;
 
         public CarController(
             ICarService carService,
@@ -24,7 +29,8 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             ICategoryService categoryService,
             IBranchService branchService,
             IUnitOfWork unitOfWork,
-            ICarImageService carImageService)
+            ICarImageService carImageService,
+            IMapper mapper)
         {
             _carService = carService;
             _brandService = brandService;
@@ -33,6 +39,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             _branchService = branchService;
             _unitOfWork = unitOfWork;
             _carImageService = carImageService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -75,22 +82,18 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
                 var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
 
+                var carDtoList = _mapper.Map<List<ResultCarDTO>>(pagedCars);
+
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.Brands = await _brandService.TGetListAsync();
 
-                return View(pagedCars);
+                return View(carDtoList);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Araçlar yüklenirken bir hata oluştu.";
-                ViewBag.TotalCars = 0;
-                ViewBag.AvailableCount = 0;
-                ViewBag.RentedCount = 0;
-                ViewBag.CurrentPage = 1;
-                ViewBag.TotalPages = 0;
-                ViewBag.Brands = new List<Brand>();
-                return View(new List<Car>());
+                return View(new List<ResultCarDTO>());
             }
         }
 
@@ -113,23 +116,25 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCar(Car car, IFormFile? imageFile, List<IFormFile>? carImageFiles, string? imageSourceType)
+        public async Task<IActionResult> CreateCar(CreateCarDTO createCarDTO, IFormFile? imageFile, List<IFormFile>? carImageFiles, string? imageSourceType)
         {
             try
             {
-                ModelState.Remove("Brand");
-                ModelState.Remove("CarModel");
-                ModelState.Remove("Category");
-                ModelState.Remove("Branch");
-                ModelState.Remove("CarImages");
+                var validator = new CreateCarValidator();
+                var result = await validator.ValidateAsync(createCarDTO);
 
                 if (!ModelState.IsValid)
                 {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
                     ViewBag.Brands = await _brandService.TGetListAsync();
                     ViewBag.Categories = await _categoryService.TGetListAsync();
                     ViewBag.Branches = await _branchService.TGetListAsync();
-                    return View(car);
+                    return View(createCarDTO);
                 }
+
+                var car = _mapper.Map<Car>(createCarDTO);
 
                 await _carService.TInsertAsync(car);
                 await _unitOfWork.SaveAsync();
@@ -197,7 +202,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.Branches = await _branchService.TGetListAsync();
                 TempData["Error"] = $"Hata oluştu: {ex.Message}";
-                return View(car);
+                return View(createCarDTO);
             }
         }
 
@@ -210,6 +215,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 if (car == null)
                     return NotFound("Araç bulunamadı.");
 
+                var dto = _mapper.Map<UpdateCarDTO>(car);
                 ViewBag.Brands = await _brandService.TGetListAsync();
                 ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.Branches = await _branchService.TGetListAsync();
@@ -217,7 +223,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 if (car.BrandId > 0)
                     ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
 
-                return View(car);
+                return View(dto);
             }
             catch (Exception ex)
             {
@@ -230,7 +236,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditCar(
             int id,
-            Car car,
+            UpdateCarDTO updateCarDTO,
             IFormFile? imageFile,
             List<IFormFile>? carImageFiles,
             string? imageSourceType,
@@ -238,34 +244,27 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         {
             try
             {
-                if (id != car.CarId)
+                if (id != updateCarDTO.CarId)
                     return BadRequest("Araç ID eşleşmiyor.");
 
-                ModelState.Remove("Brand");
-                ModelState.Remove("CarModel");
-                ModelState.Remove("Category");
-                ModelState.Remove("Branch");
-                ModelState.Remove("CarImages");
+                var validator = new UpdateCarValidator();
+                var validationResult = await validator.ValidateAsync(updateCarDTO);
 
-                if (!ModelState.IsValid)
+                if (!ModelState.IsValid || !validationResult.IsValid)
                 {
-                    ViewBag.Brands = await _brandService.TGetListAsync();
-                    ViewBag.Categories = await _categoryService.TGetListAsync();
-                    ViewBag.Branches = await _branchService.TGetListAsync();
-                    if (car.BrandId > 0)
-                        ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
-                    return View(car);
+                    await LoadEditViewBags(updateCarDTO.BrandId);
+                    return View(updateCarDTO);
                 }
 
-                //  KAPAK GÖRSELİ 
+                var car = await _carService.TGetByIdAsync(id);
+                if (car == null) return NotFound("Araç bulunamadı.");
+
+                _mapper.Map(updateCarDTO, car);
+
+                //Kapak Görseli İşlemleri
                 if (imageSourceType == "remove")
                 {
-                    if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
-                    {
-                        var oldPath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
-                        if (System.IO.File.Exists(oldPath))
-                            System.IO.File.Delete(oldPath);
-                    }
+                    DeleteLocalFile(car.CoverImageUrl);
                     car.CoverImageUrl = null;
                 }
                 else if (imageSourceType == "file" && imageFile != null && imageFile.Length > 0)
@@ -273,97 +272,88 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                     if (imageFile.Length > 5 * 1024 * 1024)
                     {
                         ModelState.AddModelError("", "Görsel 5MB'dan büyük olamaz.");
-                        ViewBag.Brands = await _brandService.TGetListAsync();
-                        ViewBag.Categories = await _categoryService.TGetListAsync();
-                        ViewBag.Branches = await _branchService.TGetListAsync();
-                        if (car.BrandId > 0)
-                            ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
-                        return View(car);
+                        await LoadEditViewBags(updateCarDTO.BrandId);
+                        return View(updateCarDTO);
                     }
 
-                    if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
-                    {
-                        var oldPath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
-                        if (System.IO.File.Exists(oldPath))
-                            System.IO.File.Delete(oldPath);
-                    }
-
+                    DeleteLocalFile(car.CoverImageUrl);
                     var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(imageFile.FileName)}";
-                    var uploadPath = Path.Combine("wwwroot", "uploads", "cars", fileName);
-                    var directory = Path.GetDirectoryName(uploadPath)!;
+                    var path = Path.Combine("wwwroot/uploads/cars", fileName);
 
-                    if (!Directory.Exists(directory))
-                        Directory.CreateDirectory(directory);
-
-                    using (var stream = new FileStream(uploadPath, FileMode.Create))
+                    using (var stream = new FileStream(path, FileMode.Create))
                         await imageFile.CopyToAsync(stream);
 
                     car.CoverImageUrl = $"/uploads/cars/{fileName}";
                 }
 
-                //  SİLİNECEK DİĞER GÖRSELLER 
-                if (deletedImageIds != null && deletedImageIds.Count > 0)
+                // Silinecek Galeri Görselleri
+                if (deletedImageIds != null && deletedImageIds.Any())
                 {
-                    foreach (var imageId in deletedImageIds)
+                    foreach (var imgId in deletedImageIds)
                     {
-                        if (int.TryParse(imageId, out int idParsed))
+                        if (int.TryParse(imgId, out int parsedId))
                         {
-                            var img = await _carImageService.TGetByIdAsync(idParsed);
+                            var img = await _carImageService.TGetByIdAsync(parsedId);
                             if (img != null)
                             {
-                                if (!string.IsNullOrEmpty(img.CoverImageUrl) && img.CoverImageUrl.StartsWith("/"))
-                                {
-                                    var path = Path.Combine("wwwroot", img.CoverImageUrl.TrimStart('/'));
-                                    if (System.IO.File.Exists(path))
-                                        System.IO.File.Delete(path);
-                                }
-                                await _carImageService.TDeleteAsync(idParsed);
+                                DeleteLocalFile(img.CoverImageUrl);
+                                await _carImageService.TDeleteAsync(parsedId);
                             }
                         }
                     }
                 }
 
-                //  YENİ DİĞER GÖRSELLER 
-                if (carImageFiles != null && carImageFiles.Count > 0)
+                // Yeni Galeri Görselleri Ekleme
+                if (carImageFiles != null && carImageFiles.Any())
                 {
                     foreach (var file in carImageFiles)
                     {
-                        if (file.Length <= 0 || file.Length > 5 * 1024 * 1024)
-                            continue;
-
-                        var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
-                        var uploadPath = Path.Combine("wwwroot", "uploads", "cars", fileName);
-                        var directory = Path.GetDirectoryName(uploadPath)!;
-
-                        if (!Directory.Exists(directory))
-                            Directory.CreateDirectory(directory);
-
-                        using (var stream = new FileStream(uploadPath, FileMode.Create))
-                            await file.CopyToAsync(stream);
-
-                        await _carImageService.TInsertAsync(new CarImage
+                        if (file.Length > 0 && file.Length <= 5 * 1024 * 1024)
                         {
-                            CoverImageUrl = $"/uploads/cars/{fileName}",
-                            CarId = car.CarId
-                        });
+                            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+                            var path = Path.Combine("wwwroot/uploads/cars", fileName);
+                            using (var stream = new FileStream(path, FileMode.Create))
+                                await file.CopyToAsync(stream);
+
+                            await _carImageService.TInsertAsync(new CarImage
+                            {
+                                CoverImageUrl = $"/uploads/cars/{fileName}",
+                                CarId = car.CarId
+                            });
+                        }
                     }
                 }
 
+                // Güncelleme ve Kaydetme
                 await _carService.TUpdateAsync(car);
                 await _unitOfWork.SaveAsync();
 
-                TempData["Success"] = "Araç güncellendi.";
+                TempData["Success"] = "Araç başarıyla güncellendi.";
                 return RedirectToAction("CarList", "Car", new { area = "Admin" });
             }
             catch (Exception ex)
             {
-                ViewBag.Brands = await _brandService.TGetListAsync();
-                ViewBag.Categories = await _categoryService.TGetListAsync();
-                ViewBag.Branches = await _branchService.TGetListAsync();
-                if (car.BrandId > 0)
-                    ViewBag.Models = await _carModelService.GetModelsByBrandAsync(car.BrandId);
-                TempData["Error"] = $"Hata: {ex.Message}";
-                return View(car);
+                await LoadEditViewBags(updateCarDTO.BrandId);
+                TempData["Error"] = $"Sistemsel Hata: {ex.Message}";
+                return View(updateCarDTO);
+            }
+        }
+
+        private async Task LoadEditViewBags(int brandId)
+        {
+            ViewBag.Brands = await _brandService.TGetListAsync();
+            ViewBag.Categories = await _categoryService.TGetListAsync();
+            ViewBag.Branches = await _branchService.TGetListAsync();
+            if (brandId > 0)
+                ViewBag.Models = await _carModelService.GetModelsByBrandAsync(brandId);
+        }
+
+        private void DeleteLocalFile(string? imageUrl)
+        {
+            if (!string.IsNullOrEmpty(imageUrl) && imageUrl.StartsWith("/"))
+            {
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", imageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(path)) System.IO.File.Delete(path);
             }
         }
 

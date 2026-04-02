@@ -4,6 +4,7 @@ using Rentaly.DataAccessLayer.Concrete;
 using Rentaly.DataAccessLayer.UnitOfWork;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using Rentaly.BusinessLayer.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.Configure<RequestLocalizationOptions>(opts =>
     opts.SupportedUICultures = invariantCulture;
 });
 
+builder.Services.AddAutoMapper(typeof(GeneralMapping));
 builder.Services.AddControllersWithViews();
 
 // DbContext

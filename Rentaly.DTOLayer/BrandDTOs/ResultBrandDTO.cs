@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Rentaly.DTOLayer.BrandDTOs
 {
-    internal class ResultBrandDTO
+    public class ResultBrandDTO: CreateBrandDTO
     {
+        public int BrandId { get; set; } 
     }
 }

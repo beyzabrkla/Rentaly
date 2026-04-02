@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
-using Rentaly.BusinessLayer.ValidationRules;
+using Rentaly.BusinessLayer.ValidationRules.BrandValidator;
 using Rentaly.DataAccessLayer.UnitOfWork;
+using Rentaly.DTOLayer.BranchDTOs;
+using Rentaly.DTOLayer.BrandDTOs;
+using Rentaly.DTOLayer.CarDTOs;
 using Rentaly.EntityLayer.Entities;
 
 namespace Rentaly.WebUI.Areas.Admin.Controllers
@@ -12,12 +16,14 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         private readonly IBrandService _brandService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICarService _carService;
+        private readonly IMapper _mapper;
 
-        public BrandController(IBrandService brandService, IUnitOfWork unitOfWork, ICarService carService)
+        public BrandController(IBrandService brandService, IUnitOfWork unitOfWork, ICarService carService, IMapper mapper)
         {
             _brandService = brandService;
             _unitOfWork = unitOfWork;
             _carService = carService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -66,6 +72,34 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> BrandDetail(int id)
+        {
+            try
+            {
+                var brand = await _brandService.TGetByIdAsync(id);
+                if (brand == null) return NotFound("Marka bulunamadı.");
+
+                var allCars = await _carService.TGetListAsync();
+                var brandCars = allCars.Where(c => c.BrandId == id).ToList();
+
+                var carDtoList = _mapper.Map<List<ResultCarDTO>>(brandCars);
+
+                ViewBag.Branc = brand;
+                ViewBag.TotalCars = brandCars.Count;
+                ViewBag.AvailableCount = brandCars.Count(c => c.IsAvailable);
+                ViewBag.RentedCount = brandCars.Count(c => !c.IsAvailable);
+
+                return View(carDtoList);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Şube detayı yüklenirken bir hata oluştu.";
+                return RedirectToAction("BranchList");
+            }
+        }
+
+
+        [HttpGet]
         public IActionResult CreateBrand()
         {
             return View();
@@ -73,54 +107,78 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
      
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBrand(Brand brand)
+        public async Task<IActionResult> CreateBrand(CreateBrandDTO createBrandDTO)
         {
-            var validator = new BrandValidator();
-            var result = validator.Validate(brand);
+            var validator = new CreateBrandValidator();
+            var result = validator.Validate(createBrandDTO);
 
             if (!result.IsValid)
             {
-                TempData["Error"] = string.Join("<br/>", result.Errors.Select(x => x.ErrorMessage));
-                return RedirectToAction("BrandList");
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(createBrandDTO);
             }
 
             try
             {
+                var brand = _mapper.Map<Brand>(createBrandDTO);
+
                 await _brandService.TInsertAsync(brand);
                 await _unitOfWork.SaveAsync();
                 TempData["Success"] = "Marka başarıyla eklendi.";
+                return RedirectToAction("BrandList");
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Veritabanına kaydedilirken hata: " + ex.Message;
+                return View(createBrandDTO);
+
             }
-            return RedirectToAction("BrandList");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditBranch(int id)
+        {
+            var brand = await _brandService.TGetByIdAsync(id);
+            if (brand == null) return NotFound();
+
+            var dto = _mapper.Map<UpdateBrandDTO>(brand);
+            return View(dto);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditBrand(Brand brand)
+        public async Task<IActionResult> EditBrand(UpdateBrandDTO updateBrandDTO)
         {
-            var validator = new BrandValidator();
-            var result = validator.Validate(brand);
+            var validator = new UpdateBrandValidator();
+            var result = validator.Validate(updateBrandDTO);
+
 
             if (!result.IsValid)
             {
-                TempData["Error"] = string.Join("<br/>", result.Errors.Select(x => x.ErrorMessage));
-                return RedirectToAction("BrandList");
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(updateBrandDTO);
             }
 
             try
             {
+                var brand = _mapper.Map<Brand>(updateBrandDTO);
+
                 await _brandService.TUpdateAsync(brand);
                 await _unitOfWork.SaveAsync();
                 TempData["Success"] = "Marka başarıyla güncellendi.";
+                return RedirectToAction("BrandList");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Güncelleme hatası: " + ex.Message;
+                TempData["Error"] = $"Hata: {ex.Message}";
+                return View(updateBrandDTO);
             }
-            return RedirectToAction("BrandList");
         }
 
     }

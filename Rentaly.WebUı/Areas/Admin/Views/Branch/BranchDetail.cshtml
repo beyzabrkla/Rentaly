@@ -1,5 +1,4 @@
-﻿@using Rentaly.EntityLayer.Entities
-@model List<Car>
+﻿@model List<ResultCarDTO>
 @{
     var branch = ViewBag.Branch as Branch;
     ViewData["Title"] = branch?.BranchName + " Araçları";
@@ -60,7 +59,7 @@
                 <div class="vehicle-card h-100">
                     <div class="vehicle-img-wrap">
                         <img src="@(string.IsNullOrEmpty(car.CoverImageUrl) ? "https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok" : car.CoverImageUrl)"
-                             alt="@car.CarModel?.ModelName" />
+                             alt="@car.CarModelName" />
                         <span class="vehicle-status @(car.IsAvailable ? "status-available" : "status-rented")">
                             <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
                             @(car.IsAvailable ? "Müsait" : "Kirada")
@@ -71,8 +70,8 @@
                     </div>
 
                     <div class="vehicle-body">
-                        <div class="vehicle-brand">@car.Brand?.BrandName</div>
-                        <div class="vehicle-name">@car.CarModel?.ModelName</div>
+                        <div class="vehicle-brand">@car.BrandName</div>
+                        <div class="vehicle-name">@car.CarModelName</div>
 
                         <div class="vehicle-specs">
                             <div class="spec-item">

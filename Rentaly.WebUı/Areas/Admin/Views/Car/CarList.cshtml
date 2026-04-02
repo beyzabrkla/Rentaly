@@ -1,6 +1,6 @@
 ﻿@using Rentaly.EntityLayer.Entities
 @using Microsoft.AspNetCore.WebUtilities
-@model List<Car>
+@model List<ResultCarDTO>
 @{
     ViewData["Title"] = "CarList";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -59,30 +59,30 @@
                value="@searchFilter"
                onkeypress="if(event.key==='Enter') filterCars()" />
     </div>
-    <select class="filter-select" id="brandFilter" onchange="filterCars()">
-        <option value="">Tüm Markalar</option>
-        @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
-        {
-            <option value="@brand.BrandId" @(brandFilter == brand.BrandId.ToString() ? "selected" : "")>
-                @brand.BrandName
-            </option>
-        }
-    </select>
-    <select class="filter-select" id="statusFilter" onchange="filterCars()">
-        <option value="">Tüm Durumlar</option>
-        <option value="Müsait" @(statusFilter == "Müsait" ? "selected" : "")>Müsait</option>
-        <option value="Kirada" @(statusFilter == "Kirada" ? "selected" : "")>Kirada</option>
-    </select>
-    <select class="filter-select" id="fuelFilter" onchange="filterCars()">
-        <option value="">Tüm Yakıt Tipleri</option>
-        @foreach (var fuel in new[] { "Benzin", "Dizel", "Elektrik", "Hibrit" })
-        {
-            <option value="@fuel" @(fuelFilter == fuel ? "selected" : "")>@fuel</option>
-        }
-    </select>
-    <button class="btn-action btn-detail" onclick="resetFilters()">
-        <i class="fa-solid fa-rotate-left"></i> Sıfırla
-    </button>
+        <select class="filter-select" id="brandFilter" onchange="filterCars()">
+            <option value="">Tüm Markalar</option>
+            @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
+            {
+                <!option value="@brand.BrandId" @(brandFilter == brand.BrandId.ToString() ? "selected" : "")>
+                    @brand.BrandName
+                </!option>
+            }
+        </select>
+        <select class="filter-select" id="statusFilter" onchange="filterCars()">
+            <option value="">Tüm Durumlar</option>
+            <!option value="Müsait" @(statusFilter == "Müsait" ? "selected" : "")>Müsait</!option>
+            <!option value="Kirada" @(statusFilter == "Kirada" ? "selected" : "")>Kirada</!option>
+        </select>
+        <select class="filter-select" id="fuelFilter" onchange="filterCars()">
+            <option value="">Tüm Yakıt Tipleri</option>
+            @foreach (var fuel in new[] { "Benzin", "Dizel", "Elektrik", "Hibrit" })
+            {
+                <!option value="@fuel" @(fuelFilter == fuel ? "selected" : "")>@fuel</!option>
+            }
+        </select>
+        <button class="btn-action btn-detail" onclick="resetFilters()">
+            <i class="fa-solid fa-rotate-left"></i> Sıfırla
+        </button>
 </div>
 
 <p class="results-count mb-3">
@@ -108,24 +108,18 @@
         {
             <div class="col-12 col-sm-6 col-xl-4 vehicle-col">
                 <div class="vehicle-card">
-
                     @* Görsel *@
                     <div class="vehicle-img-wrap">
-                        @if (!string.IsNullOrEmpty(car.CoverImageUrl))
-                        {
-                            <img src="@car.CoverImageUrl"
-                                 alt="@(car.Brand?.BrandName) @(car.CarModel?.ModelName)"
-                                 loading="lazy"
-                                 onerror="this.src='https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok'" />
-                        }
-                        else
-                        {
-                            <img src="https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok" alt="Fotoğraf yok" />
-                        }
+                        <img src="@(string.IsNullOrEmpty(car.CoverImageUrl) ? "https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok" : car.CoverImageUrl)"
+                             alt="@car.BrandName @car.CarModelName"
+                             loading="lazy"
+                             onerror="this.src='https://placehold.co/600x340/1a1a1a/555?text=Foto+Yok'" />
+                
                         <span class="vehicle-status @(car.IsAvailable ? "status-available" : "status-rented")">
                             <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
                             @(car.IsAvailable ? "Müsait" : "Kirada")
                         </span>
+                
                         @if (!string.IsNullOrEmpty(car.FuelType))
                         {
                             <span class="vehicle-fuel">
@@ -137,8 +131,8 @@
 
                     @* Kart Gövdesi *@
                     <div class="vehicle-body">
-                        <div class="vehicle-brand">@(car.Brand?.BrandName ?? "—")</div>
-                        <div class="vehicle-name">@(car.CarModel?.ModelName ?? "—")</div>
+                        <div class="vehicle-brand">@(car.BrandName ?? "—")</div>
+                        <div class="vehicle-name">@(car.CarModelName ?? "—")</div>
 
                         <div class="vehicle-specs">
                             <div class="spec-item">
@@ -151,7 +145,7 @@
                             </div>
                             <div class="spec-item">
                                 <i class="fa-solid fa-tag"></i>
-                                <span>@(car.Category?.CategoryName ?? "—")</span>
+                                <span>@(car.CategoryName ?? "—")</span>
                             </div>
                             <div class="spec-item">
                                 <i class="fa-solid fa-users"></i>
@@ -173,12 +167,10 @@
                         <a href="@Url.Action("EditCar", "Car", new { area = "Admin", id = car.CarId })" class="btn-action btn-edit">
                             <i class="fa-solid fa-pen-to-square"></i> Düzenle
                         </a>
-                        <button type="button" class="btn-action btn-delete"
-                                onclick="confirmDelete(@car.CarId)">
+                        <button type="button" class="btn-action btn-delete" onclick="confirmDelete(@car.CarId)">
                             <i class="fa-solid fa-trash-can"></i> Sil
                         </button>
                     </div>
-
                 </div>
             </div>
         }

@@ -1,16 +1,16 @@
 ﻿using FluentValidation;
-using Rentaly.EntityLayer.Entities;
+using Rentaly.DTOLayer.CustomerDTOs;
 
-namespace Rentaly.BusinessLayer.ValidationRules
+namespace Rentaly.BusinessLayer.ValidationRules.CustomerValidator
 {
-    public class CustomerValidator :AbstractValidator<Customer>
+    public class CreateCustomerValidator : AbstractValidator<CreateCustomerDTO>
     {
-        public CustomerValidator()
+        public CreateCustomerValidator()
         {
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Ad alanı boş bırakılamaz.")
-                .MinimumLength(2).WithMessage("Ad en az 2 karakter olmalıdır.")
-                .MaximumLength(50).WithMessage("Ad en fazla 50 karakter olabilir.");
+                        .NotEmpty().WithMessage("Ad alanı boş bırakılamaz.")
+                        .MinimumLength(2).WithMessage("Ad en az 2 karakter olmalıdır.")
+                        .MaximumLength(50).WithMessage("Ad en fazla 50 karakter olabilir.");
 
             RuleFor(x => x.Surname)
                 .NotEmpty().WithMessage("Soyad alanı boş bırakılamaz.")
@@ -42,6 +42,7 @@ namespace Rentaly.BusinessLayer.ValidationRules
                 .NotEmpty().WithMessage("Ehliyet tarihi boş bırakılamaz.")
                 .LessThanOrEqualTo(DateTime.Now)
                 .WithMessage("Ehliyet tarihi gelecekte olamaz.");
+
         }
     }
 }

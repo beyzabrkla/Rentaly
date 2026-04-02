@@ -1,6 +1,6 @@
 ﻿@using Rentaly.EntityLayer.Entities
 @using Microsoft.AspNetCore.WebUtilities
-@model List<Brand>
+@model List<ResultBrandDTO>
 @{
     ViewData["Title"] = "Marka Yönetimi";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -87,9 +87,9 @@
 <div class="row g-4">
     @foreach (var brand in Model)
     {
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3" id="brand-row-@brand.BrandId">
             <div class="vehicle-card" style="height: 100%; display: flex; flex-direction: column;">
-                
+            
                 <div class="vehicle-img-wrap" style="height: 140px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 15px; border-radius: 12px 12px 0 0;">
                     @if (!string.IsNullOrEmpty(brand.CoverImageUrl))
                     {

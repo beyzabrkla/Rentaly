@@ -1,16 +1,11 @@
 ﻿using FluentValidation;
-using Rentaly.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rentaly.DTOLayer.BrandDTOs;
 
-namespace Rentaly.BusinessLayer.ValidationRules
+namespace Rentaly.BusinessLayer.ValidationRules.BrandValidator
 {
-    public class BrandValidator :AbstractValidator<Brand>
+    public class CreateBrandValidator : AbstractValidator<CreateBrandDTO>
     {
-        public BrandValidator()
+        public CreateBrandValidator()
         {
             RuleFor(x => x.BrandName)
                 .NotEmpty().WithMessage("Marka adı boş geçilemez");
@@ -31,6 +26,7 @@ namespace Rentaly.BusinessLayer.ValidationRules
             RuleFor(x => x.CoverImageUrl)
                 .Must(BeAValidUrl)
                 .WithMessage("Geçerli bir görsel URL giriniz");
+
         }
 
         private bool StartWithUpperLetter(string brandName)
