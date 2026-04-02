@@ -22,10 +22,6 @@ namespace Rentaly.BusinessLayer.ValidationRules
                 .MaximumLength(30).WithMessage("Marka adı en fazla 30 karakter olabilir");
 
             RuleFor(x => x.BrandName)
-                .Matches(@"^[a-zA-ZğüşıöçĞÜŞİÖÇ\s]+$")
-                .WithMessage("Marka adı sadece harf içermelidir");
-
-            RuleFor(x => x.BrandName)
                 .Must(StartWithUpperLetter)
                 .WithMessage("Marka adı büyük harfle başlamalıdır");
 

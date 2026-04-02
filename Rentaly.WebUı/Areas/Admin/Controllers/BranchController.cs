@@ -80,6 +80,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 return View(new List<Branch>());
             }
         }
+    
         [HttpGet]
         public async Task<IActionResult> BranchDetail(int id)
         {
@@ -114,7 +115,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBranch(Branch branch)
+        public async Task<IActionResult> CreateBranch([FromBody]Branch branch)
         {
             try
             {

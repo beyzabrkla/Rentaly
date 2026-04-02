@@ -21,7 +21,7 @@ namespace Rentaly.BusinessLayer.Concrete
 
         public override async Task TInsertAsync(Brand entity)
         {
-            // İş akışı kontrolü (Örn: Veritabanında aynı isim var mı?)
+            // İş akışı kontrolü (Veritabanında aynı isim var mı?)
             var brands = await _uow.BrandDal.GetListAsync();
             if (brands.Any(x => x.BrandName.ToLower() == entity.BrandName.ToLower()))
                 throw new Exception("Bu marka zaten mevcut");
