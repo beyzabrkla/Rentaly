@@ -1,0 +1,228 @@
+﻿@using Rentaly.EntityLayer.Entities
+@using Microsoft.AspNetCore.WebUtilities
+@model List<Brand>
+@{
+    ViewData["Title"] = "Marka Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    
+    // Araç sayıları (Marka başına)
+    var carCounts = ViewBag.CarCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    
+    // Filtre değerleri
+    string searchFilter = Context.Request.Query["search"];
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @Html.Raw(TempData["Error"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<style>
+    .custom-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .brand-logo-preview {
+        width: 100%;
+        height: 120px;
+        object-fit: contain;
+        background: #252525;
+        border-radius: 12px;
+        padding: 10px;
+    }
+</style>
+
+@Html.AntiForgeryToken()
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Marka Yönetimi</h1>
+        <p class="page-subtitle">Araç markalarını ve portföy dağılımını yönetin.</p>
+    </div>
+    <button class="btn-primary-custom" onclick="openBrandModal(0)">
+        <i class="fa-solid fa-plus"></i> Yeni Marka Ekle
+    </button>
+</div>
+
+@* Üst Stat Kartları *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-6">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:var(--text-main);">@ViewBag.TotalCount</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Toplam Marka</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-6">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:var(--primary);">@carCounts.Values.Sum()</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Sistemdeki Toplam Araç</div>
+        </div>
+    </div>
+</div>
+
+@* Filtreleme Alanı *@
+<div class="toolbar-card mb-4">
+    <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Marka ara..." value="@searchFilter" onkeypress="if(event.key==='Enter') filterBrands()" />
+    </div>
+    <button class="btn-action btn-detail" onclick="window.location.href='/Admin/Brand/BrandList'">
+        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+    </button>
+</div>
+
+<p class="results-count mb-3">
+    Toplam <strong>@ViewBag.TotalCount</strong> markadan <strong>@Model.Count</strong> tanesi gösteriliyor.
+</p>
+
+@* Liste Kısmı *@
+<div class="row g-4">
+    @foreach (var brand in Model)
+    {
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div class="vehicle-card" style="height: 100%; display: flex; flex-direction: column;">
+                
+                <div class="vehicle-img-wrap" style="height: 140px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 15px; border-radius: 12px 12px 0 0;">
+                    @if (!string.IsNullOrEmpty(brand.CoverImageUrl))
+                    {
+                        <img src="@brand.CoverImageUrl" style="max-width:100%; max-height:100%; object-fit:contain;" alt="@brand.BrandName" />
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-image fa-2x" style="color: #ccc;"></i>
+                    }
+                </div>
+
+                <div class="vehicle-body text-center" style="flex-grow: 1; padding: 15px;">
+                    <div class="vehicle-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 5px;">@brand.BrandName</div>
+                    <div class="vehicle-specs justify-content-center">
+                        <div class="spec-item">
+                            <i class="fa-solid fa-car" style="color: var(--primary);"></i>
+                            <span style="font-weight: 600;">@(carCounts.ContainsKey(brand.BrandId) ? carCounts[brand.BrandId] : 0) Araç</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vehicle-actions" style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
+                    <button onclick="handleEdit('@brand.BrandId', '@Html.Raw(brand.BrandName)', '@brand.CoverImageUrl')" class="btn-action btn-edit" style="flex:1; font-size: 13px;">
+                        <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                    </button>
+                    <button onclick="confirmDelete(@brand.BrandId)" class="btn-action btn-delete" style="padding: 0 15px;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@* Pagination *@
+@{
+    var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+    var filterParams = new Dictionary<string, string>();
+    foreach (var param in queryParams) { if (param.Key.ToLower() != "page") filterParams[param.Key] = param.Value.ToString(); }
+    string GetPageUrl(int n)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = n.ToString() };
+        return Url.Action("BrandList", "Brand", new { area = "Admin" }) + QueryString.Create(qs).Value;
+    }
+}
+
+@if ((int)ViewBag.TotalPages > 1)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav style="display:flex;justify-content:center;gap:8px;">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <a href="@GetPageUrl(i)" class="btn-action @(i == (int)ViewBag.CurrentPage ? "btn-delete" : "btn-detail")" style="flex:unset;padding:8px 14px;">@i</a>
+                }
+            </nav>
+        </div>
+    </div>
+}
+
+@* Marka Ekle/Düzenle Modal *@
+<div id="brandModal" class="custom-modal-backdrop">
+    <div class="custom-modal-content" style="background: #1a1a1a; border: 1px solid #282828; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px;">
+        <h4 id="modalTitle" class="mb-4 text-white" style="font-weight:800;">Marka Bilgileri</h4>
+        <form id="brandForm" method="post">
+            @Html.AntiForgeryToken()
+    
+            <input type="hidden" name="BrandId" id="modalBrandId" />
+    
+            <div class="mb-3">
+                <label class="form-label text-muted small">Marka Adı</label>
+                <input type="text" name="BrandName" id="modalBrandName" class="filter-select w-100" placeholder="Örn: BMW" />
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-muted small">Logo URL (Kapak Görseli)</label>
+                <input type="text" name="CoverImageUrl" id="modalCoverImageUrl" class="filter-select w-100" placeholder="https://..." oninput="updatePreview(this.value)" />
+                <div class="mt-2 text-center">
+                    <img id="logoPreview" src="" class="brand-logo-preview" style="display:none;" />
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn-action btn-detail" onclick="closeModals()">İptal</button>
+                <button type="submit" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
+            </div>
+        </form>   
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterBrands() {
+            const search = document.getElementById('searchInput').value;
+            window.location.href = `?page=1&search=${encodeURIComponent(search)}`;
+        }
+
+        function updatePreview(url) {
+            const img = document.getElementById('logoPreview');
+            if(url) {
+                img.src = url;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+        }
+
+        function openBrandModal(id) {
+            document.getElementById('brandForm').reset();
+            document.getElementById('modalBrandId').value = id;
+            document.getElementById('modalTitle').innerText = "Yeni Marka Ekle";
+            document.getElementById('brandForm').action = "/Admin/Brand/CreateBrand";
+            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('brandModal').style.display = 'flex';
+        }
+
+        function handleEdit(id, name, imageUrl) {
+            document.getElementById('modalBrandId').value = id;
+            document.getElementById('modalBrandName').value = name;
+            document.getElementById('modalCoverImageUrl').value = imageUrl;
+            updatePreview(imageUrl);
+            document.getElementById('modalTitle').innerText = "Markayı Düzenle";
+            document.getElementById('brandForm').action = "/Admin/Brand/EditBrand";
+            document.getElementById('brandModal').style.display = 'flex';
+        }
+
+        function closeModals() { document.getElementById('brandModal').style.display = 'none'; }
+        window.onclick = e => { if (e.target.id === 'brandModal') closeModals(); }
+
+        function confirmDelete(id) {
+            if(confirm('Bu markayı silmek istediğinize emin misiniz?')) {
+                window.location.href = `/Admin/Brand/DeleteBrand/${id}`;
+            }
+        }
+    </script>
+}
