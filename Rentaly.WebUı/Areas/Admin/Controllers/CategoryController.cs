@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Humanizer;
+using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
+using Rentaly.BusinessLayer.ValidationRules.CategoryValidator;
 using Rentaly.DataAccessLayer.UnitOfWork;
+using Rentaly.DTOLayer.CategoryDTOs;
 using Rentaly.EntityLayer.Entities;
 
 namespace Rentaly.WebUI.Areas.Admin.Controllers
@@ -10,11 +14,13 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
     {
         private readonly ICategoryService _categoryService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryService categoryService, IUnitOfWork unitOfWork)
+        public CategoryController(ICategoryService categoryService, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _categoryService = categoryService;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -23,12 +29,13 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             try
             {
                 var values = await _categoryService.TGetListAsync();
+                var categoryDtoList = _mapper.Map<List<ResultCategoryDTO>>(values);
                 return View(values);
             }
             catch (Exception ex)
             {
                 TempData["Error"] = "Kategoriler yüklenirken bir hata oluştu.";
-                return View(new List<Category>());
+                return View(new List<ResultCategoryDTO>());
             }
         }
 
@@ -40,12 +47,22 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateCategory(Category category)
+        public async Task<IActionResult> CreateCategory(CreateCategoryDTO createCategoryDTO)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return View(category);
+                var validator = new CreateCategoryValidator();
+                var result = await validator.ValidateAsync(createCategoryDTO);
+
+                if (!result.IsValid)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+                    return View(createCategoryDTO);
+                }
+
+                var category = _mapper.Map<Category>(createCategoryDTO);
 
                 await _categoryService.TInsertAsync(category);
                 await _unitOfWork.SaveAsync();
@@ -56,7 +73,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"Hata oluştu: {ex.Message}";
-                return View(category);
+                return View(createCategoryDTO);
             }
         }
 
@@ -69,7 +86,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 if (value == null)
                     return NotFound("Kategori bulunamadı.");
 
-                return View(value);
+                var dto = _mapper.Map<UpdateCategoryDTO>(value);
+
+                return View(dto);
             }
             catch (Exception ex)
             {
@@ -80,12 +99,24 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditCategory(Category category)
+        public async Task<IActionResult> EditCategory(UpdateCategoryDTO updateCategoryDTO)
         {
             try
             {
-                if (!ModelState.IsValid)
-                    return View(category);
+                var validator = new UpdateCategoryValidator();
+                var result = await validator.ValidateAsync(updateCategoryDTO);
+
+                if (!result.IsValid)
+                {
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+
+                    return View(updateCategoryDTO);
+                }
+
+                var category = await _categoryService.TGetByIdAsync(updateCategoryDTO.CategoryId);
+                if (category == null) return NotFound();
+                _mapper.Map(updateCategoryDTO, category);
 
                 await _categoryService.TUpdateAsync(category);
                 await _unitOfWork.SaveAsync();
@@ -96,7 +127,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"Hata: {ex.Message}";
-                return View(category);
+                return View(updateCategoryDTO);
             }
         }
 

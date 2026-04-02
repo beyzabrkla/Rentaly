@@ -1,5 +1,5 @@
 ﻿@using Rentaly.EntityLayer.Entities
-@model Car
+@model UpdateCarDTO
 @{
     ViewData["Title"] = "EditCar";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -537,7 +537,7 @@
     <div>
         <h1 class="page-title">Araç Düzenle</h1>
         <p class="page-subtitle">
-            <strong style="color:var(--primary);">@Model.Brand?.BrandName @Model.CarModel?.ModelName</strong>
+            <strong style="color:var(--primary);">@Model.BrandName @Model.CarModelName</strong>
             — @Model.PlateNumber
         </p>
     </div>
@@ -613,49 +613,57 @@
                     <div class="row g-3">
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="BrandId">Marka <span class="required">*</span></label>
-                            <select id="BrandId" name="BrandId" class="form-select is-valid"
+                            <select id="BrandId" asp-for="BrandId" name="BrandId" class="form-select"
                                     onchange="loadModels(this.value);liveValidate(this)">
                                 <option value="">— Marka Seçin —</option>
                                 @foreach (var b in ViewBag.Brands as List<Brand> ?? new List<Brand>())
                                 {
-                                    <option value="@b.BrandId" @(Model.BrandId == b.BrandId ? "selected" : "")>@b.BrandName</option>
+                                    <option value="@b.BrandId">@b.BrandName</option>
                                 }
                             </select>
                             <div class="invalid-feedback" id="brandError"><i class="fa-solid fa-circle-exclamation"></i> Marka seçimi zorunludur.</div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="CarModelId">Model <span class="required">*</span></label>
-                            <select id="CarModelId" name="CarModelId" class="form-select is-valid"
-                                    onchange="liveValidate(this)">
+                            <select id="CarModelId" asp-for="CarModelId" name="CarModelId" class="form-select" onchange="liveValidate(this)">
                                 <option value="">— Model Seçin —</option>
                                 @if (ViewBag.Models != null)
                                 {
-                                    foreach (var m in ViewBag.Models as List<CarModel> ?? new List<CarModel>())
+                                    foreach (var m in ViewBag.Models as List<CarModel>)
                                     {
-                                        <option value="@m.CarModelId" @(Model.CarModelId == m.CarModelId ? "selected" : "")>@m.ModelName</option>
+                                        <option value="@m.CarModelId">@m.ModelName</option>
                                     }
                                 }
                             </select>
-                            <div class="invalid-feedback" id="modelError"><i class="fa-solid fa-circle-exclamation"></i> Model seçimi zorunludur.</div>
+
+                            <div class="invalid-feedback" id="modelError">
+                                <i class="fa-solid fa-circle-exclamation"></i> Model seçimi zorunludur.
+                                </div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="CategoryId">Kategori <span class="required">*</span></label>
-                            <select id="CategoryId" name="CategoryId" class="form-select is-valid" onchange="liveValidate(this)">
+                            <select id="CategoryId" asp-for="CategoryId" name="CategoryId" class="form-select is-valid" onchange="liveValidate(this)">
                                 <option value="">— Kategori Seçin —</option>
-                                @foreach (var c in ViewBag.Categories as List<Category> ?? new List<Category>())
+                                @if (ViewBag.Categories != null)
                                 {
-                                    <option value="@c.CategoryId" @(Model.CategoryId == c.CategoryId ? "selected" : "")>@c.CategoryName</option>
+                                    @foreach (var c in ViewBag.Categories as List<Category>)
+                                    {
+                                        <option value="@c.CategoryId">@c.CategoryName</option>
+                                    }
                                 }
                             </select>
                             <div class="invalid-feedback" id="categoryError"><i class="fa-solid fa-circle-exclamation"></i> Kategori seçimi zorunludur.</div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="BranchId">Şube <span class="required">*</span></label>
-                            <select id="BranchId" name="BranchId" class="form-select is-valid" onchange="liveValidate(this)">
+                            <select id="BranchId" asp-for="BranchId" name="BranchId" class="form-select is-valid" onchange="liveValidate(this)">
                                 <option value="">— Şube Seçin —</option>
-                                @foreach (var br in ViewBag.Branches as List<Branch> ?? new List<Branch>())
+                                @if (ViewBag.Branches != null)
                                 {
-                                    <option value="@br.BranchId" @(Model.BranchId == br.BranchId ? "selected" : "")>@br.BranchName - @br.City</option>
+                                    @foreach (var br in ViewBag.Branches as List<Branch>)
+                                    {
+                                        <option value="@br.BranchId">@br.BranchName - @br.City</option>
+                                    }   
                                 }
                             </select>
                             <div class="invalid-feedback" id="branchError"><i class="fa-solid fa-circle-exclamation"></i> Şube seçimi zorunludur.</div>
@@ -696,11 +704,11 @@
                         </div>
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Transmission">Vites <span class="required">*</span></label>
-                            <select id="Transmission" name="Transmission" class="form-select is-valid" onchange="liveValidate(this)">
+                            <select id="Transmission" asp-for="Transmission" name="Transmission" class="form-select is-valid" onchange="liveValidate(this)">
                                 <option value="">— Seçin —</option>
                                 @foreach (var t in new[] { "Otomatik", "Manuel", "Yarı Otomatik", "CVT" })
                                 {
-                                    <option value="@t" @(Model.Transmission == t ? "selected" : "")>@t</option>
+                                    <option value="@t">@t</option>
                                 }
                             </select>
                             <div class="invalid-feedback" id="transError"><i class="fa-solid fa-circle-exclamation"></i> Vites tipi zorunludur.</div>
@@ -1018,7 +1026,7 @@
                         </div>
                         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
                             <span style="color:var(--text-muted);">Marka / Model</span>
-                            <strong>@Model.Brand?.BrandName @Model.CarModel?.ModelName</strong>
+                            <strong>@Model.BrandName @Model.CarModelName</strong>
                         </div>
                         <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);">
                             <span style="color:var(--text-muted);">Yıl</span>

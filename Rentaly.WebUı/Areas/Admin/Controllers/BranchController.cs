@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
+using Rentaly.BusinessLayer.ValidationRules.BranchValidator;
 using Rentaly.DataAccessLayer.UnitOfWork;
+using Rentaly.DTOLayer.BranchDTOs;
+using Rentaly.DTOLayer.CarDTOs;
 using Rentaly.EntityLayer.Entities;
 
 namespace Rentaly.WebUI.Areas.Admin.Controllers
@@ -11,15 +15,18 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         private readonly IBranchService _branchService;
         private readonly ICarService _carService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
         public BranchController(
             IBranchService branchService,
             ICarService carService,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IMapper mapper)
         {
             _branchService = branchService;
             _carService = carService;
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -80,25 +87,26 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 return View(new List<Branch>());
             }
         }
-    
+
         [HttpGet]
         public async Task<IActionResult> BranchDetail(int id)
         {
             try
             {
                 var branch = await _branchService.TGetByIdAsync(id);
-                if (branch == null)
-                    return NotFound("Şube bulunamadı.");
+                if (branch == null) return NotFound("Şube bulunamadı.");
 
                 var allCars = await _carService.TGetListAsync();
                 var branchCars = allCars.Where(c => c.BranchId == id).ToList();
+
+                var carDtoList = _mapper.Map<List<ResultCarDTO>>(branchCars);
 
                 ViewBag.Branch = branch;
                 ViewBag.TotalCars = branchCars.Count;
                 ViewBag.AvailableCount = branchCars.Count(c => c.IsAvailable);
                 ViewBag.RentedCount = branchCars.Count(c => !c.IsAvailable);
 
-                return View(branchCars);
+                return View(carDtoList);
             }
             catch (Exception ex)
             {
@@ -112,15 +120,26 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         {
             return View();
         }
-
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateBranch([FromBody]Branch branch)
+        public async Task<IActionResult> CreateBranch(CreateBranchDTO createBranchDTO)
         {
+            var validator = new CreateBranchValidator();
+            var result = await validator.ValidateAsync(createBranchDTO);
+
+            if (!result.IsValid)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(createBranchDTO);
+            }
+
             try
             {
-                if (!ModelState.IsValid)
-                    return View(branch);
+                var branch = _mapper.Map<Branch>(createBranchDTO);
 
                 await _branchService.TInsertAsync(branch);
                 await _unitOfWork.SaveAsync();
@@ -131,36 +150,39 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"Hata oluştu: {ex.Message}";
-                return View(branch);
+                return View(createBranchDTO);
             }
         }
 
         [HttpGet]
         public async Task<IActionResult> EditBranch(int id)
         {
-            try
-            {
-                var branch = await _branchService.TGetByIdAsync(id);
-                if (branch == null)
-                    return NotFound("Şube bulunamadı.");
+            var branch = await _branchService.TGetByIdAsync(id);
+            if (branch == null) return NotFound();
 
-                return View(branch);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Şube yüklenirken hata oluştu.";
-                return RedirectToAction("BranchList");
-            }
+            var dto = _mapper.Map<UpdateBranchDTO>(branch);
+            return View(dto);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditBranch(Branch branch)
+        public async Task<IActionResult> EditBranch(UpdateBranchDTO updateBranchDTO)
         {
+            var validator = new UpdateBranchValidator();
+            var result = await validator.ValidateAsync(updateBranchDTO);
+
+            if (!result.IsValid)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
+                }
+                return View(updateBranchDTO);
+            }
+
             try
             {
-                if (!ModelState.IsValid)
-                    return View(branch);
+                var branch = _mapper.Map<Branch>(updateBranchDTO);
 
                 await _branchService.TUpdateAsync(branch);
                 await _unitOfWork.SaveAsync();
@@ -171,7 +193,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Error"] = $"Hata: {ex.Message}";
-                return View(branch);
+                return View(updateBranchDTO);
             }
         }
 

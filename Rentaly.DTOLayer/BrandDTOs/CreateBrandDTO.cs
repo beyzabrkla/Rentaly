@@ -8,5 +8,8 @@ namespace Rentaly.DTOLayer.BrandDTOs
 {
     public class CreateBrandDTO
     {
+        public string BrandName { get; set; }
+        public string? CoverImageUrl { get; set; }
+
     }
 }

@@ -1,16 +1,11 @@
 ﻿using FluentValidation;
-using Rentaly.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rentaly.DTOLayer.RentalDTOs;
 
-namespace Rentaly.BusinessLayer.ValidationRules
+namespace Rentaly.BusinessLayer.ValidationRules.RentalValidator
 {
-    public class RentalValidator : AbstractValidator<Rental>
+    public class CreateRentalValidator : AbstractValidator<CreateRentalDTO>
     {
-        public RentalValidator()
+        public CreateRentalValidator()
         {
             RuleFor(x => x.CarId).GreaterThan(0).WithMessage("Araç seçimi zorunludur.");
             RuleFor(x => x.CustomerId).GreaterThan(0).WithMessage("Müşteri seçimi zorunludur.");
@@ -27,6 +22,7 @@ namespace Rentaly.BusinessLayer.ValidationRules
             RuleFor(x => x.ReturnBranchId).GreaterThan(0).WithMessage("İade şubesi seçilmelidir.");
 
             RuleFor(x => x.Status).NotEmpty().WithMessage("Kiralama durumu belirtilmelidir.");
+
         }
     }
 }

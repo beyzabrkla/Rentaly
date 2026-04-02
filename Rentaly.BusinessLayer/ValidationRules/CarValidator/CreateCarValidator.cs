@@ -1,20 +1,15 @@
 ﻿using FluentValidation;
-using Rentaly.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Rentaly.DTOLayer.CarDTOs;
 
-namespace Rentaly.BusinessLayer.ValidationRules
+namespace Rentaly.BusinessLayer.ValidationRules.CarValidator
 {
-    public class CarValidator : AbstractValidator<Car>
+    public class CreateCarValidator : AbstractValidator<CreateCarDTO>
     {
-        public CarValidator()
+        public CreateCarValidator()
         {
             RuleFor(x => x.PlateNumber)
-                .NotEmpty().WithMessage("Plaka boş geçilemez")
-                .MaximumLength(10).WithMessage("Plaka en fazla 10 karakter olabilir");
+                    .NotEmpty().WithMessage("Plaka boş geçilemez")
+                    .MaximumLength(10).WithMessage("Plaka en fazla 10 karakter olabilir");
 
             RuleFor(x => x.VIN)
                 .NotEmpty().WithMessage("Şasi numarası boş geçilemez")
@@ -64,6 +59,7 @@ namespace Rentaly.BusinessLayer.ValidationRules
 
             RuleFor(x => x.Transmission)
                 .NotEmpty().WithMessage("Şanzıman tipi (Manuel/Otomatik) seçilmelidir.");
+
         }
     }
 }

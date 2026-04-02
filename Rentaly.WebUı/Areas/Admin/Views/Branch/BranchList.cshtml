@@ -1,14 +1,15 @@
-﻿@using Rentaly.EntityLayer.Entities
-@using Microsoft.AspNetCore.WebUtilities
-@model List<Branch>
+﻿@using Microsoft.AspNetCore.WebUtilities
+@model List<ResultBranchDTO>
 @{
     ViewData["Title"] = "Şube Yönetimi";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
-    var carCounts = ViewBag.CarCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
     
-    // Filtre değerlerini URL'den alıyoruz
     string statusFilter = Context.Request.Query["status"];
     string searchFilter = Context.Request.Query["search"];
+    
+    var carCounts = ViewBag.CarCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
+    bool isTrueSelected = statusFilter == "True";
+    bool isFalseSelected = statusFilter == "False";
 }
 
 <style>
@@ -74,8 +75,8 @@
     </div>
     <select class="filter-select" id="statusFilter" onchange="filterBranches()">
         <option value="">Tüm Durumlar</option>
-        <option value="True" @(statusFilter == "True" ? "selected" : "")>Aktif</option>
-        <option value="False" @(statusFilter == "False" ? "selected" : "")>Pasif</option>
+        <option value="True" selected="@isTrueSelected">Aktif</option>
+        <option value="False" selected="@isFalseSelected">Pasif</option>
     </select>
     <button class="btn-action btn-detail" onclick="window.location.href='/Admin/Branch/BranchList'">
         <i class="fa-solid fa-rotate-left"></i> Sıfırla
