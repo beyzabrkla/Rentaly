@@ -133,13 +133,10 @@
 
                 <div class="vehicle-actions">
                     <a href="/Admin/Branch/BranchDetail/@branch.BranchId" class="btn-action btn-detail" style="flex:1">
-                        <i class="fa-solid fa-eye"></i> Detay
+                        <i class="fa-solid fa-eye"></i> Kayıtlı Araçlar
                     </a>
                     <button onclick="handleEdit('@branch.BranchId', '@Html.Raw(branch.BranchName)', '@Html.Raw(branch.City)', '@Html.Raw(branch.Address)', '@branch.IsActive')" class="btn-action btn-edit">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button onclick="confirmDelete(@branch.BranchId)" class="btn-action btn-delete">
-                        <i class="fa-solid fa-trash-can"></i>
+                        <i class="fa-solid fa-pen-to-square"></i>Şube Detay
                     </button>
                 </div>
             </div>
@@ -147,7 +144,6 @@
     }
 </div>
 
-@* Gelişmiş Pagination *@
 @{
     var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
     var filterParams = new Dictionary<string, string>();
@@ -197,30 +193,37 @@
 }
 
 @* Şube Ekle/Düzenle Modal *@
-<div id="branchModal" class="custom-modal-backdrop">
+<div id="branchModal" class="custom-modal-backdrop" style="display:none;">
     <div class="custom-modal-content" style="background: #1a1a1a; border: 1px solid #282828; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px;">
-        <h4 id="modalTitle" class="mb-4 text-white" style="font-weight:800;">Şube Bilgileri</h4>
+        <h4 id="modalTitle" class="mb-4" style="font-weight:800; color:var(--text-main);">Şube Bilgileri</h4>
+        
         <form id="branchForm" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="BranchId" id="modalBranchId" />
+            
             <div class="mb-3">
-                <label class="form-label text-muted small">Şube Adı</label>
-                <input type="text" name="BranchName" id="modalBranchName" class="filter-select w-100" required />
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Şube Adı</label>
+                <input type="text" name="BranchName" id="modalBranchName" class="filter-select w-100" required style="color:var(--text-main);" />
             </div>
+
             <div class="mb-3">
-                <label class="form-label text-muted small">Şehir</label>
-                <input type="text" name="City" id="modalCity" class="filter-select w-100" required />
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Şehir</label>
+                <input type="text" name="City" id="modalCity" class="filter-select w-100" required style="color:var(--text-main);" />
             </div>
+
             <div class="mb-3">
-                <label class="form-label text-muted small">Durum</label>
-                <select name="IsActive" id="modalIsActive" class="filter-select w-100">
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Durum</label>
+                <select name="IsActive" id="modalIsActive" class="filter-select w-100" style="color:var(--text-main);">
                     <option value="true">Aktif</option>
                     <option value="false">Pasif</option>
                 </select>
             </div>
+
             <div class="mb-4">
-                <label class="form-label text-muted small">Adres</label>
-                <textarea name="Address" id="modalAddress" class="filter-select w-100" style="height:80px;" required></textarea>
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Adres</label>
+                <textarea name="Address" id="modalAddress" class="filter-select w-100" style="height:80px; color:var(--text-main);" required></textarea>
             </div>
+
             <div class="d-flex gap-2 justify-content-end">
                 <button type="button" class="btn-action btn-detail" onclick="closeModals()">İptal</button>
                 <button type="submit" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
@@ -228,7 +231,6 @@
         </form>
     </div>
 </div>
-
 @section Scripts {
     <script>
         function filterBranches() {

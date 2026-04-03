@@ -61,5 +61,11 @@ namespace Rentaly.DataAccessLayer.EntityFramework
             return await WithAllIncludes()
                 .FirstOrDefaultAsync(c => c.CarId == id);
         }
+
+        // Şubeye göre araçlar (detaylı)
+        public async Task<List<Car>> GetCarsByBranchWithDetailsAsync(int branchId)
+            => await WithAllIncludes()
+                    .Where(x => x.BranchId == branchId)
+                    .ToListAsync();
     }
 }

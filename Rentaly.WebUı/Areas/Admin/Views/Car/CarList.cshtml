@@ -62,9 +62,9 @@
             <option value="">Tüm Markalar</option>
             @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
             {
-                <!option value="@brand.BrandId" @(brandFilter == brand.BrandId.ToString() ? "selected" : "")>
+                <option value="@brand.BrandId" selected="@(ViewBag.CurrentBrand != null && (int)ViewBag.CurrentBrand == brand.BrandId)">
                     @brand.BrandName
-                </!option>
+                </option>
             }
         </select>
         <select class="filter-select" id="statusFilter" onchange="filterCars()">
@@ -261,6 +261,8 @@
 }
 
 @* Silme Onay Modal *@
+
+
 <div id="deleteModal"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">

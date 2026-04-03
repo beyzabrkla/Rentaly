@@ -1,8 +1,23 @@
-﻿@model List<ResultCarDTO>
+﻿@using Microsoft.AspNetCore.WebUtilities
+@model List<ResultCarDTO>
 @{
     var branch = ViewBag.Branch as Branch;
     ViewData["Title"] = branch?.BranchName + " Araçları";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+    var filterParams = new Dictionary<string, string>();
+    
+    foreach (var param in queryParams)
+    {
+        if (param.Key.ToLower() != "page") filterParams[param.Key] = param.Value.ToString();
+    }
+
+    string GetPageUrl(int n)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = n.ToString() };
+        return Url.Action("BranchDetail", "Branch", new { area = "Admin" }) + QueryString.Create(qs).Value;
+    }
 }
 
 <div class="page-header">
@@ -41,13 +56,14 @@
     </div>
 </div>
 
+@* Araç Listesi *@
 <div class="row g-4">
     @if (Model == null || !Model.Any())
     {
         <div class="col-12 text-center py-5">
             <div style="color:var(--text-muted); opacity:0.5;">
                 <i class="fa-solid fa-car" style="font-size:48px; display:block; margin-bottom:16px;"></i>
-                <p style="font-size:15px;">Bu şubede henüz araç bulunmuyor.</p>
+                <p style="font-size:15px;">Bu şubede henüz kriterlere uygun araç bulunmuyor.</p>
             </div>
         </div>
     }
@@ -64,9 +80,6 @@
                             <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
                             @(car.IsAvailable ? "Müsait" : "Kirada")
                         </span>
-                        <span class="vehicle-fuel">
-                            <i class="fa-solid fa-gas-pump"></i> @car.FuelType
-                        </span>
                     </div>
 
                     <div class="vehicle-body">
@@ -74,25 +87,11 @@
                         <div class="vehicle-name">@car.CarModelName</div>
 
                         <div class="vehicle-specs">
-                            <div class="spec-item">
-                                <i class="fa-solid fa-road"></i>
-                                <span>@car.Kilometer.ToString("N0") km</span>
-                            </div>
-                            <div class="spec-item">
-                                <i class="fa-solid fa-gears"></i>
-                                <span>@car.Transmission</span>
-                            </div>
-                            <div class="spec-item">
-                                <i class="fa-solid fa-users"></i>
-                                <span>@car.SeatCount kişi</span>
-                            </div>
-                            <div class="spec-item">
-                                <i class="fa-solid fa-suitcase"></i>
-                                <span>@car.LuggageCount bagaj</span>
-                            </div>
+                            <div class="spec-item"><i class="fa-solid fa-road"></i> <span>@car.Kilometer.ToString("N0") km</span></div>
+                            <div class="spec-item"><i class="fa-solid fa-gears"></i> <span>@car.Transmission</span></div>
                         </div>
 
-                        <div class="vehicle-price-row">
+                        <div class="vehicle-price-row mt-3">
                             <div class="vehicle-price">
                                 <span class="price-amount">₺@car.DailyPrice.ToString("N0")</span>
                                 <span class="price-label">/ gün</span>
@@ -105,12 +104,49 @@
                         <a href="/Admin/Car/EditCar/@car.CarId" class="btn-action btn-edit">
                             <i class="fa-solid fa-pen-to-square"></i> Düzenle
                         </a>
-                        <a href="/Admin/Car/CarDetail/@car.CarId" class="btn-action btn-detail">
-                            <i class="fa-solid fa-eye"></i> Detay
-                        </a>
                     </div>
                 </div>
             </div>
         }
     }
 </div>
+
+@* Sayfalama *@
+@if ((int)ViewBag.TotalPages > 1)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+                @if ((int)ViewBag.CurrentPage > 1)
+                {
+                    <a href="@GetPageUrl(1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;"><i class="fa-solid fa-angles-left"></i> İlk</a>
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage - 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;"><i class="fa-solid fa-angle-left"></i> Önceki</a>
+                }
+                
+                <div style="display:flex;gap:6px;">
+                    @{
+                        int start = Math.Max(1, (int)ViewBag.CurrentPage - 2);
+                        int end = Math.Min((int)ViewBag.TotalPages, (int)ViewBag.CurrentPage + 2);
+                    }
+                    @for (int i = start; i <= end; i++)
+                    {
+                        if (i == (int)ViewBag.CurrentPage)
+                        {
+                            <span class="btn-action btn-delete" style="flex:unset;padding:8px 14px;">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@GetPageUrl(i)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">@i</a>
+                        }
+                    }
+                </div>
+
+                @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                {
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage + 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">Sonraki <i class="fa-solid fa-angle-right"></i></a>
+                    <a href="@GetPageUrl((int)ViewBag.TotalPages)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px;">Son <i class="fa-solid fa-angles-right"></i></a>
+                }
+            </nav>
+        </div>
+    </div>
+}

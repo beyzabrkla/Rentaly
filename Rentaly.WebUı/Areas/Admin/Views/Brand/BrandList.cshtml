@@ -1,71 +1,44 @@
-﻿@using Rentaly.EntityLayer.Entities
-@using Microsoft.AspNetCore.WebUtilities
+﻿@using Microsoft.AspNetCore.WebUtilities
 @model List<ResultBrandDTO>
 @{
     ViewData["Title"] = "Marka Yönetimi";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
-    
-    // Araç sayıları (Marka başına)
     var carCounts = ViewBag.CarCounts as Dictionary<int, int> ?? new Dictionary<int, int>();
-    
-    // Filtre değerleri
     string searchFilter = Context.Request.Query["search"];
+    string statusFilter = Context.Request.Query["status"];
 }
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @Html.Raw(TempData["Error"])
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+
 <style>
     .custom-modal-backdrop {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(8px);
-        z-index: 10000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
+        position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px); z-index: 10000; display: none;
+        align-items: center; justify-content: center; padding: 20px;
     }
     .brand-logo-preview {
-        width: 100%;
-        height: 120px;
-        object-fit: contain;
-        background: #252525;
-        border-radius: 12px;
-        padding: 10px;
+        width: 100%; height: 120px; object-fit: contain;
+        background: #252525; border-radius: 12px; padding: 10px;
+    }
+    .status-badge {
+        position: absolute; top: 10px; right: 10px; padding: 4px 10px;
+        border-radius: 20px; font-size: 11px; font-weight: 700; z-index: 5;
+    }
+    .bg-active { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+    .bg-passive { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); }
+
+    .btn-status-toggle {
+        width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+        border-radius: 10px; transition: all 0.3s;
     }
 </style>
-
-@Html.AntiForgeryToken()
 
 <div class="page-header">
     <div>
         <h1 class="page-title">Marka Yönetimi</h1>
-        <p class="page-subtitle">Araç markalarını ve portföy dağılımını yönetin.</p>
+        <p class="page-subtitle">Araç markalarını ve portföy durumlarını yönetin.</p>
     </div>
     <button class="btn-primary-custom" onclick="openBrandModal(0)">
         <i class="fa-solid fa-plus"></i> Yeni Marka Ekle
     </button>
-</div>
-
-@* Üst Stat Kartları *@
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md-6">
-        <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:var(--text-main);">@ViewBag.TotalCount</div>
-            <div style="font-size:12.5px;color:var(--text-muted);">Toplam Marka</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-6">
-        <div class="stat-card text-center py-3">
-            <div style="font-family:'Plus Jakarta Sans';font-size:28px;font-weight:800;color:var(--primary);">@carCounts.Values.Sum()</div>
-            <div style="font-size:12.5px;color:var(--text-muted);">Sistemdeki Toplam Araç</div>
-        </div>
-    </div>
 </div>
 
 @* Filtreleme Alanı *@
@@ -74,102 +47,164 @@
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Marka ara..." value="@searchFilter" onkeypress="if(event.key==='Enter') filterBrands()" />
     </div>
+
+    <select id="statusFilter" class="filter-select" onchange="filterBrands()" style="min-width:140px;">
+        <option value="">Tüm Durumlar</option>
+        <option value="active" selected="@(statusFilter == "active")">Aktifler</option>
+        <option value="passive" selected="@(statusFilter == "passive")">Pasifler</option>
+    </select>
+
     <button class="btn-action btn-detail" onclick="window.location.href='/Admin/Brand/BrandList'">
         <i class="fa-solid fa-rotate-left"></i> Sıfırla
     </button>
 </div>
 
-<p class="results-count mb-3">
-    Toplam <strong>@ViewBag.TotalCount</strong> markadan <strong>@Model.Count</strong> tanesi gösteriliyor.
-</p>
-
 @* Liste Kısmı *@
 <div class="row g-4">
     @foreach (var brand in Model)
     {
-        <div class="col-12 col-md-6 col-lg-4 col-xl-3" id="brand-row-@brand.BrandId">
-            <div class="vehicle-card" style="height: 100%; display: flex; flex-direction: column;">
-            
+        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+            <div class="vehicle-card" style="position:relative; height: 100%; display: flex; flex-direction: column; opacity: @(brand.Status ? "1" : "0.7")">
+                
+                <span class="status-badge @(brand.Status ? "bg-active" : "bg-passive")">
+                    @(brand.Status ? "Aktif" : "Pasif")
+                </span>
                 <div class="vehicle-img-wrap" style="height: 140px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 15px; border-radius: 12px 12px 0 0;">
-                    @if (!string.IsNullOrEmpty(brand.CoverImageUrl))
-                    {
-                        <img src="@brand.CoverImageUrl" style="max-width:100%; max-height:100%; object-fit:contain;" alt="@brand.BrandName" />
-                    }
-                    else
-                    {
-                        <i class="fa-solid fa-image fa-2x" style="color: #ccc;"></i>
-                    }
+                    <img src="@(string.IsNullOrEmpty(brand.CoverImageUrl) ? "/images/no-image.png" : brand.CoverImageUrl)" 
+                         style="max-width:100%; max-height:100%; object-fit:contain;" alt="@brand.BrandName" />
                 </div>
-
                 <div class="vehicle-body text-center" style="flex-grow: 1; padding: 15px;">
-                    <div class="vehicle-name" style="font-size: 1.1rem; font-weight: 700; margin-bottom: 5px;">@brand.BrandName</div>
-                    <div class="vehicle-specs justify-content-center">
-                        <div class="spec-item">
-                            <i class="fa-solid fa-car" style="color: var(--primary);"></i>
-                            <span style="font-weight: 600;">@(carCounts.ContainsKey(brand.BrandId) ? carCounts[brand.BrandId] : 0) Araç</span>
-                        </div>
+                    <div class="vehicle-name" style="font-size: 1.1rem; font-weight: 700; color:var(--text-main);">@brand.BrandName</div>
+                    <div class="spec-item justify-content-center mt-2">
+                        <i class="fa-solid fa-car" style="color: var(--primary);"></i>
+                        <span style="font-weight: 600; color:var(--text-muted);">@(carCounts.ContainsKey(brand.BrandId) ? carCounts[brand.BrandId] : 0) Araç</span>
                     </div>
                 </div>
-
-                <div class="vehicle-actions" style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
-                    <button onclick="handleEdit('@brand.BrandId', '@Html.Raw(brand.BrandName)', '@brand.CoverImageUrl')" class="btn-action btn-edit" style="flex:1; font-size: 13px;">
-                        <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                <div class="vehicle-actions" style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px;">
+                    <a href="/Admin/Car/CarList?brand=@brand.BrandId" class="btn-action btn-detail" style="flex:1; font-size: 12px; display:flex; align-items:center; justify-content:center; gap:5px; text-decoration:none;">
+                        <i class="fa-solid fa-car-side"></i> Araçları Gör
+                    </a>
+                    <button onclick="handleEdit('@brand.BrandId', '@Html.Raw(brand.BrandName)', '@brand.CoverImageUrl', '@brand.Status'.toLowerCase())" class="btn-action btn-edit" style="width:38px; flex:none;" title="Markayı Düzenle">
+                        <i class="fa-solid fa-pen-to-square"></i>
                     </button>
-                    <button onclick="confirmDelete(@brand.BrandId)" class="btn-action btn-delete" style="padding: 0 15px;">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+                    <a href="/Admin/Brand/ChangeStatus/@brand.BrandId" class="btn-action @(brand.Status ? "btn-delete" : "btn-primary-custom")" style="width: 38px; height:38px; flex: none; display:flex; align-items:center; justify-content:center; border-radius:10px;" title="Durumu Değiştir">
+                        <i class="fa-solid @(brand.Status ? "fa-eye-slash" : "fa-eye")"></i>
+                    </a>
                 </div>
             </div>
         </div>
     }
 </div>
 
-@* Pagination *@
+@* Pagination - Marka Listesi *@
 @{
     var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
     var filterParams = new Dictionary<string, string>();
-    foreach (var param in queryParams) { if (param.Key.ToLower() != "page") filterParams[param.Key] = param.Value.ToString(); }
-    string GetPageUrl(int n)
+    foreach (var param in queryParams)
     {
-        var qs = new Dictionary<string, string>(filterParams) { ["page"] = n.ToString() };
+        // Sayfa parametresini hariç tutup diğer filtreleri (search, status) saklıyoruz
+        if (param.Key.ToLower() != "page") filterParams[param.Key] = param.Value.ToString();
+    }
+
+    string GetPageUrl(int pageNumber)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = pageNumber.ToString() };
         return Url.Action("BrandList", "Brand", new { area = "Admin" }) + QueryString.Create(qs).Value;
     }
 }
 
-@if ((int)ViewBag.TotalPages > 1)
+@if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
 {
-    <div class="row mt-5">
+    <div class="row mt-5 mb-4">
         <div class="col-12">
-            <nav style="display:flex;justify-content:center;gap:8px;">
-                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+            <nav aria-label="Sayfa navigasyonu" style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+                
+                @* Önceki Sayfa Butonları *@
+                @if ((int)ViewBag.CurrentPage > 1)
                 {
-                    <a href="@GetPageUrl(i)" class="btn-action @(i == (int)ViewBag.CurrentPage ? "btn-delete" : "btn-detail")" style="flex:unset;padding:8px 14px;">@i</a>
+                    <a href="@GetPageUrl(1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        <i class="fa-solid fa-angles-left"></i> İlk
+                    </a>
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage - 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        <i class="fa-solid fa-angle-left"></i> Önceki
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        <i class="fa-solid fa-angles-left"></i> İlk
+                    </span>
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        <i class="fa-solid fa-angle-left"></i> Önceki
+                    </span>
+                }
+
+                @* Sayfa Numaraları (Aktif sayfanın 2 öncesi ve 2 sonrası) *@
+                <div style="display:flex;gap:6px;">
+                    @{
+                        int start = Math.Max(1, (int)ViewBag.CurrentPage - 2);
+                        int end = Math.Min((int)ViewBag.TotalPages, (int)ViewBag.CurrentPage + 2);
+                    }
+                    @for (int i = start; i <= end; i++)
+                    {
+                        if (i == (int)ViewBag.CurrentPage)
+                        {
+                            <span class="btn-action btn-delete" style="flex:unset;padding:8px 16px; min-width:45px; text-align:center; cursor:default;">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@GetPageUrl(i)" class="btn-action btn-detail" style="flex:unset;padding:8px 16px; text-decoration:none; min-width:45px; text-align:center;">@i</a>
+                        }
+                    }
+                </div>
+
+                @* Sonraki Sayfa Butonları *@
+                @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                {
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage + 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        Sonraki <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                    <a href="@GetPageUrl((int)ViewBag.TotalPages)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        Son <i class="fa-solid fa-angles-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        Sonraki <i class="fa-solid fa-angle-right"></i>
+                    </span>
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        Son <i class="fa-solid fa-angles-right"></i>
+                    </span>
                 }
             </nav>
         </div>
     </div>
 }
 
-@* Marka Ekle/Düzenle Modal *@
 <div id="brandModal" class="custom-modal-backdrop">
     <div class="custom-modal-content" style="background: #1a1a1a; border: 1px solid #282828; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px;">
-        <h4 id="modalTitle" class="mb-4 text-white" style="font-weight:800;">Marka Bilgileri</h4>
+        <h4 id="modalTitle" class="mb-4" style="font-weight:800; color:var(--text-main);">Marka Bilgileri</h4>
         <form id="brandForm" method="post">
             @Html.AntiForgeryToken()
-    
             <input type="hidden" name="BrandId" id="modalBrandId" />
-    
             <div class="mb-3">
-                <label class="form-label text-muted small">Marka Adı</label>
-                <input type="text" name="BrandName" id="modalBrandName" class="filter-select w-100" placeholder="Örn: BMW" />
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Marka Adı</label>
+                <input type="text" name="BrandName" id="modalBrandName" class="filter-select w-100" required style="color:var(--text-main);" />
             </div>
-
+            <div class="mb-3">
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Logo URL</label>
+                <input type="text" name="CoverImageUrl" id="modalCoverImageUrl" class="filter-select w-100" oninput="updatePreview(this.value)" style="color:var(--text-main);" />
+            </div>
             <div class="mb-4">
-                <label class="form-label text-muted small">Logo URL (Kapak Görseli)</label>
-                <input type="text" name="CoverImageUrl" id="modalCoverImageUrl" class="filter-select w-100" placeholder="https://..." oninput="updatePreview(this.value)" />
-                <div class="mt-2 text-center">
-                    <img id="logoPreview" src="" class="brand-logo-preview" style="display:none;" />
-                </div>
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Görünürlük Durumu</label>
+                <select name="Status" id="modalStatus" class="filter-select w-100" style="color:var(--text-main);">
+                    <option value="true">Aktif (Listelenir)</option>
+                    <option value="false">Pasif (Gizlenir)</option>
+                </select>
+            </div>
+            <div class="mt-2 text-center mb-4">
+                <img id="logoPreview" src="" class="brand-logo-preview" style="display:none; border: 1px solid #333;" />
             </div>
 
             <div class="d-flex gap-2 justify-content-end">
@@ -182,34 +217,51 @@
 
 @section Scripts {
     <script>
+
         function filterBrands() {
             const search = document.getElementById('searchInput').value;
-            window.location.href = `?page=1&search=${encodeURIComponent(search)}`;
+            const status = document.getElementById('statusFilter').value;
+            
+            let url = `?page=1`;
+            
+            if (search) {
+                url += `&search=${encodeURIComponent(search)}`;
+            }
+            
+            if (status) {
+                url += `&status=${status}`;
+            }
+            
+            window.location.href = url;
         }
+
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                filterBrands();
+            }
+        });
 
         function updatePreview(url) {
             const img = document.getElementById('logoPreview');
-            if(url) {
-                img.src = url;
-                img.style.display = 'block';
-            } else {
-                img.style.display = 'none';
-            }
+            if(url) { img.src = url; img.style.display = 'block'; } 
+            else { img.style.display = 'none'; }
         }
 
         function openBrandModal(id) {
             document.getElementById('brandForm').reset();
             document.getElementById('modalBrandId').value = id;
+            document.getElementById('modalStatus').value = "true";
             document.getElementById('modalTitle').innerText = "Yeni Marka Ekle";
             document.getElementById('brandForm').action = "/Admin/Brand/CreateBrand";
             document.getElementById('logoPreview').style.display = 'none';
             document.getElementById('brandModal').style.display = 'flex';
         }
 
-        function handleEdit(id, name, imageUrl) {
+        function handleEdit(id, name, imageUrl, status) {
             document.getElementById('modalBrandId').value = id;
             document.getElementById('modalBrandName').value = name;
             document.getElementById('modalCoverImageUrl').value = imageUrl;
+            document.getElementById('modalStatus').value = status;
             updatePreview(imageUrl);
             document.getElementById('modalTitle').innerText = "Markayı Düzenle";
             document.getElementById('brandForm').action = "/Admin/Brand/EditBrand";
@@ -218,11 +270,5 @@
 
         function closeModals() { document.getElementById('brandModal').style.display = 'none'; }
         window.onclick = e => { if (e.target.id === 'brandModal') closeModals(); }
-
-        function confirmDelete(id) {
-            if(confirm('Bu markayı silmek istediğinize emin misiniz?')) {
-                window.location.href = `/Admin/Brand/DeleteBrand/${id}`;
-            }
-        }
     </script>
 }

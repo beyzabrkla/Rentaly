@@ -6,6 +6,7 @@ using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.DTOLayer.BranchDTOs;
 using Rentaly.DTOLayer.CarDTOs;
 using Rentaly.EntityLayer.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Rentaly.WebUI.Areas.Admin.Controllers
 {
@@ -37,131 +38,85 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 var allBranches = await _branchService.TGetListAsync();
                 var allCars = await _carService.TGetListAsync();
 
-                // Filtreleme Mantığı
                 var filteredBranches = allBranches.AsQueryable();
 
+                // Filtreleme
                 if (!string.IsNullOrEmpty(search))
                 {
-                    search = search.ToLower();
+                    var lowerSearch = search.ToLower();
                     filteredBranches = filteredBranches.Where(x =>
-                        x.BranchName.ToLower().Contains(search) ||
-                        x.City.ToLower().Contains(search)
-                    ).AsQueryable();
+                        x.BranchName.ToLower().Contains(lowerSearch) ||
+                        x.City.ToLower().Contains(lowerSearch));
                 }
 
                 if (status.HasValue)
                 {
-                    filteredBranches = filteredBranches.Where(x => x.IsActive == status.Value).AsQueryable();
+                    filteredBranches = filteredBranches.Where(x => x.IsActive == status.Value);
                 }
 
-                // İstatistikler (Filtrelemeden bağımsız genel sayılar)
-                ViewBag.TotalCount = allBranches.Count;
-                ViewBag.ActiveCount = allBranches.Count(x => x.IsActive);
-                ViewBag.PassiveCount = allBranches.Count(x => !x.IsActive);
-
-                // Sayfalama Mantığı (6 tane)
+                // Sayfalama
                 int pageSize = 6;
                 var branchList = filteredBranches.ToList();
                 int totalItems = branchList.Count;
 
-                var pagedData = branchList
+                var pagedBranches = branchList
                     .Skip((page - 1) * pageSize)
                     .Take(pageSize)
                     .ToList();
 
-                // View'a Gidecek Diğer Veriler
+                var pagedDataDto = _mapper.Map<List<ResultBranchDTO>>(pagedBranches);
+
+                // ViewBags
+                ViewBag.TotalCount = allBranches.Count;
+                ViewBag.ActiveCount = allBranches.Count(x => x.IsActive);
+                ViewBag.PassiveCount = allBranches.Count(x => !x.IsActive);
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+                ViewBag.Search = search;
+                ViewBag.Status = status;
 
                 ViewBag.CarCounts = allBranches.ToDictionary(
                     b => b.BranchId,
                     b => allCars.Count(c => c.BranchId == b.BranchId)
                 );
 
-                return View(pagedData);
+                return View(pagedDataDto);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 TempData["Error"] = "Şubeler yüklenirken bir hata oluştu.";
-                ViewBag.CarCounts = new Dictionary<int, int>();
-                return View(new List<Branch>());
+                return View(new List<ResultBranchDTO>());
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> BranchDetail(int id)
-        {
-            try
-            {
-                var branch = await _branchService.TGetByIdAsync(id);
-                if (branch == null) return NotFound("Şube bulunamadı.");
-
-                var allCars = await _carService.TGetListAsync();
-                var branchCars = allCars.Where(c => c.BranchId == id).ToList();
-
-                var carDtoList = _mapper.Map<List<ResultCarDTO>>(branchCars);
-
-                ViewBag.Branch = branch;
-                ViewBag.TotalCars = branchCars.Count;
-                ViewBag.AvailableCount = branchCars.Count(c => c.IsAvailable);
-                ViewBag.RentedCount = branchCars.Count(c => !c.IsAvailable);
-
-                return View(carDtoList);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Şube detayı yüklenirken bir hata oluştu.";
-                return RedirectToAction("BranchList");
-            }
-        }
-
-        [HttpGet]
-        public IActionResult CreateBranch()
-        {
-            return View();
-        }
-       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateBranch(CreateBranchDTO createBranchDTO)
         {
+            // Validasyon kontrolü
             var validator = new CreateBranchValidator();
             var result = await validator.ValidateAsync(createBranchDTO);
 
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                }
-                return View(createBranchDTO);
+                TempData["Error"] = string.Join("<br>", result.Errors.Select(x => x.ErrorMessage));
+                return RedirectToAction("BranchList");
             }
 
             try
             {
                 var branch = _mapper.Map<Branch>(createBranchDTO);
-
                 await _branchService.TInsertAsync(branch);
                 await _unitOfWork.SaveAsync();
 
-                TempData["Success"] = "Şube başarıyla eklendi.";
-                return RedirectToAction("BranchList");
+                TempData["Success"] = "Yeni şube başarıyla eklendi.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Hata oluştu: {ex.Message}";
-                return View(createBranchDTO);
+                TempData["Error"] = "Hata: " + ex.Message;
             }
-        }
 
-        [HttpGet]
-        public async Task<IActionResult> EditBranch(int id)
-        {
-            var branch = await _branchService.TGetByIdAsync(id);
-            if (branch == null) return NotFound();
-
-            var dto = _mapper.Map<UpdateBranchDTO>(branch);
-            return View(dto);
+            return RedirectToAction("BranchList");
         }
 
         [HttpPost]
@@ -173,28 +128,85 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
             if (!result.IsValid)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                }
-                return View(updateBranchDTO);
+                TempData["Error"] = string.Join("<br>", result.Errors.Select(x => x.ErrorMessage));
+                return RedirectToAction("BranchList");
             }
 
             try
             {
-                var branch = _mapper.Map<Branch>(updateBranchDTO);
+                var branch = await _branchService.TGetByIdAsync(updateBranchDTO.BranchId);
+                if (branch == null) return NotFound();
 
+                _mapper.Map(updateBranchDTO, branch);
                 await _branchService.TUpdateAsync(branch);
                 await _unitOfWork.SaveAsync();
 
-                TempData["Success"] = "Şube başarıyla güncellendi.";
-                return RedirectToAction("BranchList");
+                TempData["Success"] = "Şube bilgileri güncellendi.";
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Hata: {ex.Message}";
-                return View(updateBranchDTO);
+                TempData["Error"] = "Güncelleme sırasında hata: " + ex.Message;
             }
+
+            return RedirectToAction("BranchList");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> BranchDetail(int id, string search, string fuel, string transmission, int page = 1)
+        {
+            //Şube Bilgisini Getir
+            var branch = await _branchService.TGetByIdAsync(id);
+            if (branch == null)
+            {
+                return NotFound();
+            }
+            ViewBag.Branch = branch;
+
+            //Şubeye Ait Araçları Getir (İlişkili verilerle birlikte)
+            var cars = await _carService.GetCarsByBranchWithDetailsAsync(id);
+
+            //İstatistikleri (Filtresiz ham veri üzerinden) hesapla
+            ViewBag.TotalCars = cars.Count;
+            ViewBag.AvailableCount = cars.Count(x => x.IsAvailable);
+            ViewBag.RentedCount = cars.Count(x => !x.IsAvailable);
+
+            //Filtreleme İşlemleri
+            var filteredCars = cars.AsEnumerable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                filteredCars = filteredCars.Where(x =>
+                    (x.Brand != null && x.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    (x.CarModel != null && x.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
+            }
+
+            if (!string.IsNullOrEmpty(fuel))
+            {
+                filteredCars = filteredCars.Where(x => x.FuelType == fuel);
+            }
+
+            if (!string.IsNullOrEmpty(transmission))
+            {
+                filteredCars = filteredCars.Where(x => x.Transmission == transmission);
+            }
+
+            int pageSize = 6;
+            var totalFilteredCount = filteredCars.Count();
+
+            var pagedCars = filteredCars
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var mappedCars = _mapper.Map<List<ResultCarDTO>>(pagedCars);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalFilteredCount / pageSize);
+            ViewBag.Search = search;
+            ViewBag.Fuel = fuel;
+            ViewBag.Transmission = transmission;
+
+            return View(mappedCars);
         }
 
         [HttpPost]
@@ -204,20 +216,15 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             try
             {
                 var branch = await _branchService.TGetByIdAsync(id);
-                if (branch == null)
-                    return Json(new { success = false, message = "Şube bulunamadı." });
+                if (branch == null) return Json(new { success = false });
 
                 branch.IsActive = !branch.IsActive;
                 await _branchService.TUpdateAsync(branch);
                 await _unitOfWork.SaveAsync();
 
-                var status = branch.IsActive ? "aktif" : "pasif";
-                return Json(new { success = true, message = $"Şube {status} edildi.", isActive = branch.IsActive });
+                return Json(new { success = true, isActive = branch.IsActive });
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Hata: {ex.Message}" });
-            }
+            catch { return Json(new { success = false }); }
         }
     }
 }
