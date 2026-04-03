@@ -1,6 +1,4 @@
 ﻿using Rentaly.EntityLayer.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Rentaly.DataAccessLayer.Abstract
 {
@@ -12,5 +10,6 @@ namespace Rentaly.DataAccessLayer.Abstract
         Task<List<Car>> GetAllWithDetailsAsync();
         Task<List<Car>> GetAvailableWithDetailsAsync();
         Task<Car> GetCarByIdWithDetailsAsync(int id);
+        Task<List<Car>> GetCarsByBranchWithDetailsAsync(int branchId);
     }
 }

@@ -44,30 +44,34 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CarList(int page = 1, string? search = null, int? brand = null, string? fuel = null, string? status = null, string? active = null,
-                    decimal? minPrice = null, decimal? maxPrice = null)
+        public async Task<IActionResult> CarList(int page = 1, string? search = null, int? brand = null, string? fuel = null, string? status = null, string? active = null, decimal? minPrice = null, decimal? maxPrice = null)
         {
             try
             {
-                var allCars = await _carService.GetAllWithDetailsAsync();
+                  var allCars = await _carService.GetAllWithDetailsAsync();
+
                 ViewBag.TotalCars = allCars.Count;
                 ViewBag.AvailableCount = allCars.Count(c => c.IsAvailable);
                 ViewBag.RentedCount = allCars.Count(c => !c.IsAvailable);
 
                 var query = allCars.AsQueryable();
 
+                //Filtreleme
                 if (!string.IsNullOrEmpty(search))
-                    query = query.Where(c =>
-                        (c.Brand != null && c.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
-                        (c.CarModel != null && c.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                    query = query.Where(c => (c.Brand != null && c.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) || (c.CarModel != null && c.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
 
+                //BrandList'ten gelen ID buraya düşer
                 if (brand.HasValue && brand.Value > 0)
+                {
                     query = query.Where(c => c.BrandId == brand.Value);
+                    ViewBag.SelectedBrandId = brand.Value;
+
+                    query = query.Where(c => c.BrandId == brand.Value);
+                    ViewBag.CurrentBrand = brand.Value;
+                }
 
                 if (!string.IsNullOrEmpty(fuel))
-                    query = query.Where(c =>
-                        !string.IsNullOrEmpty(c.FuelType) &&
-                        c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
+                    query = query.Where(c => !string.IsNullOrEmpty(c.FuelType) && c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
 
                 if (!string.IsNullOrEmpty(status))
                     query = query.Where(c => status == "Müsait" ? c.IsAvailable : !c.IsAvailable);
@@ -81,19 +85,21 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 int totalFiltered = query.Count();
                 int totalPages = (int)Math.Ceiling(totalFiltered / (double)PAGE_SIZE);
                 page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
-                var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
 
-                var carDtoList = _mapper.Map<List<ResultCarDTO>>(pagedCars);
+                var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
 
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.Brands = await _brandService.TGetListAsync();
 
-                return View(carDtoList);
+                ViewBag.CurrentSearch = search;
+                ViewBag.CurrentBrand = brand;
+
+                return View(_mapper.Map<List<ResultCarDTO>>(pagedCars));
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Araçlar yüklenirken bir hata oluştu.";
+                TempData["Error"] = "Araçlar listelenirken bir teknik hata oluştu.";
                 return View(new List<ResultCarDTO>());
             }
         }

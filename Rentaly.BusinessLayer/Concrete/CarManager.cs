@@ -28,6 +28,11 @@ namespace Rentaly.BusinessLayer.Concrete
         public async Task<Car> GetCarByIdWithDetailsAsync(int id) // CarId'ye göre detaylı araç bilgisi alma
             => await _unitOfWork.CarDal.GetCarByIdWithDetailsAsync(id);
 
+        public async Task<List<Car>> GetCarsByBranchWithDetailsAsync(int branchId) // ŞubeId'ye göre araçları detaylı şekilde alma
+        {
+            return await _unitOfWork.CarDal.GetCarsByBranchWithDetailsAsync(branchId);
+        }
+
         public async Task<List<Car>> GetCarsByBrandAsync(int brandId) // MarkaId'ye göre araçları alma
         {
             return await _unitOfWork.CarDal.GetCarsByBrandAsync(brandId);
