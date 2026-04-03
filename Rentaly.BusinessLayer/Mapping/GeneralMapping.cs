@@ -30,13 +30,20 @@ namespace Rentaly.BusinessLayer.Mapping
 
             CreateMap<Car, CreateCarDTO>().ReverseMap();
             CreateMap<Car, ResultCarDTO>()
-                                        .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.BrandName))
-                                        .ForMember(dest => dest.CarModelName, opt => opt.MapFrom(src => src.CarModel.ModelName))
-                                        .ReverseMap();
+                .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : null))
+                .ForMember(dest => dest.CarModelName, opt => opt.MapFrom(src => src.CarModel != null ? src.CarModel.ModelName : null))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null))
+                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch != null ? src.Branch.BranchName : null))
+                .ReverseMap();
+
             CreateMap<Car, UpdateCarDTO>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.BrandName))
                 .ForMember(dest => dest.CarModelName, opt => opt.MapFrom(src => src.CarModel.ModelName))
-                .ReverseMap();
+                .ForMember(dest => dest.CarImages, opt => opt.MapFrom(src => src.CarImages))
+                .ReverseMap()
+                .ForMember(dest => dest.Brand, opt => opt.Ignore())
+                .ForMember(dest => dest.CarModel, opt => opt.Ignore())
+                .ForMember(dest => dest.CarImages, opt => opt.Ignore());
 
             CreateMap<CarImage, CreateCarImageDTO>().ReverseMap();
             CreateMap<CarImage, ResultCarImageDTO>().ReverseMap();

@@ -29,8 +29,10 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             try
             {
                 var values = await _categoryService.TGetListAsync();
+
                 var categoryDtoList = _mapper.Map<List<ResultCategoryDTO>>(values);
-                return View(values);
+
+                return View(categoryDtoList);
             }
             catch (Exception ex)
             {
