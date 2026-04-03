@@ -1,5 +1,4 @@
-﻿@using Rentaly.EntityLayer.Entities
-@model UpdateCarDTO
+﻿@model UpdateCarDTO
 @{
     ViewData["Title"] = "EditCar";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -545,7 +544,6 @@
         <i class="fa-solid fa-arrow-left"></i> Listeye Dön
     </a>
 </div>
-
 <form id="editCarForm" asp-action="EditCar" asp-controller="Car" asp-area="Admin"
       asp-route-id="@Model.CarId" method="post" enctype="multipart/form-data" novalidate>
     @Html.AntiForgeryToken()
@@ -576,6 +574,7 @@
                                 <i class="fa-solid fa-hashtag input-icon"></i>
                             </div>
                             <div class="invalid-feedback" id="plateError"><i class="fa-solid fa-circle-exclamation"></i> Geçerli bir plaka giriniz.</div>
+                                <span asp-validation-for="PlateNumber" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                             <div id="platePreviewWrap" style="margin-top:10px; @(Model.PlateNumber != null ? "" : "display:none;")">
                                 <div class="plate-preview">
                                     <div class="plate-flag"><span>🇹🇷</span><small>TR</small></div>
@@ -589,14 +588,14 @@
                                 <input type="text" id="VIN" name="VIN"
                                        class="form-control @(Model.VIN != null ? "is-valid" : "")"
                                        value="@Model.VIN"
-                                       placeholder="WBA5A5C5XED123456" maxlength="50" autocomplete="off"
+                                       placeholder="WBA5A5C5XED123456" maxlength="17" autocomplete="off"
                                        style="font-family:monospace;letter-spacing:1px;font-size:13px;"
                                        oninput="this.value=this.value.toUpperCase();updateVinCount();liveValidate(this)" />
                                 <i class="fa-solid fa-barcode input-icon"></i>
                             </div>
                             <div class="d-flex justify-content-between mt-1">
-                                <div class="invalid-feedback" id="vinError"><i class="fa-solid fa-circle-exclamation"></i> VIN zorunludur.</div>
-                                <div class="char-count ms-auto"><span id="vinCount">@(Model.VIN?.Length ?? 0)</span>/50</div>
+                                    <span asp-validation-for="VIN" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
+                                <div class="char-count ms-auto"><span id="vinCount">@(Model.VIN?.Length ?? 0)</span>/17</div>
                             </div>
                         </div>
                     </div>
@@ -622,6 +621,7 @@
                                 }
                             </select>
                             <div class="invalid-feedback" id="brandError"><i class="fa-solid fa-circle-exclamation"></i> Marka seçimi zorunludur.</div>
+                                <span asp-validation-for="BrandId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="CarModelId">Model <span class="required">*</span></label>
@@ -639,6 +639,7 @@
                             <div class="invalid-feedback" id="modelError">
                                 <i class="fa-solid fa-circle-exclamation"></i> Model seçimi zorunludur.
                                 </div>
+                                <span asp-validation-for="CarModelId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="CategoryId">Kategori <span class="required">*</span></label>
@@ -653,6 +654,7 @@
                                 }
                             </select>
                             <div class="invalid-feedback" id="categoryError"><i class="fa-solid fa-circle-exclamation"></i> Kategori seçimi zorunludur.</div>
+                                <span asp-validation-for="CategoryId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="BranchId">Şube <span class="required">*</span></label>
@@ -667,6 +669,7 @@
                                 }
                             </select>
                             <div class="invalid-feedback" id="branchError"><i class="fa-solid fa-circle-exclamation"></i> Şube seçimi zorunludur.</div>
+                                <span asp-validation-for="BranchId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                     </div>
                 </div>
@@ -689,6 +692,7 @@
                                 <i class="fa-solid fa-calendar input-icon"></i>
                             </div>
                             <div class="invalid-feedback" id="yearError"><i class="fa-solid fa-circle-exclamation"></i> Yıl zorunludur.</div>
+                                <span asp-validation-for="Year" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Kilometer">Kilometre <span class="required">*</span></label>
@@ -701,6 +705,7 @@
                                 <span class="input-suffix">km</span>
                             </div>
                             <div class="invalid-feedback" id="kmError"><i class="fa-solid fa-circle-exclamation"></i> Kilometre zorunludur.</div>
+                                <span asp-validation-for="Kilometer" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Transmission">Vites <span class="required">*</span></label>
@@ -712,6 +717,7 @@
                                 }
                             </select>
                             <div class="invalid-feedback" id="transError"><i class="fa-solid fa-circle-exclamation"></i> Vites tipi zorunludur.</div>
+                                <span asp-validation-for="Transmission" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Yakıt Tipi <span class="required">*</span></label>
@@ -779,6 +785,7 @@
                                 <span class="input-suffix">₺</span>
                             </div>
                             <div class="invalid-feedback" id="priceError"><i class="fa-solid fa-circle-exclamation"></i> Günlük fiyat zorunludur.</div>
+                                <span asp-validation-for="DailyPrice" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="DepositAmount">Depozito <span class="required">*</span></label>
@@ -792,6 +799,7 @@
                                 <span class="input-suffix">₺</span>
                             </div>
                             <div class="invalid-feedback" id="depositError"><i class="fa-solid fa-circle-exclamation"></i> Depozito zorunludur.</div>
+                                <span asp-validation-for="DepositAmount" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12">
                             <div class="price-banner" id="priceBanner">
@@ -824,7 +832,6 @@
             </div>
 
         </div>
-
         <div class="col-12 col-xl-4">
             @* KAPAK GÖRSELI *@
             <div class="form-section">
@@ -1064,6 +1071,10 @@
 @section Scripts {
     <script>
 
+            function validatePlateNumber(plate) {
+            const regex = /^\d{2}\s?[A-Z]{1,3}\s?\d{2,4}$/;
+            return regex.test(plate.trim());
+        }
         // ═══ MODEL AJAX (marka değişince) ═══
         async function loadModels(brandId) {
             const sel = document.getElementById('CarModelId');

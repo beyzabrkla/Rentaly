@@ -11,6 +11,8 @@ namespace Rentaly.BusinessLayer.ValidationRules.CarValidator
             Include(new CreateCarValidator());
 
             RuleFor(x => x.CarId).NotEmpty().WithMessage("Güncellenecek Araç Bulunamadı.");
+            
+            RuleFor(x => x.CoverImageUrl).NotNull().When(x => false);
         }
     }
 }

@@ -718,14 +718,15 @@
                             <label class="form-label" for="VIN">Şasi No (VIN) <span class="required">*</span></label>
                             <div class="input-icon-wrap">
                                 <input type="text" id="VIN" name="VIN" class="form-control"
-                                       placeholder="WBA5A5C5XED123456" maxlength="50" autocomplete="off"
+                                       placeholder="WBA5A5C5XED123456" maxlength="17" autocomplete="off"
                                        style="font-family:monospace;letter-spacing:1px;font-size:13px;"
                                        oninput="this.value=this.value.toUpperCase();updateVinCount();liveValidate(this)" />
                                 <i class="fa-solid fa-barcode input-icon"></i>
                             </div>
                             <div class="d-flex justify-content-between mt-1">
                                 <div class="invalid-feedback" id="vinError"><i class="fa-solid fa-circle-exclamation"></i> VIN zorunludur.</div>
-                                <div class="char-count ms-auto"><span id="vinCount">0</span>/50</div>
+                                <span asp-validation-for="VIN" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
+                                <div class="char-count ms-auto"><span id="vinCount">0</span>/17</div>
                             </div>
                         </div>
                     </div>
@@ -753,6 +754,7 @@
                                 <button type="button" class="btn-quick-add" onclick="openModal('brand')" title="Yeni marka ekle"><i class="fa-solid fa-plus"></i></button>
                             </div>
                             <div class="invalid-feedback" id="brandError"><i class="fa-solid fa-circle-exclamation"></i> Marka seçimi zorunludur.</div>
+                            <span asp-validation-for="BrandId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="CarModelId">Model <span class="required">*</span></label>
@@ -763,6 +765,8 @@
                                 <button type="button" class="btn-quick-add" onclick="openModal('model')" title="Yeni model ekle"><i class="fa-solid fa-plus"></i></button>
                             </div>
                             <div class="invalid-feedback" id="modelError"><i class="fa-solid fa-circle-exclamation"></i> Model seçimi zorunludur.</div>
+                            <span asp-validation-for="CategoryId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
+
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="CategoryId">Kategori <span class="required">*</span></label>
@@ -777,6 +781,7 @@
                                 <button type="button" class="btn-quick-add" onclick="openModal('category')" title="Yeni kategori ekle"><i class="fa-solid fa-plus"></i></button>
                             </div>
                             <div class="invalid-feedback" id="categoryError"><i class="fa-solid fa-circle-exclamation"></i> Kategori seçimi zorunludur.</div>
+                            <span asp-validation-for="CategoryId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="BranchId">Şube <span class="required">*</span></label>
@@ -791,6 +796,7 @@
                                 <button type="button" class="btn-quick-add" onclick="openModal('branch')" title="Yeni şube ekle"><i class="fa-solid fa-plus"></i></button>
                             </div>
                             <div class="invalid-feedback" id="branchError"><i class="fa-solid fa-circle-exclamation"></i> Şube seçimi zorunludur.</div>
+                            <span asp-validation-for="BranchId" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                     </div>
                 </div>
@@ -811,6 +817,7 @@
                                 <i class="fa-solid fa-calendar input-icon"></i>
                             </div>
                             <div class="invalid-feedback" id="yearError"><i class="fa-solid fa-circle-exclamation"></i> Yıl zorunludur.</div>
+                            <span asp-validation-for="Year" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Kilometer">Kilometre <span class="required">*</span></label>
@@ -820,6 +827,7 @@
                                 <span class="input-suffix">km</span>
                             </div>
                             <div class="invalid-feedback" id="kmError"><i class="fa-solid fa-circle-exclamation"></i> Kilometre zorunludur.</div>
+                            <span asp-validation-for="Kilometer" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6 col-md-4">
                             <label class="form-label" for="Transmission">Vites <span class="required">*</span></label>
@@ -831,6 +839,7 @@
                                 <option value="CVT">CVT</option>
                             </select>
                             <div class="invalid-feedback" id="transError"><i class="fa-solid fa-circle-exclamation"></i> Vites tipi zorunludur.</div>
+                            <span asp-validation-for="Transmission" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12">
                             <label class="form-label">Yakıt Tipi <span class="required">*</span></label>
@@ -890,6 +899,7 @@
                                 <span class="input-suffix">₺</span>
                             </div>
                             <div class="invalid-feedback" id="priceError"><i class="fa-solid fa-circle-exclamation"></i> Günlük fiyat zorunludur.</div>
+                            <span asp-validation-for="DailyPrice" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label" for="DepositAmount">Depozito <span class="required">*</span></label>
@@ -899,6 +909,7 @@
                                 <span class="input-suffix">₺</span>
                             </div>
                             <div class="invalid-feedback" id="depositError"><i class="fa-solid fa-circle-exclamation"></i> Depozito zorunludur.</div>
+                            <span asp-validation-for="DepositAmount" class="invalid-feedback" style="display:flex;gap:4px;align-items:center;color:var(--danger);font-size:12px;margin-top:5px;"></span>
                         </div>
                         <div class="col-12">
                             <div class="price-banner" id="priceBanner">
@@ -1043,15 +1054,17 @@
                     <div class="toggle-row">
                         <div class="toggle-label"><strong><i class="fa-solid fa-circle-check me-2" style="color:#10b981;"></i>Müsait</strong><span>Kiralamaya açık olsun</span></div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" id="IsAvailable" name="IsAvailable" value="true" checked />
-                            <input type="hidden" name="IsAvailable" value="false" />
+                            <input class="form-check-input" type="checkbox" id="IsAvailableToggle" checked
+                                   onchange="document.getElementById('IsAvailableHidden').value = this.checked ? 'true' : 'false'" />
+                            <input type="hidden" id="IsAvailableHidden" name="IsAvailable" value="true" />
                         </div>
                     </div>
                     <div class="toggle-row">
                         <div class="toggle-label"><strong><i class="fa-solid fa-power-off me-2" style="color:var(--primary);"></i>Aktif</strong><span>Sistemde görünsün</span></div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" id="IsActive" name="IsActive" value="true" checked />
-                            <input type="hidden" name="IsActive" value="false" />
+                            <input class="form-check-input" type="checkbox" id="IsActiveToggle" checked
+                                   onchange="document.getElementById('IsActiveHidden').value = this.checked ? 'true' : 'false'" />
+                            <input type="hidden" id="IsActiveHidden" name="IsActive" value="true" />
                         </div>
                     </div>
                 </div>
@@ -1289,8 +1302,8 @@
                 if (json.success && json.data?.length > 0) {
                     json.data.forEach(m => {
                         const opt = document.createElement('option');
-                        opt.value       = m.carModelId ?? m.modelId ?? m.id;
-                        opt.textContent = m.modelName  ?? m.name;
+                        opt.value       = m.id;
+                        opt.textContent = m.name;
                         sel.appendChild(opt);
                     });
                 } else {

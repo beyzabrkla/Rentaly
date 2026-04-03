@@ -1,5 +1,4 @@
-﻿@using Rentaly.EntityLayer.Entities
-@model List<ResultCategoryDTO>
+﻿@model List<ResultCategoryDTO>
 @{
     ViewData["Title"] = "Kategori Yönetimi";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
@@ -82,6 +81,7 @@
     <div class="custom-modal-content">
         <h4 id="modalTitle" style="font-weight:800; margin-bottom:20px; color:var(--text-main);">Kategori Ekle</h4>
         <form id="categoryForm" method="post">
+            @Html.AntiForgeryToken()
             <input type="hidden" name="CategoryId" id="modalCategoryId" />
             <div class="mb-4">
                 <label class="form-label" style="font-size:13px; color:var(--text-muted);">Kategori Adı</label>
@@ -104,7 +104,7 @@
         <p id="deleteModalText" style="color:var(--text-muted); font-size:14px; margin-bottom:25px;"></p>
         <div class="d-flex gap-2 justify-content-center">
             <button type="button" class="btn-action btn-detail" onclick="closeModals()">Vazgeç</button>
-            <a id="confirmDeleteBtn" href="#" class="btn-action btn-delete" style="padding:10px 25px; flex:none;">Evet, Sil</a>
+            <button id="confirmDeleteBtn" type="button" class="btn-action btn-delete" style="padding:10px 25px; flex:none;">Evet, Sil</button>
         </div>
     </div>
 </div>
@@ -127,14 +127,40 @@
             document.getElementById('modalTitle').innerText = "Kategoriyi Düzenle";
             document.getElementById('modalCategoryId').value = id;
             document.getElementById('modalCategoryName').value = name;
-            categoryForm.action = "/Admin/Category/UpdateCategory";
+            categoryForm.action = "/Admin/Category/EditCategory";
             categoryModal.style.display = 'flex';
         }
 
         function confirmDelete(id, name) {
             document.getElementById('deleteModalText').innerText = `"${name}" kategorisini silmek istediğinizden emin misiniz?`;
-            document.getElementById('confirmDeleteBtn').href = `/Admin/Category/DeleteCategory/${id}`;
+            const deleteBtn = document.getElementById('confirmDeleteBtn');
+            deleteBtn.onclick = function() {
+                deleteCategoryAjax(id);
+            };
+    
             deleteModal.style.display = 'flex';
+        }
+
+            function deleteCategoryAjax(id) {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            $.ajax({
+                url: `/Admin/Category/DeleteCategory/${id}`,
+                type: 'POST',
+                data: {
+                    __RequestVerificationToken: token 
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload(); 
+                    } else {
+                        alert("Hata: " + response.message);
+                    }
+                },
+                error: function() {
+                    alert("Silme işlemi sırasında bir sunucu hatası oluştu.");
+                }
+            });
         }
 
         function closeModals() {

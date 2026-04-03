@@ -43,9 +43,6 @@ namespace Rentaly.BusinessLayer.ValidationRules.CarValidator
                 .GreaterThanOrEqualTo(0)
                 .WithMessage("Depozito negatif olamaz");
 
-            RuleFor(x => x.CoverImageUrl)
-                .NotEmpty().WithMessage("Araç görseli boş olamaz");
-
             RuleFor(x => x.SeatCount)
                 .InclusiveBetween(1, 12)
                 .WithMessage("Koltuk sayısı 1 ile 12 arasında olmalıdır");
