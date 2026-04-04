@@ -1,11 +1,6 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
 using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
 {
@@ -16,6 +11,11 @@ namespace Rentaly.BusinessLayer.Concrete
         public CarModelManager(IUnitOfWork unitOfWork) : base(unitOfWork)
         {
             _unitOfWork = unitOfWork;
+        }
+
+        public async Task<List<CarModel>> GetCarModelsWithBrandsAsync()
+        {
+            return await _unitOfWork.CarModelDal.GetCarModelsWithBrands();
         }
 
         public async Task<List<CarModel>> GetModelsByBrandAsync(int brandId)

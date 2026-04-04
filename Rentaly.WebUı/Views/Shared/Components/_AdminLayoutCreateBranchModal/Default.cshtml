@@ -1,0 +1,24 @@
+﻿<div class="quick-modal-backdrop" id="modal-branch">
+    <div class="quick-modal">
+        <div class="quick-modal-title"><i class="fa-solid fa-building"></i> Yeni Şube Ekle</div>
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label" for="qBranchName">Şube Adı <span class="required">*</span></label>
+                <input type="text" id="qBranchName" class="form-control" placeholder="Örn: Kadıköy Şubesi" maxlength="100" />
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label" for="qBranchCity">Şehir <span class="required">*</span></label>
+                <input type="text" id="qBranchCity" class="form-control" placeholder="Örn: İstanbul" maxlength="100" />
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label" for="qBranchAddress">Adres</label>
+                <input type="text" id="qBranchAddress" class="form-control" placeholder="Örn: Bağdat Cad. No:1" maxlength="250" />
+            </div>
+        </div>
+        <div class="quick-modal-error" id="qBranchError"></div>
+        <div class="quick-modal-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeModal('branch')">İptal</button>
+            <button type="button" class="btn-modal-save" id="qBranchSaveBtn" onclick="quickSave('branch')"><i class="fa-solid fa-check"></i> Kaydet</button>
+        </div>
+    </div>
+</div>

@@ -938,7 +938,6 @@
                     <div class="char-count"><span id="descCount">0</span>/1000</div>
                 </div>
             </div>
-
         </div>
 
         <div class="col-12 col-xl-4">
@@ -1044,6 +1043,7 @@
                     </div>
                 </div>
             </div>
+
             @* Durum *@
             <div class="form-section">
                 <div class="section-header">
@@ -1088,7 +1088,6 @@
                     <div class="sum-row" id="sumPrice"><div style="display:flex;justify-content:space-between;"><span style="color:var(--text-muted);">Günlük Fiyat</span><strong id="sumPriceVal" style="color:var(--primary);"></strong></div></div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -1109,71 +1108,14 @@
 
 @* QUICK-ADD MODALLER *@
 
-<div class="quick-modal-backdrop" id="modal-brand">
-    <div class="quick-modal">
-        <div class="quick-modal-title"><i class="fa-solid fa-trademark"></i> Yeni Marka Ekle</div>
-        <label class="form-label" for="qBrandName">Marka Adı <span class="required">*</span></label>
-        <input type="text" id="qBrandName" class="form-control" placeholder="Örn: Skoda" maxlength="100" />
-        <div class="quick-modal-error" id="qBrandError"></div>
-        <div class="quick-modal-footer">
-            <button type="button" class="btn-modal-cancel" onclick="closeModal('brand')">İptal</button>
-            <button type="button" class="btn-modal-save" id="qBrandSaveBtn" onclick="quickSave('brand')"><i class="fa-solid fa-check"></i> Kaydet</button>
-        </div>
-    </div>
-</div>
+@await Component.InvokeAsync("_AdminLayoutCreateBrandModal")
 
-<div class="quick-modal-backdrop" id="modal-model">
-    <div class="quick-modal">
-        <div class="quick-modal-title"><i class="fa-solid fa-cube"></i> Yeni Model Ekle</div>
-        <label class="form-label">Marka</label>
-        <div id="qModelBrandInfo" style="font-size:13px;color:var(--text-muted);margin-bottom:14px;padding:8px 12px;background:#2a2a2a;border-radius:var(--radius-sm);"></div>
-        <label class="form-label" for="qModelName">Model Adı <span class="required">*</span></label>
-        <input type="text" id="qModelName" class="form-control" placeholder="Örn: Octavia" maxlength="100" />
-        <div class="quick-modal-error" id="qModelError"></div>
-        <div class="quick-modal-footer">
-            <button type="button" class="btn-modal-cancel" onclick="closeModal('model')">İptal</button>
-            <button type="button" class="btn-modal-save" id="qModelSaveBtn" onclick="quickSave('model')"><i class="fa-solid fa-check"></i> Kaydet</button>
-        </div>
-    </div>
-</div>
+@await Component.InvokeAsync("_AdminLayoutCreateModelModal")
 
-<div class="quick-modal-backdrop" id="modal-category">
-    <div class="quick-modal">
-        <div class="quick-modal-title"><i class="fa-solid fa-tags"></i> Yeni Kategori Ekle</div>
-        <label class="form-label" for="qCategoryName">Kategori Adı <span class="required">*</span></label>
-        <input type="text" id="qCategoryName" class="form-control" placeholder="Örn: Cabrio" maxlength="100" />
-        <div class="quick-modal-error" id="qCategoryError"></div>
-        <div class="quick-modal-footer">
-            <button type="button" class="btn-modal-cancel" onclick="closeModal('category')">İptal</button>
-            <button type="button" class="btn-modal-save" id="qCategorySaveBtn" onclick="quickSave('category')"><i class="fa-solid fa-check"></i> Kaydet</button>
-        </div>
-    </div>
-</div>
+@await Component.InvokeAsync("_AdminLayoutCreateCategoryModal")
 
-<div class="quick-modal-backdrop" id="modal-branch">
-    <div class="quick-modal">
-        <div class="quick-modal-title"><i class="fa-solid fa-building"></i> Yeni Şube Ekle</div>
-        <div class="row g-3">
-            <div class="col-12">
-                <label class="form-label" for="qBranchName">Şube Adı <span class="required">*</span></label>
-                <input type="text" id="qBranchName" class="form-control" placeholder="Örn: Kadıköy Şubesi" maxlength="100" />
-            </div>
-            <div class="col-12 col-sm-6">
-                <label class="form-label" for="qBranchCity">Şehir <span class="required">*</span></label>
-                <input type="text" id="qBranchCity" class="form-control" placeholder="Örn: İstanbul" maxlength="100" />
-            </div>
-            <div class="col-12 col-sm-6">
-                <label class="form-label" for="qBranchAddress">Adres</label>
-                <input type="text" id="qBranchAddress" class="form-control" placeholder="Örn: Bağdat Cad. No:1" maxlength="250" />
-            </div>
-        </div>
-        <div class="quick-modal-error" id="qBranchError"></div>
-        <div class="quick-modal-footer">
-            <button type="button" class="btn-modal-cancel" onclick="closeModal('branch')">İptal</button>
-            <button type="button" class="btn-modal-save" id="qBranchSaveBtn" onclick="quickSave('branch')"><i class="fa-solid fa-check"></i> Kaydet</button>
-        </div>
-    </div>
-</div>
+@await Component.InvokeAsync("_AdminLayoutCreateBranchModal")
+
 
 @section Scripts {
     <script>
