@@ -1,0 +1,117 @@
+﻿@using Microsoft.AspNetCore.WebUtilities
+@using Rentaly.DTOLayer.CarDTOs
+@model List<ResultCarDTO>
+@{
+    ViewData["Title"] = "Operasyonel Analiz";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    string branchFilter = Context.Request.Query["branchId"];
+    string statusFilter = Context.Request.Query["status"];
+}
+
+<style>
+    /* Marka Yönetimi Sayfasıyla Birebir Aynı CSS Yapısı */
+    .plate-badge-custom {
+        background: #fff; color: #000; font-weight: 800; padding: 4px 10px;
+        border-radius: 6px; border-left: 5px solid #003399; font-size: 12px; display: inline-block;
+    }
+    .status-badge {
+        padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    }
+    .bg-active { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+    .bg-passive { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); }
+    
+    /* Beyazlık sorununu kökten çözen tablo stili */
+    .vehicle-card { background: #1a1a1a !important; border: 1px solid #282828 !important; border-radius: 20px; }
+    .table-rentaly { color: var(--text-main); background: transparent !important; }
+    .table-rentaly tr { border-bottom: 1px solid #252525; }
+    .table-rentaly td { background: transparent !important; padding: 15px; color: #ccc; }
+    .table-rentaly th { color: #666; font-size: 11px; text-transform: uppercase; padding: 15px; border-bottom: 1px solid #333; }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Operasyonel Analiz</h1>
+        <p class="page-subtitle">Filo durumunu ve şube performansını izleyin.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Admin/Report/ExportExcel?branchId=@branchFilter&status=@statusFilter" class="btn-primary-custom" style="text-decoration:none;">
+            <i class="fa-solid fa-file-excel"></i> Excel Raporu
+        </a>
+        <button class="btn-action btn-detail" style="width:auto; padding:0 15px;" onclick="window.print()">
+            <i class="fa-solid fa-print"></i> PDF
+        </button>
+    </div>
+</div>
+
+@* Filtreleme Alanı *@
+<div class="toolbar-card mb-4">
+    <form method="get" class="d-flex gap-3 w-100 align-items-center">
+        <div class="search-wrap" style="flex: 1;">
+            <i class="fa-solid fa-building"></i>
+            <select name="branchId" class="filter-select border-0 bg-transparent text-white w-100" style="outline:none;">
+                <option value="">Tüm Şubeler</option>
+                @foreach (var b in ViewBag.Branches) {
+                    <option value="@b.BranchId" selected="@(branchFilter == b.BranchId.ToString())">@b.BranchName</option>
+                }
+            </select>
+        </div>
+
+        <select name="status" class="filter-select" style="min-width:140px;">
+            <option value="">Tümü</option>
+            <option value="true" selected="@(statusFilter == "true")">Aktifler</option>
+            <option value="false" selected="@(statusFilter == "false")">Pasifler</option>
+        </select>
+
+        <button type="submit" class="btn-action btn-edit" style="width:auto; padding:0 20px;">
+            <i class="fa-solid fa-filter me-2"></i> Uygula
+        </button>
+    </form>
+</div>
+
+@* Rapor Listesi *@
+<div class="row">
+    <div class="col-12">
+        <div class="vehicle-card p-0 overflow-hidden">
+            <table class="table table-rentaly mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">PLAKA</th>
+                        <th>MARKA & MODEL</th>
+                        <th>ŞUBE</th>
+                        <th>GÜNLÜK FİYAT</th>
+                        <th class="text-center">DURUM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var car in Model) {
+                        <tr>
+                            <td class="ps-4"><span class="plate-badge-custom">@car.PlateNumber</span></td>
+                            <td>
+                                <div style="font-weight:700; color:#fff;">@car.BrandName</div>
+                                <div style="font-size:12px; color:#666;">@car.CarModelName</div>
+                            </td>
+                            <td>@car.BranchName</td>
+                            <td style="font-weight:700; color:var(--primary);">₺@car.DailyPrice.ToString("N0")</td>
+                            <td class="text-center">
+                                <span class="status-badge @(car.IsActive ? "bg-active" : "bg-passive")">
+                                    @(car.IsActive ? "Aktif" : "Pasif")
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @* Paging - Kartın İçinde *@
+            @if (ViewBag.TotalPages > 1) {
+                <div class="p-3 border-top border-secondary d-flex justify-content-center gap-2" style="background: #151515;">
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++) {
+                        <a href="?branchId=@branchFilter&status=@statusFilter&page=@i" 
+                           class="btn-action @(ViewBag.CurrentPage == i ? "btn-delete" : "btn-detail")" 
+                           style="width:35px; height:35px; text-decoration:none;">@i</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -24,6 +24,7 @@ namespace Rentaly.DTOLayer.CarDTOs
         public int LuggageCount { get; set; }
         public string? FuelType { get; set; }
         public string? Transmission { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
     }
 }
