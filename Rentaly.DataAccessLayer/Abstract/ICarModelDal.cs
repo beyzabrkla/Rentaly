@@ -12,5 +12,6 @@ namespace Rentaly.DataAccessLayer.Abstract
     {
         // CarModel'e özel metotlar
         Task<List<CarModel>> GetModelsByBrandAsync(int brandId);
+        Task<List<CarModel>> GetCarModelsWithBrands();
     }
 }

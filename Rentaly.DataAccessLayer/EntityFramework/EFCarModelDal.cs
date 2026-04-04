@@ -20,6 +20,13 @@ namespace Rentaly.DataAccessLayer.EntityFramework
             _context = context;
         }
 
+        public async Task<List<CarModel>> GetCarModelsWithBrands()
+        {
+            return await _context.CarModels
+                        .Include(m => m.Brand)
+                        .ToListAsync();
+        }
+
         public async Task<List<CarModel>> GetModelsByBrandAsync(int brandId)
         {
             return await _context.CarModels

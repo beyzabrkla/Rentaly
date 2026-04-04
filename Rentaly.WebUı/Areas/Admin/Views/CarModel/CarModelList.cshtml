@@ -1,0 +1,344 @@
+﻿@using Microsoft.AspNetCore.WebUtilities
+@model List<ResultCarModelDTO>
+@{
+    ViewData["Title"] = "Model Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    
+    string searchFilter = Context.Request.Query["search"];
+    string brandFilter = Context.Request.Query["brand"];
+}
+
+<style>
+    .model-brand-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 5;
+        background: rgba(var(--primary-rgb), 0.15);
+        color: var(--primary);
+        padding: 4px 12px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        backdrop-filter: blur(4px);
+    }
+
+    .model-card-icon {
+        font-size: 3.5rem;
+        color: var(--text-muted);
+        opacity: 0.1;
+        transition: all 0.3s;
+    }
+
+    .vehicle-card:hover .model-card-icon {
+        opacity: 0.2;
+        transform: scale(1.1) rotate(-5deg);
+    }
+
+    .custom-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+</style>
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Araç Modelleri</h1>
+        <p class="page-subtitle">Markalara ait alt modelleri ve segmentleri tanımlayın.</p>
+    </div>
+    <button class="btn-primary-custom" onclick="openModelModal(0)">
+        <i class="fa-solid fa-plus"></i> Yeni Model Ekle
+    </button>
+</div>
+
+@* Filtreleme Alanı *@
+<div class="toolbar-card mb-4">
+    <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Model ara..." value="@searchFilter" onkeypress="if(event.key==='Enter') filterModels()" />
+    </div>
+
+    <select id="brandFilter" class="filter-select" onchange="filterModels()" style="min-width:160px;">
+        <option value="">Tüm Markalar</option>
+        @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
+        {
+            <option value="@brand.BrandId" selected="@(brandFilter == brand.BrandId.ToString())">@brand.BrandName</option>
+        }
+    </select>
+
+    <button class="btn-action btn-detail" onclick="window.location.href='/Admin/CarModel/CarModelList'">
+        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+    </button>
+</div>
+
+@* Model Listesi *@
+<div class="row g-4">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-layer-group fa-3x mb-3" style="color:var(--text-muted);opacity:.2;"></i>
+            <p style="color:var(--text-muted);">Henüz bir model tanımlanmamış.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                <div class="vehicle-card" style="position:relative; height: 100%; display: flex; flex-direction: column;">
+                    
+                    @* Marka Etiketi *@
+                    <div class="model-brand-badge">
+                        <i class="fa-solid fa-tag me-1"></i> @item.BrandName
+                    </div>
+
+                    @* Görsel Alanı (Vektörel İkonlu) *@
+                    <div class="vehicle-img-wrap" style="height: 140px; background: linear-gradient(145deg, #1a1a1a, #222); display: flex; align-items: center; justify-content: center; border-radius: 12px 12px 0 0;">
+                        <i class="fa-solid fa-car-side model-card-icon"></i>
+                    </div>
+
+                    @* İçerik *@
+                    <div class="vehicle-body text-center" style="flex-grow: 1; padding: 20px;">
+                        <div class="vehicle-name" style="font-size: 1.2rem; font-weight: 800; color:var(--text-main);">@item.ModelName</div>
+                        <div class="spec-item justify-content-center mt-2">
+                            <span style="font-size: 12px; color:var(--text-muted); letter-spacing: 1px; text-transform: uppercase;">@item.BrandName SERİSİ</span>
+                        </div>
+                    </div>
+
+                    @* Aksiyonlar *@
+                    <div class="vehicle-actions" style="padding: 12px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px;">
+                        @* Filtreli CarList'e Gönder *@
+                        <a href="/Admin/Car/CarList?search=@item.ModelName" class="btn-action btn-detail" style="flex:1; font-size: 11.5px; display:flex; align-items:center; justify-content:center; gap:5px; text-decoration:none;" title="Bu modeldeki araçları gör">
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i> Araçları Gör
+                        </a>
+                        
+                        <button onclick="handleEdit('@item.CarModelId', '@item.BrandId', '@Html.Raw(item.ModelName)')" class="btn-action btn-edit" style="width:38px; flex:none;">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        
+                        <button onclick="confirmDelete(@item.CarModelId)" class="btn-action btn-delete" style="width:38px; flex:none;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@* Pagination *@
+@{
+    var queryParams = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+    var filterParams = new Dictionary<string, string>();
+    foreach (var param in queryParams)
+    {
+        if (param.Key.ToLower() != "page")
+            filterParams[param.Key] = param.Value.ToString();
+    }
+
+    string GetPageUrl(int pageNumber)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = pageNumber.ToString() };
+        // URL'i CarModelList olarak düzelttim (Car/CarList değil)
+        return Url.Action("CarModelList", "CarModel", new { area = "Admin" }) + QueryString.Create(qs).Value;
+    }
+}
+
+@if (ViewBag.TotalPages != null && (int)ViewBag.TotalPages > 1)
+{
+    <div class="row mt-5">
+        <div class="col-12">
+            <nav aria-label="Sayfa navigasyonu"
+                 style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;">
+
+                @if ((int)ViewBag.CurrentPage > 1)
+                {
+                    <a href="@GetPageUrl(1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        <i class="fa-solid fa-angles-left"></i> İlk
+                    </a>
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage - 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        <i class="fa-solid fa-angle-left"></i> Önceki
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        <i class="fa-solid fa-angles-left"></i> İlk
+                    </span>
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        <i class="fa-solid fa-angle-left"></i> Önceki
+                    </span>
+                }
+
+                <div style="display:flex;gap:6px;">
+                    @{
+                        int start = Math.Max(1, (int)ViewBag.CurrentPage - 2);
+                        int end = Math.Min((int)ViewBag.TotalPages, (int)ViewBag.CurrentPage + 2);
+                    }
+                    @for (int i = start; i <= end; i++)
+                    {
+                        if (i == (int)ViewBag.CurrentPage)
+                        {
+                            <span class="btn-action btn-delete" style="flex:unset;padding:8px 14px;cursor:default;">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@GetPageUrl(i)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">@i</a>
+                        }
+                    }
+                </div>
+
+                @if ((int)ViewBag.CurrentPage < (int)ViewBag.TotalPages)
+                {
+                    <a href="@GetPageUrl((int)ViewBag.CurrentPage + 1)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        Sonraki <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                    <a href="@GetPageUrl((int)ViewBag.TotalPages)" class="btn-action btn-detail" style="flex:unset;padding:8px 14px; text-decoration:none;">
+                        Son <i class="fa-solid fa-angles-right"></i>
+                    </a>
+                }
+                else
+                {
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        Sonraki <i class="fa-solid fa-angle-right"></i>
+                    </span>
+                    <span class="btn-action" style="flex:unset;padding:8px 14px;opacity:.35;cursor:not-allowed;">
+                        Son <i class="fa-solid fa-angles-right"></i>
+                    </span>
+                }
+            </nav>
+        </div>
+    </div>
+}
+
+<div id="modelModal" class="custom-modal-backdrop">
+    <div class="custom-modal-content" style="background: #1a1a1a; border: 1px solid #282828; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px;">
+        <h4 id="modalTitle" class="mb-4" style="font-weight:800; color:var(--text-main);">Model Bilgileri</h4>
+        <form id="modelForm" method="post">
+            <input type="hidden" name="CarModelId" id="modalModelId" />
+            
+            <div class="mb-3">
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Bağlı Olduğu Marka</label>
+                <select name="BrandId" id="modalBrandId" class="filter-select w-100" required>
+                    <option value="">Marka Seçiniz...</option>
+                    @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
+                    {
+                        <option value="@brand.BrandId">@brand.BrandName</option>
+                    }
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Model Adı</label>
+                <input type="text" name="ModelName" id="modalModelName" class="filter-select w-100" placeholder="Örn: 3 Series, Corolla, Golf..." required />
+            </div>
+
+            <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn-action btn-detail" onclick="closeModals()">İptal</button>
+                <button type="submit" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:#1a1a1a;border:1px solid #282828;border-radius:20px;padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+        <i class="fa-solid fa-triangle-exclamation fa-2x mb-3" style="color:#f1c40f;"></i>
+        <h5 class="mb-2" style="font-weight:800;color:#fff;">Model Silinecek</h5>
+        <p style="font-size:13.5px;color:#888;margin-bottom:24px;">Bu modeli silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button type="button" class="btn-action btn-detail" style="flex:unset;padding:9px 20px;" onclick="closeDeleteModal()">
+                <i class="fa-solid fa-xmark"></i> İptal
+            </button>
+            <button type="button" class="btn-action btn-delete" style="flex:unset;padding:9px 20px;background:#e74c3c;color:#fff;" id="confirmDeleteBtn">
+                <i class="fa-solid fa-trash-can"></i> Evet, Sil
+            </button>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        let currentDeleteId = 0;
+
+        function filterModels() {
+            const search = document.getElementById('searchInput').value;
+            const brand = document.getElementById('brandFilter').value;
+            let url = `?page=1`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+            if (brand) url += `&brand=${brand}`;
+            window.location.href = url;
+        }
+
+        function openModelModal(id) {
+            document.getElementById('modelForm').reset();
+            document.getElementById('modalModelId').value = id;
+            document.getElementById('modalTitle').innerText = "Yeni Model Ekle";
+            document.getElementById('modelForm').action = "/Admin/CarModel/CreateModel";
+            document.getElementById('modelModal').style.display = 'flex';
+        }
+
+        function handleEdit(id, brandId, name) {
+            document.getElementById('modalModelId').value = id;
+            document.getElementById('modalBrandId').value = brandId;
+            document.getElementById('modalModelName').value = name;
+
+            document.getElementById('modalTitle').innerText = "Modeli Düzenle";
+            document.getElementById('modelForm').action = "/Admin/CarModel/EditModel";
+            document.getElementById('modelModal').style.display = 'flex';
+        }
+
+        function confirmDelete(id) {
+            currentDeleteId = id; 
+            document.getElementById('deleteModal').style.display = 'flex'; 
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            currentDeleteId = 0;
+        }
+
+        document.getElementById('confirmDeleteBtn').onclick = function () {
+            if (currentDeleteId !== 0) {
+                executeDelete(currentDeleteId);
+            }
+        };
+
+        function executeDelete(id) {
+            fetch(`/Admin/CarModel/DeleteModel/${id}`, {
+                method: 'POST'
+            }).then(res => res.json()).then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Silme işlemi başarısız oldu.");
+                    closeDeleteModal();
+                }
+            }).catch(err => {
+                console.error("Silme hatası:", err);
+                closeDeleteModal();
+            });
+        }
+
+        function closeModals() {
+            document.getElementById('modelModal').style.display = 'none';
+        }
+
+        window.onclick = function (event) {
+            const modelModal = document.getElementById('modelModal');
+            const deleteModal = document.getElementById('deleteModal');
+            
+            if (event.target === modelModal) closeModals();
+            if (event.target === deleteModal) closeDeleteModal();
+        }
+    </script>
+}

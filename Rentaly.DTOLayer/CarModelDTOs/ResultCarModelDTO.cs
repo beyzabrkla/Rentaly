@@ -9,5 +9,6 @@ namespace Rentaly.DTOLayer.CarModelDTOs
     public class ResultCarModelDTO:CreateCarModelDTO
     {
         public int CarModelId { get; set; }
+        public string BrandName { get; set; }
     }
 }

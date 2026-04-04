@@ -9,5 +9,7 @@ namespace Rentaly.DTOLayer.CarModelDTOs
     public class UpdateCarModelDTO:CreateCarModelDTO
     {
         public int CarModelId { get; set; }
+        public string BrandName { get; set; }
+
     }
 }
