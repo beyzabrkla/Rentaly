@@ -43,6 +43,7 @@ namespace Rentaly.BusinessLayer.Mapping
                 .ReverseMap()
                 .ForMember(dest => dest.Brand, opt => opt.Ignore())
                 .ForMember(dest => dest.CarModel, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.CarImages, opt => opt.Ignore());
 
             CreateMap<CarImage, CreateCarImageDTO>().ReverseMap();

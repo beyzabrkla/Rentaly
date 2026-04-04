@@ -24,7 +24,7 @@ namespace Rentaly.EntityLayer.Entities
 
         public int BranchId { get; set; }
         public virtual Branch? Branch { get; set; }
-
+        public  DateTime CreatedDate { get; set; } = DateTime.Now;
         public string? Description { get; set; }
         public int Year { get; set; }
         public int Kilometer { get; set; }

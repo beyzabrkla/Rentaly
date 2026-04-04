@@ -1,8 +1,254 @@
-﻿
-@{
-    ViewData["Title"] = "Index";
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+﻿@{
+    ViewData["Title"] = "Panel Özeti";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Index</h1>
+<style>
+    .badge-neon-red {
+        background: rgba(255, 0, 0, 0.15); 
+        color: #ffffff;
+        border: 1px solid rgba(255, 0, 0, 0.4);
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .stat-card-premium {
+        border-radius: 20px;
+        padding: 24px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #6a1313;
+        transition: all 0.4s ease;
+        background: #111;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .stat-card-premium:hover { transform: translateY(-5px); border-color: #ff0000; box-shadow: 0 10px 25px rgba(255, 0, 0, 0.15); }
+    
+    .bg-carbon-red { background: linear-gradient(135deg, #651927  0%, #0d0d0d 100%); border-bottom: 4px solid #ff0000; }
+    .bg-carbon-blue { background: linear-gradient(135deg, #2b378d 0%, #0d0d0d 100%); border-bottom: 4px solid #00d2ff; }
 
+    .stat-label-top { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #666; }
+    .stat-value-main { font-size: 42px; font-weight: 900; color: #fff; margin: 5px 0; line-height: 1; }
+    .stat-footer-text { font-size: 12px; color: #bda5a5; font-weight: 700; }
+    .stat-icon-bg { position: absolute; right: -10px; bottom: -10px; font-size: 75px; opacity: 0.05; color: #fff; }
+
+    /*TR PLAKA TASARIMI*/
+    .plate-preview {
+        display: flex;
+        align-items: stretch;
+        background: #e0e0e0;
+        border: 2px solid #111;
+        border-radius: 5px;
+        overflow: hidden;
+        height: 30px;
+        width: fit-content;
+        margin-bottom: 8px;
+    }
+    .plate-flag {
+        background: #003399;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        font-size: 7px;
+    }
+    .plate-flag span { font-size: 10px; }
+    .plate-number {
+        color: #111;
+        font-family: 'Exo 2', sans-serif;
+        font-weight: 800;
+        font-size: 14px;
+        padding: 0 8px;
+        display: flex;
+        align-items: center;
+        background: #f8f8f8;
+    }
+
+    .recent-item-box {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid #222;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+    .efficiency-desc { color: #94a3b8; font-size: 10px; margin-top: 3px; }
+
+    /* Göz yormayan, şeffaf ve net etiket tasarımı */
+    .badge-outline-red {
+        background: rgba(0, 0, 0, 0.5); /* Arka planı koyulaştırdık ki parlama yapmasın */
+        color: #ffffff !important;      /* Yazı tam beyaz, net okunur */
+        border: 1px solid #ff0000;      /* Sadece kenarlık kırmızı, temayı korur */
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.1); /* Çok hafif dış ışıma */
+    }
+</style>
+
+<div class="page-header mb-4">
+    <div>
+        <h1 class="page-title">Sistem Panoraması</h1>
+        <p class="page-subtitle">Rentaly operasyonel verileri ve filo analizi.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    @* MEVCUT FİLO *@
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-premium bg-carbon-blue">
+            <div>
+                <div class="stat-label-top">Mevcut Filo</div>
+                <div class="stat-value-main" style="color: #00d2ff;">@ViewBag.CarCount</div>
+            </div>
+            <div class="stat-footer-text"><i class="fa-solid fa-circle-check me-1"></i> AKTİF ARAÇ SAYISI</div>
+            <div class="stat-icon-bg"><i class="fa-solid fa-car"></i></div>
+        </div>
+    </div>
+
+    @* VARYASYONLAR (MODELLER) *@
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-premium bg-carbon-red">
+            <div>
+                <div class="stat-label-top">Varyasyonlar</div>
+                <div class="stat-value-main">@ViewBag.ModelCount</div>
+            </div>
+            <div class="stat-footer-text"><i class="fa-solid fa-layer-group me-1"></i> KAYITLI ALT MODEL</div>
+            <div class="stat-icon-bg"><i class="fa-solid fa-tags"></i></div>
+        </div>
+    </div>
+
+    @* OPERASYON NOKTALARI (ŞUBELER) *@
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-premium bg-carbon-blue">
+            <div>
+                <div class="stat-label-top">Operasyon Noktaları</div>
+                <div class="stat-value-main">@ViewBag.BranchCount</div>
+            </div>
+            <div class="stat-footer-text"><i class="fa-solid fa-location-dot me-1"></i> HİZMET VEREN ŞUBE</div>
+            <div class="stat-icon-bg"><i class="fa-solid fa-code-branch"></i></div>
+        </div>
+    </div>
+
+    @* SEGMENT DAĞILIMI (KATEGORİLER) *@
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card-premium bg-carbon-red">
+            <div>
+                <div class="stat-label-top">Segment Dağılımı</div>
+                <div class="stat-value-main" style="color: #ff0000;">@ViewBag.CategoryCount</div>
+            </div>
+            <div class="stat-footer-text"><i class="fa-solid fa-sliders me-1"></i> ARAÇ KATEGORİSİ</div>
+            <div class="stat-icon-bg"><i class="fa-solid fa-gauge-high"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="stat-card-premium p-4" style="height: 450px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 style="color: #fff; font-weight: 800; margin:0;">FİLO BÜYÜME ANALİZİ</h5>
+                <span class="badge-outline-red">
+                    <span style="width: 8px; height: 8px; background: #ff0000; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 5px #ff0000;"></span>
+                        AYLIK VERİ
+                </span>           
+             </div>
+            <div style="height: 340px;">
+                <canvas id="mainChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="stat-card-premium p-4" style="height: 450px; display: flex; flex-direction: column;">
+            <h5 style="color: #fff; font-weight: 800; margin-bottom: 20px;">SON KAYITLAR</h5>
+            
+            <div style="flex-grow: 1; overflow-y: auto; scrollbar-width: none;">
+                @foreach (var car in ViewBag.RecentCars as List<Rentaly.EntityLayer.Entities.Car>)
+                {
+                    <div class="recent-item-box">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="plate-preview">
+                                    <div class="plate-flag"><span>🇹🇷</span><small>TR</small></div>
+                                    <div class="plate-number">@car.PlateNumber</div>
+                                </div>
+                                <div style="color: #fff; font-weight: 700; font-size: 13px;">@car.Brand?.BrandName @car.CarModel?.ModelName</div>
+                            </div>
+                            <div class="text-end">
+                                <span style="color: #ff0000; font-size: 10px; font-weight: 900; display: block;">YENİ</span>
+                                <small style="color: #bda5a5; font-size: 10px;">@car.CreatedDate.ToString("dd.MM.yyyy")</small>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-4 pt-3 border-top border-secondary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <span style="color:#fff; font-size:11px; font-weight:800;">OPERASYONEL VERİMLİLİK</span>
+                        <div class="efficiency-desc">Aktif araçların toplam filoya oranıdır.</div>
+                    </div>
+                    <span style="color:#ff0000; font-weight:900; font-size: 18px;">%@ViewBag.Efficiency</span>
+                </div>
+                <div style="height: 6px; background: #222; border-radius: 10px; overflow: hidden; margin-top: 10px;">
+                    <div style="width: @ViewBag.Efficiency%; background: #ff0000; height: 100%; box-shadow: 0 0 10px rgba(255,0,0,0.4);"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.25)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChartLabels)),
+                datasets: [{
+                    data: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.ChartData)),
+                    borderColor: '#ff0000',
+                    borderWidth: 4,
+                    pointBackgroundColor: '#fff',
+                    pointRadius: 6,
+                    fill: true,
+                    backgroundColor: gradient,
+                    tension: 0.4 
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { color: '#666', font: { weight: 'bold', size: 11 }, padding: 10 } 
+                    },
+                    y: { 
+                        grid: { color: 'rgba(255,255,255,0.05)' }, 
+                        ticks: { color: '#bda5a5', stepSize: 1 },
+                        beginAtZero: true 
+                    }
+                }
+            }
+        });
+    </script>
+}

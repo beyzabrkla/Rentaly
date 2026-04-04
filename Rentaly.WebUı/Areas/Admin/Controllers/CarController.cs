@@ -48,13 +48,12 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         {
             try
             {
-                  var allCars = await _carService.GetAllWithDetailsAsync();
+                var allCars = await _carService.GetAllWithDetailsAsync();
+                var query = allCars.OrderByDescending(x => x.CreatedDate).AsQueryable(); // En yeni en üstte
 
                 ViewBag.TotalCars = allCars.Count;
                 ViewBag.AvailableCount = allCars.Count(c => c.IsAvailable);
                 ViewBag.RentedCount = allCars.Count(c => !c.IsAvailable);
-
-                var query = allCars.AsQueryable();
 
                 //Filtreleme
                 if (!string.IsNullOrEmpty(search))
@@ -155,7 +154,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 }
 
                 var car = _mapper.Map<Car>(createCarDTO);
-
+                car.CreatedDate = DateTime.Now;
                 await _carService.TInsertAsync(car);
                 await _unitOfWork.SaveAsync();
 
@@ -263,6 +262,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 if (car == null) return NotFound("Güncellenecek araç bulunamadı.");
 
                 string oldCoverPath = car.CoverImageUrl;
+                DateTime originalCreatedDate = car.CreatedDate; //mevcut tarihi yedekle
 
                 var validator = new UpdateCarValidator();
                 var validationResult = await validator.ValidateAsync(updateCarDTO);
@@ -278,7 +278,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
                 //mapping
                 _mapper.Map(updateCarDTO, car);
-                
+
+                car.CreatedDate = originalCreatedDate; //yedeklenen tarihi geri yükle
+
                 // Kapak Görseli
                 if (imageSourceType == "remove")
                 {
