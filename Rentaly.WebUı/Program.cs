@@ -1,10 +1,12 @@
+using DinkToPdf;
+using DinkToPdf.Contracts;
+using Microsoft.AspNetCore.Localization;
 using Rentaly.BusinessLayer.Abstract;
 using Rentaly.BusinessLayer.Concrete;
+using Rentaly.BusinessLayer.Mapping;
 using Rentaly.DataAccessLayer.Concrete;
 using Rentaly.DataAccessLayer.UnitOfWork;
-using Microsoft.AspNetCore.Localization;
 using System.Globalization;
-using Rentaly.BusinessLayer.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,8 @@ builder.Services.AddScoped<ICategoryService, CategoryManager>();
 builder.Services.AddScoped<ICustomerService, CustomerManager>();
 builder.Services.AddScoped<IRentalService, RentalManager>();
 builder.Services.AddScoped<ICarImageService, CarImageManager>();
+
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 
 var app = builder.Build();
 

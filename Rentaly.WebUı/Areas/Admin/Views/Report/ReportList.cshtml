@@ -2,116 +2,418 @@
 @using Rentaly.DTOLayer.CarDTOs
 @model List<ResultCarDTO>
 @{
-    ViewData["Title"] = "Operasyonel Analiz";
+    ViewData["Title"] = "Operasyonel Rapor Merkezi";
     Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
     string branchFilter = Context.Request.Query["branchId"];
     string statusFilter = Context.Request.Query["status"];
+    string rentFilter   = Context.Request.Query["rent"];
+    string sortFilter   = Context.Request.Query["sort"];
+    string searchFilter = Context.Request.Query["search"];
+
+    int totalCount  = (int)(ViewBag.TotalCount  ?? 0);
+    int activeCount = (int)(ViewBag.ActiveCount ?? 0);
+    int activeRate  = (int)(ViewBag.ActiveRate  ?? 0);
+    int avgPrice    = (int)(ViewBag.AvgPrice    ?? 0);
+    decimal totalValue  = (decimal)(ViewBag.TotalValue ?? 0m);
+    int totalPages  = (int)(ViewBag.TotalPages  ?? 1);
+    int currentPage = (int)(ViewBag.CurrentPage ?? 1);
+
+    int passiveCount = totalCount - activeCount;
+    double activePct    = totalCount > 0 ? Math.Round((double)activeCount / totalCount * 100, 1) : 0;
+    double circ          = 2 * Math.PI * 35;
+    double dash1         = circ * activePct / 100;
+    double dash2         = circ * (1 - activePct / 100);
+    double donutOffset   = circ * 0.25;
+
+    var branchGroups = Model
+        .GroupBy(x => x.BranchName ?? "Bilinmiyor")
+        .Select(g => new { Name = g.Key, Count = g.Count() })
+        .OrderByDescending(x => x.Count)
+        .ToList();
+
+    int      maxBranchCount = branchGroups.Any() ? branchGroups.Max(x => x.Count) : 1;
+    string[] barColors      = { "#a855f7", "#10b981", "#f59e0b", "#3b82f6", "#ef4444", "#06b6d4", "#ec4899", "#8b5cf6" };
+
+    decimal minPrice = Model.Any() ? Model.Min(x => x.DailyPrice) : 0;
+    decimal maxPrice = Model.Any() ? Model.Max(x => x.DailyPrice) : 0;
+
+    var queryParams  = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
+    var filterParams = new Dictionary<string, string>();
+    foreach (var param in queryParams)
+    {
+        if (param.Key.ToLower() != "page")
+            filterParams[param.Key] = param.Value.ToString();
+    }
+
+    string PageUrl(int page)
+    {
+        var qs = new Dictionary<string, string>(filterParams) { ["page"] = page.ToString() };
+        return Url.Action("ReportList", "Report", new { area = "Admin" }) + QueryString.Create(qs).Value;
+    }
+
+    int pageStart = Math.Max(1, currentPage - 2);
+    int pageEnd   = Math.Min(totalPages, currentPage + 2);
+    int rowNum    = (currentPage - 1) * 10;
 }
 
 <style>
-    /* Marka Yönetimi Sayfasıyla Birebir Aynı CSS Yapısı */
-    .plate-badge-custom {
-        background: #fff; color: #000; font-weight: 800; padding: 4px 10px;
-        border-radius: 6px; border-left: 5px solid #003399; font-size: 12px; display: inline-block;
-    }
-    .status-badge {
-        padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
-    }
-    .bg-active { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
-    .bg-passive { background: rgba(255, 71, 87, 0.2); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); }
-    
-    /* Beyazlık sorununu kökten çözen tablo stili */
-    .vehicle-card { background: #1a1a1a !important; border: 1px solid #282828 !important; border-radius: 20px; }
-    .table-rentaly { color: var(--text-main); background: transparent !important; }
-    .table-rentaly tr { border-bottom: 1px solid #252525; }
-    .table-rentaly td { background: transparent !important; padding: 15px; color: #ccc; }
-    .table-rentaly th { color: #666; font-size: 11px; text-transform: uppercase; padding: 15px; border-bottom: 1px solid #333; }
+    .plate-badge { background: #fff; color: #000; font-weight: 800; font-size: 11.5px; padding: 3px 9px; border-radius: 6px; border-left: 5px solid #003399; display: inline-block; white-space: nowrap; }
+    .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .badge-active { background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+    .badge-passive { background: rgba(239,68,68,.15);  color: #ef4444; border: 1px solid rgba(239,68,68,.25);  }
+    .badge-available { background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.25); }
+    .badge-rented { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.25); }
+    .badge-branch { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.25); }
+    .report-stat { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
+    .report-stat .rs-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .report-stat .rs-val { font-size: 26px; font-weight: 800; line-height: 1; }
+    .report-stat .rs-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+    .chart-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+    .chart-title { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .chart-subtitle { font-size: 11.5px; color: var(--text-muted); margin-bottom: 14px; }
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .bar-label { font-size: 12px; color: var(--text-muted); width: 110px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; background: #222; border-radius: 4px; height: 8px; overflow: hidden; }
+    .bar-fill { height: 100%; border-radius: 4px; }
+    .bar-val { font-size: 12px; font-weight: 700; color: var(--text-main); width: 38px; text-align: right; flex-shrink: 0; }
+    .mini-stat { background: #111; border-radius: 10px; padding: 10px 12px; }
+    .mini-stat .ms-l { font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+    .mini-stat .ms-v { font-size: 17px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
+    .report-table { width: 100%; border-collapse: collapse; }
+    .report-table thead tr { border-bottom: 1px solid #252525; }
+    .report-table th { color: #555; font-size: 10.5px; text-transform: uppercase; letter-spacing: .7px; padding: 13px 16px; font-weight: 700; white-space: nowrap; text-align: left; }
+    .report-table td { color: #bbb; font-size: 13px; padding: 13px 16px; border-bottom: 1px solid #1e1e1e; vertical-align: middle; }
+    .report-table tr:hover td { background: rgba(255,255,255,.02); }
+    .brand-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(168,85,247,.12); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--primary); flex-shrink: 0; }
+    .pg-btn { background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--text-muted); font-size: 12.5px; padding: 6px 12px; cursor: pointer; transition: all .15s; text-decoration: none; display: inline-block; }
+    .pg-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .pg-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+    .pg-btn.disabled { opacity: .3; pointer-events: none; }
 </style>
 
 <div class="page-header">
     <div>
-        <h1 class="page-title">Operasyonel Analiz</h1>
-        <p class="page-subtitle">Filo durumunu ve şube performansını izleyin.</p>
+        <h1 class="page-title">Operasyonel Rapor Merkezi</h1>
+        <p class="page-subtitle">Filo durumu, gelir analizi ve şube performansını tek ekranda izleyin.</p>
     </div>
-    <div class="d-flex gap-2">
-        <a href="/Admin/Report/ExportExcel?branchId=@branchFilter&status=@statusFilter" class="btn-primary-custom" style="text-decoration:none;">
-            <i class="fa-solid fa-file-excel"></i> Excel Raporu
-        </a>
-        <button class="btn-action btn-detail" style="width:auto; padding:0 15px;" onclick="window.print()">
-            <i class="fa-solid fa-print"></i> PDF
+    <div class="d-flex gap-2 flex-wrap">
+    <button onclick="exportToExcel()"
+                class="btn-primary-custom"
+                style="background: linear-gradient(135deg,#10b981,#059669); border:none; cursor:pointer;">
+            <i class="fa-solid fa-file-excel"></i> Excel
+        </button>
+        <button class="btn-action btn-detail" style="width: auto; padding: 0 16px" onclick="exportToPdf()">
+            <i class="fa-solid fa-print"></i> PDF / Yazdır
         </button>
     </div>
 </div>
 
-@* Filtreleme Alanı *@
-<div class="toolbar-card mb-4">
-    <form method="get" class="d-flex gap-3 w-100 align-items-center">
-        <div class="search-wrap" style="flex: 1;">
-            <i class="fa-solid fa-building"></i>
-            <select name="branchId" class="filter-select border-0 bg-transparent text-white w-100" style="outline:none;">
-                <option value="">Tüm Şubeler</option>
-                @foreach (var b in ViewBag.Branches) {
-                    <option value="@b.BranchId" selected="@(branchFilter == b.BranchId.ToString())">@b.BranchName</option>
-                }
-            </select>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="report-stat">
+            <div class="rs-lbl">Gösterilen Araç</div>
+            <div class="rs-val" style="color: var(--text-main)">@totalCount</div>
+            <div class="rs-sub">Filtreye uyan toplam</div>
         </div>
-
-        <select name="status" class="filter-select" style="min-width:140px;">
-            <option value="">Tümü</option>
-            <option value="true" selected="@(statusFilter == "true")">Aktifler</option>
-            <option value="false" selected="@(statusFilter == "false")">Pasifler</option>
-        </select>
-
-        <button type="submit" class="btn-action btn-edit" style="width:auto; padding:0 20px;">
-            <i class="fa-solid fa-filter me-2"></i> Uygula
-        </button>
-    </form>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="report-stat">
+            <div class="rs-lbl">Aktif Araç</div>
+            <div class="rs-val" style="color: #10b981">@activeCount</div>
+            <div class="rs-sub">%@activeRate aktiflik oranı</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="report-stat">
+            <div class="rs-lbl">Toplam Günlük Değer</div>
+            <div class="rs-val" style="color: var(--primary)">₺@totalValue.ToString("N0")</div>
+            <div class="rs-sub">Filtreli araçlar toplamı</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="report-stat">
+            <div class="rs-lbl">Ort. Günlük Fiyat</div>
+            <div class="rs-val" style="color: var(--accent)">₺@avgPrice.ToString("N0")</div>
+            <div class="rs-sub">@totalCount araç ortalaması</div>
+        </div>
+    </div>
 </div>
 
-@* Rapor Listesi *@
-<div class="row">
-    <div class="col-12">
-        <div class="vehicle-card p-0 overflow-hidden">
-            <table class="table table-rentaly mb-0">
-                <thead>
-                    <tr>
-                        <th class="ps-4">PLAKA</th>
-                        <th>MARKA & MODEL</th>
-                        <th>ŞUBE</th>
-                        <th>GÜNLÜK FİYAT</th>
-                        <th class="text-center">DURUM</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var car in Model) {
-                        <tr>
-                            <td class="ps-4"><span class="plate-badge-custom">@car.PlateNumber</span></td>
-                            <td>
-                                <div style="font-weight:700; color:#fff;">@car.BrandName</div>
-                                <div style="font-size:12px; color:#666;">@car.CarModelName</div>
-                            </td>
-                            <td>@car.BranchName</td>
-                            <td style="font-weight:700; color:var(--primary);">₺@car.DailyPrice.ToString("N0")</td>
-                            <td class="text-center">
-                                <span class="status-badge @(car.IsActive ? "bg-active" : "bg-passive")">
-                                    @(car.IsActive ? "Aktif" : "Pasif")
-                                </span>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            @* Paging - Kartın İçinde *@
-            @if (ViewBag.TotalPages > 1) {
-                <div class="p-3 border-top border-secondary d-flex justify-content-center gap-2" style="background: #151515;">
-                    @for (int i = 1; i <= ViewBag.TotalPages; i++) {
-                        <a href="?branchId=@branchFilter&status=@statusFilter&page=@i" 
-                           class="btn-action @(ViewBag.CurrentPage == i ? "btn-delete" : "btn-detail")" 
-                           style="width:35px; height:35px; text-decoration:none;">@i</a>
-                    }
+<div class="row g-3 mb-4">
+    <div class="col-md-7">
+        <div class="chart-card h-100">
+            <div class="chart-title d-flex justify-content-between align-items-center">
+                <span>
+                    <i class="fa-solid fa-building me-2" style="color: var(--primary)"></i>
+                    Şubeye Göre Araç Dağılımı
+                </span>
+                <div class="d-flex gap-1">
+                    <button onclick="prevBranchPage()" class="btn-action" style="width:24px; height:24px; font-size:10px; padding:0;">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button onclick="nextBranchPage()" class="btn-action" style="width:24px; height:24px; font-size:10px; padding:0;">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
                 </div>
-            }
+            </div>
+            <div class="chart-subtitle">Her şubedeki toplam araç sayısı</div>
+            <div id="branch-bar-container">
+                @for (int i = 0; i < branchGroups.Count; i++)
+                {
+                    var group = branchGroups[i];
+                    int pct = (int)Math.Round((double)group.Count / maxBranchCount * 100);
+                    <div class="bar-row branch-item" data-index="@i" style="display: none;">
+                        <div class="bar-label" title="@group.Name">@group.Name</div>
+                        <div class="bar-track">
+                            <div class="bar-fill" style="width: @pct%; background: @barColors[i % barColors.Length]"></div>
+                        </div>
+                        <div class="bar-val">@group.Count</div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="chart-card h-100">
+            <div class="chart-title"><i class="fa-solid fa-circle-half-stroke me-2" style="color: #10b981"></i> Aktif / Pasif Oranı</div>
+            <div class="chart-subtitle">Filo aktivasyon durumu özeti</div>
+            <div class="d-flex align-items-center gap-4 mb-3">
+                <svg width="90" height="90" viewBox="0 0 90 90" style="flex-shrink: 0">
+                    <circle cx="45" cy="45" r="35" fill="none" stroke="#222" stroke-width="10" />
+                    <circle cx="45" cy="45" r="35" fill="none" stroke="#10b981" stroke-width="10" stroke-linecap="round"
+                            stroke-dasharray="@dash1.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) @((circ - dash1).ToString("F2", System.Globalization.CultureInfo.InvariantCulture))"
+                            stroke-dashoffset="@donutOffset.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" />
+                    @if (passiveCount > 0) {
+                        double passiveOffset = donutOffset - dash1;
+                        <circle cx="45" cy="45" r="35" fill="none" stroke="#ef4444" stroke-width="10" stroke-linecap="round"
+                                stroke-dasharray="@dash2.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) @((circ - dash2).ToString("F2", System.Globalization.CultureInfo.InvariantCulture))"
+                                stroke-dashoffset="@passiveOffset.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)" />
+                    }
+                    <text x="45" y="41" text-anchor="middle" fill="#eee" font-size="14" font-weight="800">%@((int)activePct)</text>
+                    <text x="45" y="55" text-anchor="middle" fill="#666" font-size="10">aktif</text>
+                </svg>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                    <div class="d-flex align-items-center gap-2" style="font-size: 13px">
+                        <span style="width:10px; height:10px; border-radius:50%; background:#10b981; display:inline-block;"></span>
+                        <span style="color: var(--text-muted)">Aktif</span>
+                        <strong style="color: var(--text-main); margin-left: auto">@activeCount</strong>
+                    </div>
+                    <div class="d-flex align-items-center gap-2" style="font-size: 13px">
+                        <span style="width:10px; height:10px; border-radius:50%; background:#ef4444; display:inline-block;"></span>
+                        <span style="color: var(--text-muted)">Pasif</span>
+                        <strong style="color: var(--text-main); margin-left: auto">@passiveCount</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-2">
+                <div class="col-4"><div class="mini-stat"><div class="ms-l">En Ucuz</div><div class="ms-v">₺@minPrice.ToString("N0")</div></div></div>
+                <div class="col-4"><div class="mini-stat"><div class="ms-l">En Pahalı</div><div class="ms-v">₺@maxPrice.ToString("N0")</div></div></div>
+                <div class="col-4"><div class="mini-stat"><div class="ms-l">Ortalama</div><div class="ms-v">₺@avgPrice.ToString("N0")</div></div></div>
+            </div>
         </div>
     </div>
 </div>
+
+<div class="toolbar-card mb-3">
+    <div class="search-wrap" style="min-width: 200px; flex: 1">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Plaka, marka veya model ara..." value="@searchFilter" onkeypress="if(event.key==='Enter') filterReport()" />
+    </div>
+
+    @* Hatalar burada düzeltildi: selected özniteliği ve ID'ler *@
+    <select class="filter-select" id="branchFilter" onchange="filterReport()">
+        <option value="">Tüm Şubeler</option>
+        @foreach (var b in ViewBag.Branches) {
+            <option value="@b.BranchId" selected="@(branchFilter == b.BranchId.ToString())">@b.BranchName</option>
+        }
+    </select>
+
+    <select class="filter-select" id="statusFilter" onchange="filterReport()">
+        <option value="">Aktif / Pasif</option>
+        <option value="true"  selected="@(statusFilter == "true")">Yalnız Aktif</option>
+        <option value="false" selected="@(statusFilter == "false")">Yalnız Pasif</option>
+    </select>
+
+    <select class="filter-select" id="rentFilter" onchange="filterReport()">
+        <option value="">Tüm Kira Durumu</option>
+        <option value="available" selected="@(rentFilter == "available")">Müsait</option>
+        <option value="rented"    selected="@(rentFilter == "rented")">Kirada</option>
+    </select>
+
+    <select class="filter-select" id="sortFilter" onchange="filterReport()">
+        <option value=""           selected="@(string.IsNullOrEmpty(sortFilter))">Sıralama</option>
+        <option value="price_asc"  selected="@(sortFilter == "price_asc")">Fiyat ↑</option>
+        <option value="price_desc" selected="@(sortFilter == "price_desc")">Fiyat ↓</option>
+    </select>
+
+    <button class="btn-action btn-detail" onclick="resetFilters()" style="width: auto; padding: 0 16px"><i class="fa-solid fa-rotate-left"></i> Sıfırla</button>
+</div>
+
+<div class="vehicle-card p-0 overflow-hidden mb-4">
+    <div style="overflow-x: auto">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th class="ps-4">#</th>
+                    <th>PLAKA</th>
+                    <th>MARKA / MODEL</th>
+                    <th>ŞUBE</th>
+                    <th>GÜNLÜK FİYAT</th>
+                    <th>KM</th>
+                    <th>KİRA DURUMU</th>
+                    <th class="text-center">DURUM</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var car in Model) {
+                    rowNum++;
+                    <tr>
+                        <td class="ps-4" style="color: #444; font-size: 12px">@rowNum</td>
+                        <td><span class="plate-badge">@car.PlateNumber</span></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="brand-avatar">@car.BrandName?.Substring(0, 1)</div>
+                                <div>
+                                    <div style="font-weight: 700; color: var(--text-main); font-size: 13px">@car.BrandName</div>
+                                    <div style="font-size: 11.5px; color: var(--text-muted)">@car.CarModelName</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="status-badge badge-branch">@car.BranchName</span></td>
+                        <td style="font-weight: 700; color: var(--primary)">₺@car.DailyPrice.ToString("N0")</td>
+                        <td style="color: #aaa; font-size: 12.5px">@car.Kilometer.ToString("N0") km</td>
+                        <td>
+                            <span class="status-badge @(car.IsAvailable ? "badge-available" : "badge-rented")">
+                                <i class="fa-solid @(car.IsAvailable ? "fa-circle-check" : "fa-circle-dot") me-1"></i>
+                                @(car.IsAvailable ? "Müsait" : "Kirada")
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="status-badge @(car.IsActive ? "badge-active" : "badge-passive")">@(car.IsActive ? "Aktif" : "Pasif")</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+    @if (totalPages > 1) {
+        <div style="display: flex; justify-content: center; align-items: center; gap: 6px; padding: 16px; border-top: 1px solid #1e1e1e">
+            <a href="@PageUrl(currentPage - 1)" class="pg-btn @(currentPage == 1 ? "disabled" : "")"><i class="fa-solid fa-angle-left"></i> Önceki</a>
+            @for (int pi = pageStart; pi <= pageEnd; pi++) {
+                <a href="@PageUrl(pi)" class="pg-btn @(pi == currentPage ? "active" : "")">@pi</a>
+            }
+            <a href="@PageUrl(currentPage + 1)" class="pg-btn @(currentPage == totalPages ? "disabled" : "")">Sonraki <i class="fa-solid fa-angle-right"></i></a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        // Şube Pagination JS
+        let currentBranchPage = 0;
+        const itemsPerPage = 5;
+        const branchItems = document.querySelectorAll('.branch-item');
+
+        function showBranchPage(page) {
+            const start = page * itemsPerPage;
+            const end = start + itemsPerPage;
+            branchItems.forEach((item, index) => {
+                item.style.display = (index >= start && index < end) ? 'flex' : 'none';
+            });
+        }
+
+        function nextBranchPage() {
+            if ((currentBranchPage + 1) * itemsPerPage < branchItems.length) {
+                currentBranchPage++;
+                showBranchPage(currentBranchPage);
+            }
+        }
+
+        function prevBranchPage() {
+            if (currentBranchPage > 0) {
+                currentBranchPage--;
+                showBranchPage(currentBranchPage);
+            }
+        }
+
+        // Genel Filtreleme JS
+        const urlReport = '@Url.Action("ReportList", "Report", new { area = "Admin" })';
+        function filterReport() {
+            const search   = document.getElementById('searchInput').value;
+            const branch   = document.getElementById('branchFilter').value;
+            const status   = document.getElementById('statusFilter').value;
+            const rent     = document.getElementById('rentFilter').value;
+            const sort     = document.getElementById('sortFilter').value;
+
+            window.location.href = urlReport + '?page=1&search=' + encodeURIComponent(search) + '&branchId=' + encodeURIComponent(branch) + '&status=' + encodeURIComponent(status) + '&rent=' + encodeURIComponent(rent) + '&sort=' + encodeURIComponent(sort);
+        }
+
+        function exportToExcel() {
+            // Mevcut filtre değerlerini al
+            const search   = document.getElementById('searchInput').value;
+            const branch   = document.getElementById('branchFilter').value;
+            const status   = document.getElementById('statusFilter').value;
+            const rent     = document.getElementById('rentFilter').value;
+            const sort     = document.getElementById('sortFilter').value;
+
+            // Excel aksiyonunun URL'ini oluştur
+            const exportUrl = '@Url.Action("ExportExcel", "Report", new { area = "Admin" })';
+    
+            // Filtreleri query string olarak ekle
+            const finalUrl = exportUrl
+                + '?search='   + encodeURIComponent(search)
+                + '&branchId=' + encodeURIComponent(branch)
+                + '&status='   + encodeURIComponent(status)
+                + '&rent='     + encodeURIComponent(rent)
+                + '&sort='     + encodeURIComponent(sort);
+
+            // Yeni sekmede veya aynı sekmede indirmeyi başlat
+            window.location.href = finalUrl;
+        }
+
+        function exportToPdf() {
+            const search = document.getElementById('searchInput').value;
+            const branch = document.getElementById('branchFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const rent   = document.getElementById('rentFilter').value;
+    
+            const exportUrl = '@Url.Action("ExportPdf", "Report", new { area = "Admin" })';
+    
+            const finalUrl = exportUrl
+                + '?search='   + encodeURIComponent(search)
+                + '&branchId=' + encodeURIComponent(branch)
+                + '&status='   + encodeURIComponent(status)
+                + '&rent='     + encodeURIComponent(rent);
+
+            // Yeni sekmede temiz rapor sayfasını açar ve otomatik yazdırma penceresini tetikler
+            window.open(finalUrl, '_blank');
+        }
+
+        function exportToPdf() {
+            // Mevcut filtreleri yakala
+            const search = document.getElementById('searchInput').value;
+            const branch = document.getElementById('branchFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const rent   = document.getElementById('rentFilter').value;
+    
+            // URL oluştur
+            const exportUrl = '@Url.Action("ExportPdf", "Report", new { area = "Admin" })';
+    
+            const finalUrl = exportUrl
+                + '?search='   + encodeURIComponent(search)
+                + '&branchId=' + encodeURIComponent(branch)
+                + '&status='   + encodeURIComponent(status)
+                + '&rent='     + encodeURIComponent(rent);
+
+            // Yeni sekmede filtreli PDF view'ını aç
+            window.open(finalUrl, '_blank');
+        }
+
+        function resetFilters() { window.location.href = urlReport; }
+
+        document.addEventListener("DOMContentLoaded", () => showBranchPage(0));
+    </script>
+}
