@@ -1,13 +1,102 @@
-﻿<div class="main-wrapper" id="mainWrapper">
+﻿<style>
+    .badge-dot {
+        width: 8px;
+        height: 8px;
+        background: #cc0c0c;
+        border: 2px solid #111; /* Navbar renginde border ki iç içe geçmesin */
+        border-radius: 50%;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        box-shadow: 0 0 10px rgba(204, 12, 12, 0.5);
+    }
+
+    /* Navbar Üst Bar Ayarları */
+    .navbar-top {
+        background: #111 !important; /* Sidebar ile birebir aynı derin siyah */
+        height: 70px;
+        display: flex;
+        align-items: center;
+        padding: 0 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Çok hafif bir ayrım çizgisi */
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        transition: all 0.3s ease;
+    }
+
+    /* Breadcrumb (Yol Tarifi) Yazı Renkleri */
+    .breadcrumb-item a {
+        color: #b3b3b3 !important; /* Sidebar link rengiyle aynı */
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .breadcrumb-item.active {
+        color: #fff !important; /* Aktif sayfa bembeyaz */
+        font-weight: 500;
+    }
+
+    /* Sağ taraftaki aksiyon butonları (Bildirim, Mesaj vb.) */
+    .action-btn {
+        background: rgba(255, 255, 255, 0.03); /* Hafif şeffaf arka plan */
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #b3b3b3;
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.2s;
+    }
+
+        .action-btn:hover {
+            background: rgba(204, 12, 12, 0.1); /* Rentaly kırmızısı hover */
+            color: #cc0c0c;
+            border-color: rgba(204, 12, 12, 0.2);
+        }
+
+    /* Admin İsim ve Rol Yazıları */
+    .admin-name {
+        color: #fff !important;
+        font-weight: 500;
+    }
+
+    .admin-role {
+        color: #888 !important;
+        font-size: 11px;
+    }
+
+    /* Hamburger Menü Butonu */
+    .toggle-btn {
+        color: #fff;
+        background: transparent;
+        border: none;
+        font-size: 20px;
+        margin-right: 15px;
+        cursor: pointer;
+    }
+</style>
+
+
+<div class="main-wrapper" id="mainWrapper">
     <nav class="navbar-top" id="navbarTop">
         <button class="toggle-btn" id="toggleBtn" onclick="toggleSidebar()">
             <i class="fa-solid fa-bars"></i>
         </button>
         <div class="navbar-breadcrumb d-none d-sm-block">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Ana Sayfa</a></li>
-                <li class="breadcrumb-item"><a href="#">Araç Yönetimi</a></li>
-                <li class="breadcrumb-item active">Araç Listesi</li>
+                <li class="breadcrumb-item"><a href="/Admin/Dashboard/Index">Ana Sayfa</a></li>
+        
+                @if (ViewData["BreadcrumbParent"] != null)
+                {
+                    <li class="breadcrumb-item">
+                        <a href="@ViewData["BreadcrumbParentUrl"]">@ViewData["BreadcrumbParent"]</a>
+                    </li>
+                }
+        
+                <li class="breadcrumb-item active">@ViewData["Title"]</li>
             </ol>
         </div>
         <div class="navbar-actions ms-auto">

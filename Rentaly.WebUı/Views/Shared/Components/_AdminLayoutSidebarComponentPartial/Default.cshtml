@@ -1,11 +1,87 @@
-﻿<aside class="sidebar" id="sidebar">
-    <a href="#" class="sidebar-logo">
-        <img class="logo-1" src="/RentalyHTML/images/logo-light.png" alt="">
-        <div class="logo-text">
-            <strong>RentCar</strong>
-            <span>Admin Panel</span>
-        </div>
-    </a>
+﻿<style>
+    .sidebar {
+        width: 260px;
+        background: #111 !important; /* Derin siyah sabitlendi */
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        overflow-x: hidden;
+        height: 100vh;
+    }
+
+        /* DARALMA DURUMU */
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+            .sidebar.collapsed .link-text,
+            .sidebar.collapsed .menu-label,
+            .sidebar.collapsed .menu-badge,
+            .sidebar.collapsed .user-info {
+                display: none !important; /* Yazılar tamamen silinir, taşma biter */
+            }
+
+    /* İkonların Tam Ortalanması */
+    .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: #b3b3b3 !important;
+        text-decoration: none;
+        transition: 0.2s;
+    }
+
+    .sidebar.collapsed .nav-link {
+        justify-content: center; /* İkonu merkeze çek */
+        padding: 15px 0;
+    }
+
+    .nav-icon {
+        width: 30px; /* İkon alanını sabitle ki daralınca kaymasın */
+        display: flex;
+        justify-content: center;
+    }
+
+    .sidebar.collapsed .nav-icon {
+        width: auto;
+        margin: 0 !important;
+    }
+
+    /* Aktif Sayfa Efekti */
+    .nav-link.active {
+        background: rgba(204, 12, 12, 0.1) !important;
+        color: #fff !important;
+        border-left: 3px solid #cc0c0c;
+    }
+
+    /* Logo ve Footer Ayarı */
+    .sidebar-logo {
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar.collapsed #mainLogo {
+        width: 40px; /* Logo küçülerek ikona dönüşür */
+    }
+
+    .sidebar-user {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        gap: 12px;
+        border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .sidebar.collapsed .sidebar-user {
+        justify-content: center;
+    }
+</style>
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <img class="logo-1" src="/RentalyHTML/images/logo-light.png" alt="Rentaly" id="mainLogo">
+    </div>
 
     <nav class="sidebar-nav" id="sidebarNav">
         <div class="menu-label">Ana Menü</div>
@@ -15,9 +91,8 @@
         </a>
 
         <div class="menu-label">Araç Yönetimi</div>
-        <div class="has-submenu" id="vehicleMenu">
-
-            <div class="submenu open" id="vehicleSubmenu">
+        <div class="has-submenu open" id="vehicleMenu">
+            <div class="submenu-list" id="vehicleSubmenu">
                 <a href="/Admin/Car/CarList" class="nav-link">
                     <span class="nav-icon"><i class="fa-solid fa-list"></i></span>
                     <span class="link-text">Araç Listesi</span>
@@ -79,4 +154,8 @@
     </div>
 </aside>
 
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebarMobile()"></div>
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed');
+}</script>
