@@ -64,10 +64,9 @@
     @foreach (var brand in Model)
     {
         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-            <div class="vehicle-card" style="position:relative; height: 100%; display: flex; flex-direction: column; opacity: @(brand.Status ? "1" : "0.7")">
-                
-                <span class="status-badge @(brand.Status ? "bg-active" : "bg-passive")">
-                    @(brand.Status ? "Aktif" : "Pasif")
+            <div class="vehicle-card" style="position:relative; height: 100%; display: flex; flex-direction: column; opacity: @(brand.Status == true ? "1" : "0.7")">                
+                <span class="status-badge @(brand.Status == true ? "bg-active" : "bg-passive")">
+                    @(brand.Status == true ? "Aktif" : "Pasif")
                 </span>
                 <div class="vehicle-img-wrap" style="height: 140px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 15px; border-radius: 12px 12px 0 0;">
                     <img src="@(string.IsNullOrEmpty(brand.CoverImageUrl) ? "/images/no-image.png" : brand.CoverImageUrl)" 
@@ -84,25 +83,28 @@
                     <a href="/Admin/Car/CarList?brand=@brand.BrandId" class="btn-action btn-detail" style="flex:1; font-size: 12px; display:flex; align-items:center; justify-content:center; gap:5px; text-decoration:none;">
                         <i class="fa-solid fa-car-side"></i> Araçları Gör
                     </a>
-                    <button onclick="handleEdit('@brand.BrandId', '@Html.Raw(brand.BrandName)', '@brand.CoverImageUrl', '@brand.Status'.toLowerCase())" class="btn-action btn-edit" style="width:38px; flex:none;" title="Markayı Düzenle">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <a href="/Admin/Brand/ChangeStatus/@brand.BrandId" class="btn-action @(brand.Status ? "btn-delete" : "btn-primary-custom")" style="width: 38px; height:38px; flex: none; display:flex; align-items:center; justify-content:center; border-radius:10px;" title="Durumu Değiştir">
-                        <i class="fa-solid @(brand.Status ? "fa-eye-slash" : "fa-eye")"></i>
-                    </a>
+                        <button onclick="handleEdit('@brand.BrandId', '@Html.Raw(brand.BrandName)', '@brand.CoverImageUrl')" 
+                                class="btn-action btn-edit" 
+                                style="width:38px; flex:none;" 
+                                title="Markayı Düzenle">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>                   
+                        <a href="/Admin/Brand/ChangeStatus/@brand.BrandId" 
+                           class="btn-action @(brand.Status == true ? "btn-delete" : "btn-primary-custom")" ...>
+                            <i class="fa-solid @(brand.Status == true ? "fa-eye-slash" : "fa-eye")"></i>
+                        </a>
                 </div>
             </div>
         </div>
     }
 </div>
 
-@* Pagination - Marka Listesi *@
+@*Sayfalama*@
 @{
     var queryParams = QueryHelpers.ParseQuery(Context.Request.QueryString.Value);
     var filterParams = new Dictionary<string, string>();
     foreach (var param in queryParams)
     {
-        // Sayfa parametresini hariç tutup diğer filtreleri (search, status) saklıyoruz
         if (param.Key.ToLower() != "page") filterParams[param.Key] = param.Value.ToString();
     }
 
@@ -184,93 +186,141 @@
 
 
 
+@* Modal *@
 <div id="brandModal" class="custom-modal-backdrop">
-    <div class="custom-modal-content" style="background: #1a1a1a; border: 1px solid #282828; border-radius: 20px; padding: 30px; width: 100%; max-width: 450px;">
+    <div class="custom-modal-content" style="background:#1a1a1a; border:1px solid #282828; border-radius:20px; padding:30px; width:100%; max-width:450px;">
         <h4 id="modalTitle" class="mb-4" style="font-weight:800; color:var(--text-main);">Marka Bilgileri</h4>
-        <form id="brandForm" method="post">
+        <form id="brandForm">
             @Html.AntiForgeryToken()
             <input type="hidden" name="BrandId" id="modalBrandId" />
+
             <div class="mb-3">
-                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Marka Adı</label>
-                <input type="text" name="BrandName" id="modalBrandName" class="filter-select w-100" required style="color:var(--text-main);" />
+                <label class="form-label">Marka Adı</label>
+                <input type="text" name="BrandName" id="modalBrandName" class="filter-select w-100" />
+                <div id="val-BrandName" class="invalid-feedback" style="display:none; gap:4px; align-items:center; color:var(--danger); font-size:12px; margin-top:5px;">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span class="error-text"></span>
+                </div>
             </div>
+
             <div class="mb-3">
-                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Logo URL</label>
-                <input type="text" name="CoverImageUrl" id="modalCoverImageUrl" class="filter-select w-100" oninput="updatePreview(this.value)" style="color:var(--text-main);" />
+                <label class="form-label">Logo URL</label>
+                <input type="text" name="CoverImageUrl" id="modalCoverImageUrl" class="filter-select w-100"
+                       oninput="updatePreview(this.value)" />
+                <div id="val-CoverImageUrl" class="invalid-feedback" style="display:none; gap:4px; align-items:center; color:var(--danger); font-size:12px; margin-top:5px;">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span class="error-text"></span>
+                </div>
             </div>
-            <div class="mb-4">
-                <label class="form-label" style="font-size:13px; color:var(--text-muted);">Görünürlük Durumu</label>
-                <select name="Status" id="modalStatus" class="filter-select w-100" style="color:var(--text-main);">
-                    <option value="true">Aktif (Listelenir)</option>
-                    <option value="false">Pasif (Gizlenir)</option>
-                </select>
-            </div>
-            <div class="mt-2 text-center mb-4">
-                <img id="logoPreview" src="" class="brand-logo-preview" style="display:none; border: 1px solid #333;" />
+
+            <div class="mb-3">
+                <img id="logoPreview" src="" alt="Logo Önizleme"
+                     style="display:none; width:100%; height:120px; object-fit:contain; background:#252525; border-radius:12px; padding:10px;" />
             </div>
 
             <div class="d-flex gap-2 justify-content-end">
                 <button type="button" class="btn-action btn-detail" onclick="closeModals()">İptal</button>
-                <button type="submit" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
+                <button type="button" onclick="saveBrand()" class="btn-primary-custom" style="padding:10px 25px;">Kaydet</button>
             </div>
-        </form>   
+        </form>
     </div>
 </div>
 
 @section Scripts {
     <script>
+        function clearValidationErrors() {
+            document.querySelectorAll('.invalid-feedback').forEach(function (el) {
+                el.style.display = 'none';
+                var span = el.querySelector('.error-text');
+                if (span) span.textContent = '';
+            });
+        }
 
         function filterBrands() {
             const search = document.getElementById('searchInput').value;
             const status = document.getElementById('statusFilter').value;
-            
-            let url = `?page=1`;
-            
-            if (search) {
-                url += `&search=${encodeURIComponent(search)}`;
-            }
-            
-            if (status) {
-                url += `&status=${status}`;
-            }
-            
+            let url = '?page=1';
+            if (search) url += '&search=' + encodeURIComponent(search);
+            if (status) url += '&status=' + status;
             window.location.href = url;
         }
 
-        document.getElementById('searchInput').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                filterBrands();
-            }
-        });
-
         function updatePreview(url) {
             const img = document.getElementById('logoPreview');
-            if(url) { img.src = url; img.style.display = 'block'; } 
-            else { img.style.display = 'none'; }
+            if (url && url !== 'null' && url.trim() !== '') {
+                img.src = url;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+                img.src = '';
+            }
         }
 
-        function openBrandModal(id) {
+        function openBrandModal() {
+            clearValidationErrors();
             document.getElementById('brandForm').reset();
-            document.getElementById('modalBrandId').value = id;
-            document.getElementById('modalStatus').value = "true";
-            document.getElementById('modalTitle').innerText = "Yeni Marka Ekle";
-            document.getElementById('brandForm').action = "/Admin/Brand/CreateBrand";
-            document.getElementById('logoPreview').style.display = 'none';
+            document.getElementById('modalBrandId').value = '0';
+            document.getElementById('modalTitle').innerText = 'Yeni Marka Ekle';
+            updatePreview('');
             document.getElementById('brandModal').style.display = 'flex';
         }
 
-        function handleEdit(id, name, imageUrl, status) {
+        function handleEdit(id, name, imageUrl) {
+            clearValidationErrors();
+
             document.getElementById('modalBrandId').value = id;
             document.getElementById('modalBrandName').value = name;
-            document.getElementById('modalCoverImageUrl').value = imageUrl;
-            document.getElementById('modalStatus').value = status;
+            document.getElementById('modalCoverImageUrl').value = imageUrl || '';
+
             updatePreview(imageUrl);
-            document.getElementById('modalTitle').innerText = "Markayı Düzenle";
-            document.getElementById('brandForm').action = "/Admin/Brand/EditBrand";
+            document.getElementById('modalTitle').innerText = 'Markayı Düzenle';
             document.getElementById('brandModal').style.display = 'flex';
         }
 
-        function closeModals() { document.getElementById('brandModal').style.display = 'none'; }
-        window.onclick = e => { if (e.target.id === 'brandModal') closeModals(); }
+        function closeModals() {
+            document.getElementById('brandModal').style.display = 'none';
+            clearValidationErrors();
+        }
+
+function saveBrand() {
+    clearValidationErrors();
+
+    var brandId = parseInt($('#modalBrandId').val());
+    var isEdit  = brandId > 0;
+    var url     = isEdit ? '/Admin/Brand/EditBrand' : '/Admin/Brand/CreateBrand';
+
+    var formData = isEdit
+        ? $('#brandForm').serialize()
+        : $('#brandForm').find(':input[name!="BrandId"]').serialize();
+
+    $.ajax({
+        url:  url,
+        type: 'POST',
+        data: formData,
+        headers: { 'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() },
+        success: function (response) {
+            if (response.success) {
+                window.location.reload();
+            } else if (response.errors) {
+                response.errors.forEach(function (error) {
+                    var key = error.propertyName || error.PropertyName;
+                    var container = document.getElementById('val-' + key);
+                    if (container) {
+                        container.style.display = 'flex';
+                        var span = container.querySelector('.error-text');
+                        if (span) span.textContent = error.errorMessage || error.ErrorMessage;
+                    }
+                });
+            }
+        },
+        error: function (xhr) {
+            console.error(xhr.responseText);
+            alert('Sunucu hatası! ' + xhr.status);
+        }
+    });
+}
+        window.onclick = function (e) {
+            if (e.target.id === 'brandModal') closeModals();
+        };
     </script>
 }

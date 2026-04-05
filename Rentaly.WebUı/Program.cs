@@ -20,7 +20,11 @@ builder.Services.Configure<RequestLocalizationOptions>(opts =>
 });
 
 builder.Services.AddAutoMapper(typeof(GeneralMapping));
-builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews(options =>
+{
+    options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+});
 
 // DbContext
 builder.Services.AddDbContext<RentalyContext>();

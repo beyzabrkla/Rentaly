@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
 using Rentaly.BusinessLayer.ValidationRules.BrandValidator;
@@ -78,44 +79,111 @@ public class BrandController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateBrand(CreateBrandDTO createBrandDTO)
     {
+        if (string.IsNullOrWhiteSpace(createBrandDTO?.BrandName))
+            return Json(new
+            {
+                success = false,
+                errors = new[] {
+            new { propertyName = "BrandName", errorMessage = "Marka adı boş geçilemez" }
+            }
+            });
+
         var validator = new CreateBrandValidator();
         var result = validator.Validate(createBrandDTO);
-
         if (!result.IsValid)
-        {
-            foreach (var error in result.Errors) { ModelState.AddModelError(error.PropertyName, error.ErrorMessage); }
-            return View(createBrandDTO);
-        }
+            return Json(new
+            {
+                success = false,
+                errors = result.Errors.Select(x => new
+                {
+                    propertyName = x.PropertyName,
+                    errorMessage = x.ErrorMessage
+                }).ToList()
+            });
 
-        var brand = _mapper.Map<Brand>(createBrandDTO);
-        await _brandService.TInsertAsync(brand);
-        await _unitOfWork.SaveAsync();
-        TempData["Success"] = "Marka başarıyla eklendi.";
-        return RedirectToAction("BrandList");
+        try
+        {
+            var brand = _mapper.Map<Brand>(createBrandDTO);
+            brand.Status = createBrandDTO.Status ?? true;
+            await _brandService.TInsertAsync(brand);
+            return Json(new { success = true });
+        }
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                errors = new[] {
+            new { propertyName = "BrandName", errorMessage = ex.Message.Contains("zaten") ? ex.Message : "Bir hata oluştu." }
+        }
+            });
+        }
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditBrand(UpdateBrandDTO updateBrandDTO)
     {
+        if (string.IsNullOrWhiteSpace(updateBrandDTO?.BrandName))
+            return Json(new
+            {
+                success = false,
+                errors = new[] {
+            new { propertyName = "BrandName", errorMessage = "Marka adı boş geçilemez" }
+        }
+            });
+
         var validator = new UpdateBrandValidator();
         var result = validator.Validate(updateBrandDTO);
-
         if (!result.IsValid)
+            return Json(new
+            {
+                success = false,
+                errors = result.Errors.Select(x => new
+                {
+                    propertyName = x.PropertyName,
+                    errorMessage = x.ErrorMessage
+                }).ToList()
+            });
+
+        try
         {
-            foreach (var error in result.Errors) { ModelState.AddModelError(error.PropertyName, error.ErrorMessage); }
-            return View(updateBrandDTO);
+            var brand = await _brandService.TGetByIdAsync(updateBrandDTO.BrandId);
+            if (brand == null)
+                return Json(new
+                {
+                    success = false,
+                    errors = new[] {
+                new { propertyName = "BrandName", errorMessage = "Marka bulunamadı." }
+            }
+                });
+
+            var currentStatus = brand.Status;
+            _mapper.Map(updateBrandDTO, brand);
+            brand.Status = currentStatus;
+
+            if (string.IsNullOrWhiteSpace(brand.BrandName))
+                return Json(new
+                {
+                    success = false,
+                    errors = new[] {
+                new { propertyName = "BrandName", errorMessage = "Marka adı boş geçilemez" }
+            }
+                });
+
+            await _brandService.TUpdateAsync(brand);
+            return Json(new { success = true });
         }
-
-        var brand = await _brandService.TGetByIdAsync(updateBrandDTO.BrandId);
-        if (brand == null) return NotFound();
-
-        _mapper.Map(updateBrandDTO, brand);
-        await _brandService.TUpdateAsync(brand);
-        await _unitOfWork.SaveAsync();
-
-        TempData["Success"] = "Marka başarıyla güncellendi.";
-        return RedirectToAction("BrandList");
+        catch (Exception ex)
+        {
+            return Json(new
+            {
+                success = false,
+                errors = new[] {
+            new { propertyName = "BrandName", errorMessage = ex.Message.Contains("zaten") ? ex.Message : "Bir hata oluştu." }
+        }
+            });
+        }
     }
 
     public async Task<IActionResult> ChangeStatus(int id)
