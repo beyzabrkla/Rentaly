@@ -1,103 +1,115 @@
 ﻿using AutoMapper;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
-using Rentaly.BusinessLayer.Abstract;
 using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.DTOLayer.CarDTOs;
 
 [Area("Admin")]
 public class ReportController : Controller
 {
-    private readonly ICarService _carService;
-    private readonly ICategoryService _categoryService;
-    private readonly IBranchService _branchService;
-    private readonly IRentalService _rentalService;
     private readonly IMapper _mapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public ReportController(ICarService carService, ICategoryService categoryService, IBranchService branchService, IRentalService rentalService, IMapper mapper, IUnitOfWork unitOfWork)
+    public ReportController(IMapper mapper, IUnitOfWork unitOfWork)
     {
-        _carService = carService;
-        _categoryService = categoryService;
-        _branchService = branchService;
-        _rentalService = rentalService;
         _mapper = mapper;
         _unitOfWork = unitOfWork;
     }
-
-    public async Task<IActionResult> ReportList(int? branchId, bool? status, int page = 1)
+    private async Task<List<ResultCarDTO>> GetFilteredCarsAsync(int? branchId, bool? status, string rent, string search)
     {
         var cars = await _unitOfWork.CarDal.GetAllWithDetailsAsync();
 
-        if (branchId.HasValue)
-            cars = cars.Where(x => x.BranchId == branchId.Value).ToList();
+        if (branchId.HasValue) cars = cars.Where(x => x.BranchId == branchId.Value).ToList();
+        if (status.HasValue) cars = cars.Where(x => x.IsActive == status.Value).ToList();
 
-        if (status.HasValue)
-            cars = cars.Where(x => x.IsActive == status.Value).ToList();
+        if (rent == "available") cars = cars.Where(x => x.IsAvailable).ToList();
+        else if (rent == "rented") cars = cars.Where(x => !x.IsAvailable).ToList();
 
-        var dtoList = _mapper.Map<List<ResultCarDTO>>(cars);
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.ToLower();
+            cars = cars.Where(x =>
+                (x.PlateNumber != null && x.PlateNumber.ToLower().Contains(search)) ||
+                (x.Brand != null && x.Brand.BrandName.ToLower().Contains(search)) ||
+                (x.CarModel != null && x.CarModel.ModelName.ToLower().Contains(search))
+            ).ToList();
+        }
+
+        return _mapper.Map<List<ResultCarDTO>>(cars);
+    }
+
+    public async Task<IActionResult> ReportList(int? branchId, bool? status, string rent, string sort, string search, int page = 1)
+    {
+        var dtoList = await GetFilteredCarsAsync(branchId, status, rent, search);
+
+        // Sıralama
+        dtoList = sort switch
+        {
+            "price_asc" => dtoList.OrderBy(x => x.DailyPrice).ToList(),
+            "price_desc" => dtoList.OrderByDescending(x => x.DailyPrice).ToList(),
+            _ => dtoList
+        };
 
         ViewBag.TotalCount = dtoList.Count;
+        ViewBag.ActiveCount = dtoList.Count(x => x.IsActive);
         ViewBag.TotalValue = dtoList.Sum(x => x.DailyPrice);
-        ViewBag.ActiveRate = dtoList.Count > 0 ? (dtoList.Count(x => x.IsActive) * 100 / dtoList.Count) : 0;
-
+        ViewBag.AvgPrice = dtoList.Count > 0 ? (int)dtoList.Average(x => x.DailyPrice) : 0;
         ViewBag.Branches = await _unitOfWork.BranchDal.GetListAsync();
 
-        ViewBag.CurrentBranch = branchId;
-        ViewBag.CurrentStatus = status;
-
-        int pageSize = 10;
-        ViewBag.TotalPages = (int)Math.Ceiling((double)dtoList.Count / pageSize);
+        const int pageSize = 10;
+        int totalPages = (int)Math.Ceiling((double)dtoList.Count / pageSize);
+        ViewBag.TotalPages = totalPages;
         ViewBag.CurrentPage = page;
 
         var pagedData = dtoList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
         return View(pagedData);
     }
-    public async Task<IActionResult> ExportExcel(int? branchId, bool? status)
+
+    public async Task<IActionResult> ExportExcel(int? branchId, bool? status, string rent, string search)
     {
-        var cars = await _unitOfWork.CarDal.GetAllWithDetailsAsync();
+        var dtoList = await GetFilteredCarsAsync(branchId, status, rent, search);
 
-        if (branchId.HasValue)
-            cars = cars.Where(x => x.BranchId == branchId.Value).ToList();
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Filo Raporu");
 
-        if (status.HasValue)
-            cars = cars.Where(x => x.IsActive == status.Value).ToList();
-
-        var dtoList = _mapper.Map<List<ResultCarDTO>>(cars);
-
-        var branchName = branchId.HasValue
-            ? (await _unitOfWork.BranchDal.GetByIdAsync(branchId.Value)).BranchName
-            : "Tum-Subeler";
-
-        var statusName = status.HasValue ? (status.Value ? "Aktif" : "Pasif") : "Tumu";
-        string fileName = $"{branchName}-{statusName}-Filo-Listesi.xlsx";
-
-        using (var workbook = new ClosedXML.Excel.XLWorkbook())
+        string[] headers = { "Plaka", "Marka", "Model", "Şube", "Fiyat", "KM", "Kira Durumu", "Durum" };
+        for (int i = 0; i < headers.Length; i++)
         {
-            var worksheet = workbook.Worksheets.Add("Filo Raporu");
-            worksheet.Cell(1, 1).Value = "Plaka";
-            worksheet.Cell(1, 2).Value = "Marka";
-            worksheet.Cell(1, 3).Value = "Model";
-            worksheet.Cell(1, 4).Value = "Şube";
-            worksheet.Cell(1, 5).Value = "Günlük Fiyat";
-
-            for (int i = 0; i < dtoList.Count; i++)
-            {
-                worksheet.Cell(i + 2, 1).Value = dtoList[i].PlateNumber;
-                worksheet.Cell(i + 2, 2).Value = dtoList[i].BrandName;
-                worksheet.Cell(i + 2, 3).Value = dtoList[i].CarModelName;
-                worksheet.Cell(i + 2, 4).Value = dtoList[i].BranchName;
-                worksheet.Cell(i + 2, 5).Value = dtoList[i].DailyPrice;
-            }
-
-            using (var stream = new MemoryStream())
-            {
-                workbook.SaveAs(stream);
-                var content = stream.ToArray();
-
-                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
-            }
+            var cell = worksheet.Cell(1, i + 1);
+            cell.Value = headers[i];
+            cell.Style.Font.Bold = true;
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#a855f7");
+            cell.Style.Font.FontColor = XLColor.White;
         }
+
+        for (int i = 0; i < dtoList.Count; i++)
+        {
+            var item = dtoList[i];
+            int row = i + 2;
+            worksheet.Cell(row, 1).Value = item.PlateNumber;
+            worksheet.Cell(row, 2).Value = item.BrandName;
+            worksheet.Cell(row, 3).Value = item.CarModelName;
+            worksheet.Cell(row, 4).Value = item.BranchName;
+            worksheet.Cell(row, 5).Value = (double)item.DailyPrice;
+            worksheet.Cell(row, 6).Value = item.Kilometer;
+            worksheet.Cell(row, 7).Value = item.IsAvailable ? "Müsait" : "Kirada";
+            worksheet.Cell(row, 8).Value = item.IsActive ? "Aktif" : "Pasif";
+        }
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Filo-Raporu.xlsx");
+    }
+
+    public async Task<IActionResult> ExportPdf(int? branchId, bool? status, string rent, string search)
+    {
+        var dtoList = await GetFilteredCarsAsync(branchId, status, rent, search);
+
+        ViewBag.ReportDate = DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+        ViewBag.TotalCount = dtoList.Count;
+
+        return View(dtoList);
     }
 }

@@ -1,0 +1,69 @@
+﻿@model List<ResultCarDTO>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Rentaly_Filo_Raporu</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; color: #333; }
+        .header { border-bottom: 2px solid #a855f7; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        h2 { color: #a855f7; margin: 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; font-size: 12px; }
+        th { background-color: #a855f7; color: white; text-transform: uppercase; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        .footer { margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+        @@media print { .no-print { display: none; } }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="no-print" style="background: #fef9c3; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 13px; border: 1px solid #fde047;">
+        <strong>Rapor Hazır:</strong> Yazdırma penceresi otomatik açılacaktır. PDF olarak kaydetmek için Hedef kısmından <b>"PDF Olarak Kaydet"</b> seçeneğini belirleyin.
+    </div>
+
+    <div class="header">
+        <div>
+            <h2>Rentaly Operasyonel Filo Raporu</h2>
+            <small>Filtrelenmiş sonuçlar listelenmektedir.</small>
+        </div>
+        <div style="text-align: right; font-size: 12px;">
+            Tarih: @ViewBag.ReportDate <br>
+            Toplam: @ViewBag.TotalCount Araç
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Plaka</th>
+                <th>Marka / Model</th>
+                <th>Şube</th>
+                <th>Günlük Fiyat</th>
+                <th>KM</th>
+                <th>Kira Durumu</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td><strong>@item.PlateNumber</strong></td>
+                    <td>@item.BrandName @item.CarModelName</td>
+                    <td>@item.BranchName</td>
+                    <td>₺@item.DailyPrice.ToString("N2")</td>
+                    <td>@item.Kilometer.ToString("N0")</td>
+                    <td>@(item.IsAvailable ? "Müsait" : "Kirada")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Bu rapor Rentaly Filo Yönetim Sistemi tarafından oluşturulmuştur.
+    </div>
+</body>
+</html>
