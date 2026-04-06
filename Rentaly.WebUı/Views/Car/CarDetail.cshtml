@@ -1,7 +1,6 @@
-﻿@using Rentaly.EntityLayer.Entities
-@model Car
+﻿@model UpdateCarDTO
 @{
-    ViewData["Title"] = $"{Model?.Brand?.BrandName} {Model?.CarModel?.ModelName} - Detaylar";
+    ViewData["Title"] = $"{Model?.BrandName} {Model?.CarModelName} - Detaylar";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -11,7 +10,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <h1>@Model?.Brand?.BrandName @Model?.CarModel?.ModelName - @Model?.Year</h1>
+                    <h1>@Model?.BrandName @Model?.CarModelName - @Model?.Year</h1>
                 </div>
                 <div class="clearfix"></div>
             </div>
@@ -27,15 +26,15 @@
                 <div class="car-image-container">
                     <img src="@Model?.CoverImageUrl"
                          class="img-fluid rounded"
-                         alt="@Model?.Brand?.BrandName @Model?.CarModel?.ModelName"
+                         alt="@Model?.BrandName @Model?.CarModelName"
                          onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22400%22%3E%3Crect fill=%22%23333%22 width=%22500%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23666%22 text-anchor=%22middle%22 dy=%22.3em%22%3EAraç Görseli Yok%3C/text%3E%3C/svg%3E'">
                 </div>
             </div>
 
             <!-- Araç Bilgileri -->
             <div class="col-lg-3">
-                <h3>@Model?.Brand?.BrandName @Model?.CarModel?.ModelName</h3>
-                <p>@Model?.Category?.CategoryName kategorisinde, @Model?.Year yılında üretilmiş güvenilir ve konforlu bir araçtır.</p>
+                <h3>@Model?.BrandName @Model?.CarModelName</h3>
+                <p>@Model?.CategoryName kategorisinde, @Model?.Year yılında üretilmiş güvenilir ve konforlu bir araçtır.</p>
 
                 <div class="spacer-10"></div>
 
@@ -43,7 +42,7 @@
                 <div class="de-spec">
                     <div class="d-row">
                         <span class="d-title">Kategori</span>
-                        <span class="d-value">@Model?.Category?.CategoryName</span>
+                        <span class="d-value">@Model?.CategoryName</span>
                     </div>
                     <div class="d-row">
                         <span class="d-title">Koltuk Sayısı</span>
@@ -79,7 +78,7 @@
                     </div>
                     <div class="d-row">
                         <span class="d-title">Mevcut Şube</span>
-                        <span class="d-value">@Model?.Branch?.BranchName</span>
+                        <span class="d-value">@Model?.BranchName</span>
                     </div>
                 </div>
 
@@ -130,7 +129,7 @@
                                 <h5>Teslim Yeri</h5>
                                 <select name="PickupBranchId" class="form-control" required>
                                     <option value="">-- Şube Seçin --</option>
-                                    <option value="@Model?.BranchId" selected>@Model?.Branch?.BranchName (@Model?.Branch?.City)</option>
+                                    <option value="@Model?.BranchId" selected>@Model?.BranchName (@Model?.City)</option>
                                 </select>
                             </div>
 
@@ -139,7 +138,7 @@
                                 <h5>Dönem Yeri</h5>
                                 <select name="ReturnBranchId" class="form-control" required>
                                     <option value="">-- Şube Seçin --</option>
-                                    <option value="@Model?.BranchId" selected>@Model?.Branch?.BranchName (@Model?.Branch?.City)</option>
+                                    <option value="@Model?.BranchId" selected>@Model?.BranchName (@Model?.City)</option>
                                 </select>
                             </div>
 
@@ -182,7 +181,7 @@
                 <div class="de-box">
                     <h4>Paylaş</h4>
                     <div class="de-color-icons">
-                        <a href="https://twitter.com/intent/tweet?text=Check out this car: @Model?.Brand?.BrandName @Model?.CarModel?.ModelName" target="_blank" title="Twitter">
+                        <a href="https://twitter.com/intent/tweet?text=Check out this car: @Model?.BrandName @Model?.CarModelName" target="_blank" title="Twitter">
                             <i class="fa fa-twitter fa-lg"></i>
                         </a>
                         <a href="https://www.facebook.com/sharer/sharer.php" target="_blank" title="Facebook">
@@ -191,7 +190,7 @@
                         <a href="https://www.linkedin.com/sharing/share-offsite/" target="_blank" title="LinkedIn">
                             <i class="fa fa-linkedin fa-lg"></i>
                         </a>
-                        <a href="mailto:?subject=Check out this car&body=@Model?.Brand?.BrandName @Model?.CarModel?.ModelName" title="Email">
+                        <a href="mailto:?subject=Check out this car&body=@Model?.BrandName @Model?.CarModelName" title="Email">
                             <i class="fa fa-envelope fa-lg"></i>
                         </a>
                     </div>
