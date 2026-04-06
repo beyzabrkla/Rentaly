@@ -10,7 +10,7 @@ namespace Rentaly.EntityLayer.Entities
         [Required, StringLength(15)]
         public string PlateNumber { get; set; }
 
-        [Required, StringLength(50)]
+        [Required, StringLength(17)]
         public string VIN { get; set; }
 
         public int BrandId { get; set; }

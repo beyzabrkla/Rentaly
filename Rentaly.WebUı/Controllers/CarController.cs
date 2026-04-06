@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Rentaly.BusinessLayer.Abstract;
-using Rentaly.EntityLayer.Entities;
+using Rentaly.DTOLayer.CarDTOs;
+using AutoMapper;
 
 namespace Rentaly.WebUI.Controllers
 {
@@ -8,12 +9,14 @@ namespace Rentaly.WebUI.Controllers
     {
         private readonly ICarService _carService;
         private readonly IBranchService _branchService;
+        private readonly IMapper _mapper;
         private const int PAGE_SIZE = 9;
 
-        public CarController(ICarService carService, IBranchService branchService)
+        public CarController(ICarService carService, IBranchService branchService, IMapper mapper)
         {
             _carService = carService;
             _branchService = branchService;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -31,6 +34,8 @@ namespace Rentaly.WebUI.Controllers
             {
                 var data = await _carService.GetAvailableWithDetailsAsync();
                 var query = data.AsQueryable();
+
+                query = query.OrderByDescending(c => c.CarId);
 
                 if (!string.IsNullOrEmpty(category) && category != "0")
                 {
@@ -59,33 +64,31 @@ namespace Rentaly.WebUI.Controllers
                 if (minPrice.HasValue) query = query.Where(c => c.DailyPrice >= minPrice.Value);
                 if (maxPrice.HasValue) query = query.Where(c => c.DailyPrice <= maxPrice.Value);
 
-                //Sayfalama Hesaplamaları
+                //Sayfalama
                 int totalCars = query.Count();
                 int totalPages = (int)Math.Ceiling(totalCars / (double)PAGE_SIZE);
-
-                // Sayfa sınırlarını kontrol et
                 page = page < 1 ? 1 : (totalPages > 0 && page > totalPages ? totalPages : page);
 
                 var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
+                var mappedCars = _mapper.Map<List<ResultCarDTO>>(pagedCars);
 
-                //View'a gidecek ek veriler
+                //View'a gidecek ek veriler 
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalCars = totalCars;
                 ViewBag.Branches = await _branchService.TGetListAsync();
-
-                //Aktif filtreleri View'da tutmak için (URL'leri bozmamak adına)
                 ViewBag.SelectedCategory = category;
                 ViewBag.SelectedBranch = branch;
 
-                return View(pagedCars);
+                // DTO listesini gönderiyoruz
+                return View(mappedCars);
             }
             catch (Exception ex)
             {
-                // Hata günlüğü tutulabilir: _logger.LogError(ex, "CarList error");
                 TempData["Error"] = "Araçlar yüklenirken teknik bir sorun oluştu.";
-                return View(new List<Car>());
+                return View(new List<ResultCarDTO>());
             }
+
         }
 
         [HttpGet]
@@ -100,8 +103,8 @@ namespace Rentaly.WebUI.Controllers
                 TempData["Warning"] = "Aradığınız araç şu anda kiralamaya kapalıdır.";
                 return RedirectToAction("CarList");
             }
-
-            return View(car);
+            var mappedCar = _mapper.Map<UpdateCarDTO>(car);
+            return View(mappedCar);
         }
 
         [HttpGet]

@@ -28,7 +28,7 @@ namespace Rentaly.BusinessLayer.ValidationRules.CarValidator
                 .GreaterThan(0).WithMessage("Şube seçimi yapılmalıdır");
 
             RuleFor(x => x.Year)
-                .InclusiveBetween(1990, DateTime.Now.Year)
+                .InclusiveBetween(1700, DateTime.Now.Year)
                 .WithMessage("Araç yılı geçerli bir değer olmalıdır");
 
             RuleFor(x => x.Kilometer)
