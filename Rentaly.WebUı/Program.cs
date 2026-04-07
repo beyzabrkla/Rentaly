@@ -46,6 +46,11 @@ builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new 
 
 var app = builder.Build();
 
+var cultureInfo = new System.Globalization.CultureInfo("tr-TR");
+System.Globalization.CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
