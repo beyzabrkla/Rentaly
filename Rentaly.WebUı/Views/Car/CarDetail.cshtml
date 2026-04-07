@@ -1,18 +1,37 @@
-﻿@model UpdateCarDTO
+﻿@model GetCarByIdDTO
 @{
     ViewData["Title"] = $"{Model?.BrandName} {Model?.CarModelName} - Detaylar";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
 }
 
+<style>
+    /* Orijinal Tema CSS */
+    .de-spec .d-row { border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 0; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .de-spec .d-title { color: rgba(255, 255, 255, 0.7); font-weight: 600; }
+    .de-spec .d-value { color: #fff; font-weight: 700; text-align: right; }
+    
+    /* Fotoğraf Galerisi Genişletme */
+    .pro-thumb-wrap { margin-top: 15px; width: 100%; }
+    .pro-thumb-wrap img { cursor: pointer; border: 2px solid transparent; transition: 0.3s; border-radius: 4px; opacity: 0.6; width: 100%; height: 80px; object-fit: cover; }
+    .pro-thumb-wrap img:hover, .pro-thumb-wrap img.active { border-color: #ff002d; opacity: 1; }
+
+    /* Fiyat Alanı Düzenleme */
+    .price-box { border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; }
+    .price-main { font-size: 24px; font-weight: 800; color: #fff; }
+    .price-deposit { font-size: 18px; font-weight: 700; color: #ff002d !important; }
+
+    /* Hesaplama Paneli (Kırmızı Çerçeve) */
+    #total-price-area { background: rgba(255,0,45,0.1); border: 1px solid #ff002d; padding: 15px; border-radius: 5px; margin-top: 15px; }
+</style>
+
 <section id="subheader" class="jarallax text-light">
-    <img src="/RentalyHTML/images/background/2.jpg" class="jarallax-img" alt="">
-    <div class="center-y relative text-center">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <h1>@Model?.BrandName @Model?.CarModelName - @Model?.Year</h1>
-                </div>
-                <div class="clearfix"></div>
+    <img src="/RentalyHTML/images/background/2.jpg" class="jarallax-img">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="spacer-50"></div>
+                <h1>@Model?.BrandName @Model?.CarModelName</h1>
+                <div class="spacer-50"></div>
             </div>
         </div>
     </div>
@@ -21,179 +40,103 @@
 <section id="section-car-details">
     <div class="container">
         <div class="row g-5">
-            <!-- Araç Görseli -->
-            <div class="col-lg-6">
-                <div class="car-image-container">
-                    <img src="@Model?.CoverImageUrl"
-                         class="img-fluid rounded"
-                         alt="@Model?.BrandName @Model?.CarModelName"
-                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22500%22 height=%22400%22%3E%3Crect fill=%22%23333%22 width=%22500%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23666%22 text-anchor=%22middle%22 dy=%22.3em%22%3EAraç Görseli Yok%3C/text%3E%3C/svg%3E'">
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="rounded overflow-hidden">
+                            <img src="@Model?.CoverImageUrl" class="img-fluid" id="mainCarImage" style="width: 100%; height: 400px; object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <h3 class="text-white">Araç Özellikleri</h3>
+                        <div class="de-spec">
+                            <div class="d-row"><span class="d-title">Şube</span><span class="d-value">@Model?.BranchName</span></div>
+                            <div class="d-row"><span class="d-title">Plaka</span><span class="d-value">@Model?.PlateNumber</span></div>
+                            <div class="d-row"><span class="d-title">Kilometre</span><span class="d-value">@Model?.Kilometer.ToString("N0") km</span></div>
+                            <div class="d-row"><span class="d-title">Yakıt</span><span class="d-value">@Model?.FuelType</span></div>
+                            <div class="d-row"><span class="d-title">Vites</span><span class="d-value">@Model?.Transmission</span></div>
+                            <div class="d-row">
+                                <span class="d-title">Koltuk / Bagaj</span>
+                                <span class="d-value">@Model?.SeatCount Koltuk / @Model?.LuggageCount L</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mt-3">
+                        @if (Model?.CarImages != null && Model.CarImages.Any())
+                        {
+                            <div class="pro-thumb-wrap">
+                                <div class="row g-2">
+                                    <div class="col-2"><img src="@Model.CoverImageUrl" class="img-fluid active" onclick="changeMainImage(this)"></div>
+                                    @foreach (var imgUrl in Model.CarImages)
+                                    {
+                                        <div class="col-2"><img src="@imgUrl" class="img-fluid" onclick="changeMainImage(this)"></div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="col-12 mt-4">
+                        <div class="de-box" style="background: rgba(255,255,255,0.02); padding: 25px; border-radius: 8px;">
+                            <h4 class="text-white mb-3">Araç Hakkında</h4>
+                            <div class="car-description">@Model?.Description</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Araç Bilgileri -->
-            <div class="col-lg-3">
-                <h3>@Model?.BrandName @Model?.CarModelName</h3>
-                <p>@Model?.CategoryName kategorisinde, @Model?.Year yılında üretilmiş güvenilir ve konforlu bir araçtır.</p>
-
-                <div class="spacer-10"></div>
-
-                <h4>Teknik Özellikler</h4>
-                <div class="de-spec">
-                    <div class="d-row">
-                        <span class="d-title">Kategori</span>
-                        <span class="d-value">@Model?.CategoryName</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Koltuk Sayısı</span>
-                        <span class="d-value">@Model?.SeatCount koltuk</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Bagaj Kapasitesi</span>
-                        <span class="d-value">@Model?.LuggageCount</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Yakıt Tipi</span>
-                        <span class="d-value">@Model?.FuelType</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Şanzıman</span>
-                        <span class="d-value">@Model?.Transmission</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Üretim Yılı</span>
-                        <span class="d-value">@Model?.Year</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Kilometre</span>
-                        <span class="d-value">@Model?.Kilometer km</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Plaka</span>
-                        <span class="d-value">@Model?.PlateNumber</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Şasi Numarası</span>
-                        <span class="d-value">@Model?.VIN</span>
-                    </div>
-                    <div class="d-row">
-                        <span class="d-title">Mevcut Şube</span>
-                        <span class="d-value">@Model?.BranchName</span>
-                    </div>
+            <div class="col-lg-4">
+                <div class="price-box text-center mb-4">
+                    <p class="text-muted small mb-0">Günlük Ücret</p>
+                    <div class="price-main">₺@Model?.DailyPrice.ToString("N2")</div>
+                    <hr style="border-color: rgba(255,255,255,0.1);">
+                    <p class="text-muted small mb-0">Depozito Ücreti</p>
+                    <div class="price-deposit">₺@Model?.DepositAmount.ToString("N2")</div>
                 </div>
 
-                <div class="spacer-single"></div>
+                <div class="de-box booking-box" style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    <h4 class="text-white mb-4 text-center">Hızlı Rezervasyon</h4>
+                    <form method="post" action="/Booking/Create">
+                        <input type="hidden" id="raw-daily-price" value="@Model?.DailyPrice.ToString().Replace(",", ".")" />
+                        <input type="hidden" id="raw-deposit" value="@Model?.DepositAmount.ToString().Replace(",", ".")" />
 
-                <h4>Durum</h4>
-                <ul class="ul-style-2">
-                    @if (Model?.IsAvailable == true)
-                    {
-                        <li><i class="fa fa-check text-success"></i> Müsait</li>
-                    }
-                    else
-                    {
-                        <li><i class="fa fa-times text-danger"></i> Kirada</li>
-                    }
-                    @if (Model?.IsActive == true)
-                    {
-                        <li><i class="fa fa-check text-success"></i> Aktif</li>
-                    }
-                </ul>
-            </div>
+                        <div class="mb-3">
+                            <label class="small text-white-50">Teslim Şubesi</label>
+                            <select name="ReturnBranchId" class="form-control bg-dark text-white border-secondary">
+                                @if (ViewBag.Branches != null) {
+                                    foreach (var item in (List<Rentaly.EntityLayer.Entities.Branch>)ViewBag.Branches) {
+                                        <option value="@item.BranchId">@item.BranchName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
 
-            <!-- Rezervasyon Paneli -->
-            <div class="col-lg-3">
-                <!-- Fiyat -->
-                <div class="de-price text-center">
-                    <p>Günlük Ücret</p>
-                    <h3>₺@Model?.DailyPrice.ToString("N2")</h3>
-                    <p class="text-muted">Depozito: ₺@Model?.DepositAmount.ToString("N2")</p>
-                </div>
-
-                <div class="spacer-30"></div>
-
-                <!-- Rezervasyon Formu -->
-                @if (Model?.IsAvailable == true)
-                {
-                    <div class="de-box text-light mb25">
-                        <form name="bookingForm" id="booking_form" method="post" action="/Rental/Create">
-                            <h4>Bu Aracı Kiralayın</h4>
-
-                            <div class="spacer-20"></div>
-
-                            <!-- Araç ID (Hidden) -->
-                            <input type="hidden" name="CarId" value="@Model?.CarId">
-
-                            <!-- Teslim Lokasyonu -->
-                            <div class="mb20">
-                                <h5>Teslim Yeri</h5>
-                                <select name="PickupBranchId" class="form-control" required>
-                                    <option value="">-- Şube Seçin --</option>
-                                    <option value="@Model?.BranchId" selected>@Model?.BranchName (@Model?.City)</option>
-                                </select>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="small text-white-50">Alış Tarihi</label>
+                                <input type="date" id="pickup_date" name="PickupDate" class="form-control bg-dark text-white border-secondary">
                             </div>
-
-                            <!-- Dönem Lokasyonu -->
-                            <div class="mb20">
-                                <h5>Dönem Yeri</h5>
-                                <select name="ReturnBranchId" class="form-control" required>
-                                    <option value="">-- Şube Seçin --</option>
-                                    <option value="@Model?.BranchId" selected>@Model?.BranchName (@Model?.City)</option>
-                                </select>
+                            <div class="col-6 mb-3">
+                                <label class="small text-white-50">İade Tarihi</label>
+                                <input type="date" id="return_date" name="ReturnDate" class="form-control bg-dark text-white border-secondary">
                             </div>
+                        </div>
 
-                            <!-- Teslim Tarihi & Saati -->
-                            <div class="mb20">
-                                <h5>Teslim Tarihi & Saati</h5>
-                                <div class="date-time-field">
-                                    <input type="date" name="PickupDate" value="" required class="form-control">
-                                    <input type="time" name="PickupTime" value="09:00" class="form-control">
-                                </div>
+                        <div id="total-price-area" class="d-none">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="small text-white-50">Kira Bedeli:</span>
+                                <span id="rental-total" class="text-white fw-bold">₺0.00</span>
                             </div>
-
-                            <!-- Dönem Tarihi & Saati -->
-                            <div class="mb20">
-                                <h5>Dönem Tarihi & Saati</h5>
-                                <div class="date-time-field">
-                                    <input type="date" name="ReturnDate" value="" required class="form-control">
-                                    <input type="time" name="ReturnTime" value="10:00" class="form-control">
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center fw-bold border-top pt-2 mt-2">
+                                <span class="text-white">TOPLAM:</span>
+                                <span style="color: #ff002d; font-size: 1.2rem;" id="grand-total">₺0.00</span>
                             </div>
+                        </div>
 
-                            <button type="submit" class="btn-main btn-fullwidth">Şimdi Kirala</button>
-
-                            <div class="clearfix"></div>
-                        </form>
-                    </div>
-                }
-                else
-                {
-                    <div class="alert alert-danger text-center">
-                        <h5>Araç Müsait Değildir</h5>
-                        <p>Bu araç şu anda kiralanmıştır. Lütfen başka bir araç seçiniz.</p>
-                        <a href="/Car/CarList" class="btn-main">Araç Listesine Dön</a>
-                    </div>
-                }
-
-                <div class="spacer-30"></div>
-
-                <!-- Paylaş -->
-                <div class="de-box">
-                    <h4>Paylaş</h4>
-                    <div class="de-color-icons">
-                        <a href="https://twitter.com/intent/tweet?text=Check out this car: @Model?.BrandName @Model?.CarModelName" target="_blank" title="Twitter">
-                            <i class="fa fa-twitter fa-lg"></i>
-                        </a>
-                        <a href="https://www.facebook.com/sharer/sharer.php" target="_blank" title="Facebook">
-                            <i class="fa fa-facebook fa-lg"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/sharing/share-offsite/" target="_blank" title="LinkedIn">
-                            <i class="fa fa-linkedin fa-lg"></i>
-                        </a>
-                        <a href="mailto:?subject=Check out this car&body=@Model?.BrandName @Model?.CarModelName" title="Email">
-                            <i class="fa fa-envelope fa-lg"></i>
-                        </a>
-                    </div>
+                        <button type="submit" class="btn-main mt-3" style="width: 100%;">HEMEN KİRALA</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -202,36 +145,34 @@
 
 @section Scripts {
     <script>
-        // Tarih minimum değeri bugün olsun
-        document.addEventListener('DOMContentLoaded', function () {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                const pickupDate = document.querySelector('input[name="PickupDate"]');
-                const returnDate = document.querySelector('input[name="ReturnDate"]');
+        document.addEventListener("DOMContentLoaded", function () {
+            const pDate = document.getElementById('pickup_date');
+            const rDate = document.getElementById('return_date');
+            const daily = parseFloat(document.getElementById('raw-daily-price').value);
+            const deposit = parseFloat(document.getElementById('raw-deposit').value);
 
-                if (pickupDate) {
-                    pickupDate.min = today;
-                    pickupDate.value = today;
+            function calc() {
+                if (pDate.value && rDate.value) {
+                    const start = new Date(pDate.value);
+                    const end = new Date(rDate.value);
+                    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                    
+                    if (days > 0) {
+                        const totalRent = days * daily;
+                        document.getElementById('rental-total').innerText = '₺' + totalRent.toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+                        document.getElementById('grand-total').innerText = '₺' + (totalRent + deposit).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+                        document.getElementById('total-price-area').classList.remove('d-none');
+                    }
                 }
-                if (returnDate) {
-                    returnDate.min = today;
-                    returnDate.value = today;
-                }
-
-                // Dönem tarihi >= Teslim tarihi olsun
-                if (pickupDate) {
-                    pickupDate.addEventListener('change', function () {
-                        if (returnDate) {
-                            returnDate.min = this.value;
-                            if (returnDate.value < this.value) {
-                                returnDate.value = this.value;
-                            }
-                        }
-                    });
-                }
-            } catch (e) {
-                console.error('Tarih ayarlaması hatası:', e);
             }
+            pDate.addEventListener('change', calc);
+            rDate.addEventListener('change', calc);
         });
+
+        function changeMainImage(img) {
+            document.getElementById('mainCarImage').src = img.src;
+            document.querySelectorAll('.pro-thumb-wrap img').forEach(i => i.classList.remove('active'));
+            img.classList.add('active');
+        }
     </script>
 }

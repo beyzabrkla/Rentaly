@@ -4,8 +4,8 @@ namespace Rentaly.DTOLayer.CarDTOs
 {
     public class CreateCarDTO
     {
-        public string PlateNumber { get; set; }
-        public string VIN { get; set; }
+        public string? PlateNumber { get; set; }
+        public string? VIN { get; set; }
         public int BrandId { get; set; }
         public int CarModelId { get; set; }
         public int CategoryId { get; set; }

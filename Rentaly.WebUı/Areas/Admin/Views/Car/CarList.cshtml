@@ -261,8 +261,6 @@
 }
 
 @* Silme Onay Modal *@
-
-
 <div id="deleteModal"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">
@@ -277,6 +275,9 @@
                 <i class="fa-solid fa-trash-can"></i> Evet, Sil
             </button>
         </div>
+        <form id="deleteTokenForm" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
     </div>
 </div>
 
@@ -316,22 +317,39 @@
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', async function () {
             if (!pendingDeleteId) return;
-            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+            const token = document.querySelector('#deleteTokenForm input[name="__RequestVerificationToken"]')?.value ?? '';
+
+            if (!token) {
+                alert('Güvenlik token bulunamadı, sayfayı yenileyip tekrar deneyin.');
+                return;
+            }
+
             try {
-                const res  = await fetch(urlDeleteCar, {
-                    method:  'POST',
+                const res = await fetch(urlDeleteCar, {
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body:    `id=${pendingDeleteId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                    body: `id=${pendingDeleteId}&__RequestVerificationToken=${encodeURIComponent(token)}`
                 });
-                const data = await res.json();
+
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    alert('Sunucudan geçersiz yanıt alındı: ' + text.substring(0, 200));
+                    return;
+                }
+
                 closeDeleteModal();
+
                 if (data.success) {
                     window.location.reload();
                 } else {
                     alert(data.message ?? 'Bir hata oluştu.');
                 }
             } catch (e) {
-                alert('Silme işlemi sırasında hata oluştu.');
+                alert('Silme işlemi sırasında hata oluştu: ' + e.message);
             }
         });
 

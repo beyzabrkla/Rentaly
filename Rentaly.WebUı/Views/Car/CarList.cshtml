@@ -4,7 +4,6 @@
     ViewData["Title"] = "CarList";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    // URL'den filter parametrelerini al
     string categoryFilter = Context.Request.Query["category"];
     string seatsFilter = Context.Request.Query["seats"];
     string fuelFilter = Context.Request.Query["fuel"];
@@ -31,32 +30,32 @@
 <section id="section-cars">
     <div class="container">
         <div class="row">
-            <!-- Sol Filtreleme Paneli -->
             <div class="col-lg-3">
-                <!-- Kategori Filtresi -->
                 <div class="item_filter_group">
                     <h4>Kategori</h4>
                     <div class="de_form">
                         <div class="de_checkbox">
-                            <input id="filter_all" name="filter_category" type="radio" value="0" @(string.IsNullOrEmpty(categoryFilter) ? "checked" : "") onchange="filterCars()">
+                            <input id="filter_all" name="filter_category" type="radio" value="0"
+                            @(string.IsNullOrEmpty(categoryFilter) ? "checked" : "")
+                                   onchange="filterCars()">
                             <label for="filter_all">Tüm Araçlar</label>
                         </div>
-                        <div class="de_checkbox">
-                            <input id="filter_sedan" name="filter_category" type="radio" value="sedan" @(categoryFilter == "sedan" ? "checked" : "") onchange="filterCars()">
-                            <label for="filter_sedan">Sedan</label>
-                        </div>
-                        <div class="de_checkbox">
-                            <input id="filter_suv" name="filter_category" type="radio" value="suv" @(categoryFilter == "suv" ? "checked" : "") onchange="filterCars()">
-                            <label for="filter_suv">SUV</label>
-                        </div>
-                        <div class="de_checkbox">
-                            <input id="filter_hatchback" name="filter_category" type="radio" value="hatchback" @(categoryFilter == "hatchback" ? "checked" : "") onchange="filterCars()">
-                            <label for="filter_hatchback">Hatchback</label>
-                        </div>
-                        <div class="de_checkbox">
-                            <input id="filter_coupe" name="filter_category" type="radio" value="coupe" @(categoryFilter == "coupe" ? "checked" : "") onchange="filterCars()">
-                            <label for="filter_coupe">Coupe</label>
-                        </div>
+
+                        @{
+                            var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
+                            foreach (var cat in categories)
+                            {
+                                var catVal = cat.CategoryName.Trim().ToLower();
+                                var catId = "filter_" + catVal;
+                                <div class="de_checkbox">
+                                    <input id="@catId" name="filter_category" type="radio"
+                                           value="@catVal"
+                                    @(categoryFilter?.Trim().ToLower() == catVal ? "checked" : "")
+                                           onchange="filterCars()">
+                                    <label for="@catId">@cat.CategoryName</label>
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
 
