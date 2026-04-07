@@ -825,9 +825,12 @@
                 </div>
                 <div class="section-body">
                     <textarea id="Description" name="Description" class="form-control"
-                              placeholder="Araç özellikleri, ekipmanlar, özel notlar…" maxlength="1000"
+                              placeholder="Araç özellikleri, ekipmanlar, özel notlar…"
+                              maxlength="3000"
+                              rows="8"
+                              style="min-height: 150px; resize: vertical;"
                               oninput="document.getElementById('descCount').textContent=this.value.length">@Model.Description</textarea>
-                    <div class="char-count"><span id="descCount">@(Model.Description?.Length ?? 0)</span>/1000</div>
+                              <div class="char-count"><span id="descCount">@(Model.Description?.Length ?? 0)</span>/3000</div>
                 </div>
             </div>
 

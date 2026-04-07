@@ -1,8 +1,6 @@
 ﻿using Rentaly.BusinessLayer.Abstract;
 using Rentaly.DataAccessLayer.UnitOfWork;
 using Rentaly.EntityLayer.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Concrete
 {

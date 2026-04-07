@@ -391,38 +391,38 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
         {
             try
             {
-                var car = await _carService.TGetByIdAsync(id);
+                //Aracı, ilişkili resim listesiyle çekiyoruz 
+                var car = await _carService.GetCarByIdWithDetailsAsync(id);
                 if (car == null)
                     return Json(new { success = false, message = "Araç bulunamadı." });
 
-                if (!string.IsNullOrEmpty(car.CoverImageUrl) && car.CoverImageUrl.StartsWith("/"))
+                //Önce galeri Resimleri temizleniyor
+                if (car.CarImages != null && car.CarImages.Any())
                 {
-                    var imagePath = Path.Combine("wwwroot", car.CoverImageUrl.TrimStart('/'));
-                    if (System.IO.File.Exists(imagePath))
-                        System.IO.File.Delete(imagePath);
-                }
-
-                if (car.CarImages != null && car.CarImages.Count > 0)
-                {
-                    foreach (var img in car.CarImages)
+                    foreach (var img in car.CarImages.ToList())
                     {
-                        if (!string.IsNullOrEmpty(img.CoverImageUrl) && img.CoverImageUrl.StartsWith("/"))
-                        {
-                            var path = Path.Combine("wwwroot", img.CoverImageUrl.TrimStart('/'));
-                            if (System.IO.File.Exists(path))
-                                System.IO.File.Delete(path);
-                        }
+                        // Fiziksel dosyayı wwwroot'tan sil
+                        DeleteLocalFile(img.CoverImageUrl);
+                        await _carImageService.TDeleteAsync(img.CarImageId);
                     }
                 }
 
+                //Aracın ana kapak fotoğrafını sil
+                DeleteLocalFile(car.CoverImageUrl);
                 await _carService.TDeleteAsync(id);
+
                 await _unitOfWork.SaveAsync();
 
-                return Json(new { success = true, message = "Araç silindi." });
+                return Json(new { success = true, message = "Araç ve tüm görselleri başarıyla silindi." });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Hata: {ex.Message}" });
+                return Json(new
+                {
+                    success = false,
+                    message = $"Silme işlemi başarısız: {ex.Message}",
+                    inner = ex.InnerException?.Message
+                });
             }
         }
 

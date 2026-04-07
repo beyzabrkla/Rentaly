@@ -9,14 +9,16 @@ namespace Rentaly.WebUI.Controllers
     {
         private readonly ICarService _carService;
         private readonly IBranchService _branchService;
+        private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
         private const int PAGE_SIZE = 9;
 
-        public CarController(ICarService carService, IBranchService branchService, IMapper mapper)
+        public CarController(ICarService carService, IBranchService branchService, IMapper mapper, ICategoryService categoryService)
         {
             _carService = carService;
             _branchService = branchService;
             _mapper = mapper;
+            _categoryService = categoryService;
         }
 
         [HttpGet]
@@ -76,7 +78,8 @@ namespace Rentaly.WebUI.Controllers
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalCars = totalCars;
-                ViewBag.Branches = await _branchService.TGetListAsync();
+                ViewBag.Branches = (await _branchService.TGetListAsync()).Where(b => b.IsActive).ToList();
+                ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.SelectedCategory = category;
                 ViewBag.SelectedBranch = branch;
 
@@ -94,16 +97,20 @@ namespace Rentaly.WebUI.Controllers
         [HttpGet]
         public async Task<IActionResult> CarDetail(int id)
         {
-            if (id <= 0) return RedirectToAction("CarList");
+            var car = await _carService.GetCarByIdWithDetailsAsync(id);
 
-            var car = await _carService.TGetByIdAsync(id);
+            if (car == null) return RedirectToAction("CarList");
 
-            if (car == null || !car.IsActive)
+            var mappedCar = _mapper.Map<GetCarByIdDTO>(car);
+
+            var branches = await _branchService.TGetListAsync();
+            ViewBag.Branches = branches.Where(x => x.IsActive).ToList();
+
+            if (car.CarImages != null && car.CarImages.Any())
             {
-                TempData["Warning"] = "Aradığınız araç şu anda kiralamaya kapalıdır.";
-                return RedirectToAction("CarList");
+                mappedCar.CarImages = car.CarImages.Select(x => x.CoverImageUrl).ToList();
             }
-            var mappedCar = _mapper.Map<UpdateCarDTO>(car);
+
             return View(mappedCar);
         }
 
