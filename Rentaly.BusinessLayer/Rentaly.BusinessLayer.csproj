@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Container\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="FluentValidation" Version="11.12.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.25" />
@@ -20,6 +16,10 @@
     <ProjectReference Include="..\Rentaly.DataAccessLayer\Rentaly.DataAccessLayer.csproj" />
     <ProjectReference Include="..\Rentaly.DTOLayer\Rentaly.DTOLayer.csproj" />
     <ProjectReference Include="..\Rentaly.EntityLayer\Rentaly.EntityLayer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ValidationRules\RentalValidator\" />
   </ItemGroup>
 
 </Project>

@@ -8,11 +8,6 @@ using Rentaly.DTOLayer.CategoryDTOs;
 using Rentaly.DTOLayer.CustomerDTOs;
 using Rentaly.DTOLayer.RentalDTOs;
 using Rentaly.EntityLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Mapping
 {
@@ -74,7 +69,8 @@ namespace Rentaly.BusinessLayer.Mapping
 
             CreateMap<Rental, CreateRentalDTO>().ReverseMap();
             CreateMap<Rental, ResultRentalDTO>().ReverseMap();
-            CreateMap<Rental, UpdateRentalDTO>().ReverseMap();
+            CreateMap<Rental, ChangeRentalStatusDTO>().ReverseMap();
+
         }
     }
 }

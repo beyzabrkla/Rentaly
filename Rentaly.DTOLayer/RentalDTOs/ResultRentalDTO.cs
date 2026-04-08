@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Rentaly.DTOLayer.RentalDTOs
+﻿namespace Rentaly.DTOLayer.RentalDTOs
 {
-    public class ResultRentalDTO:CreateRentalDTO
+    public class ResultRentalDTO : CreateRentalDTO
     {
         public int RentalId { get; set; }
+        public string? Status { get; set; }
+        public bool IsApproved { get; set; }
+
+        // UI'da güzel görünmesi için ek bilgiler
+        public string? CarPlate { get; set; }
+        public string? BrandName { get; set; }
+        public string? ModelName { get; set; }
     }
 }

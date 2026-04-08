@@ -1,0 +1,83 @@
+﻿@model UpdateCustomerDTO
+@{
+    ViewData["Title"] = "Müşteri Düzenle";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    @* CSS blokları *@
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Müşteri Bilgilerini Güncelle</h1>
+        <p class="page-subtitle">@Model.Name @Model.Surname adlı müşterinin kayıtlarını düzenliyorsunuz.</p>
+    </div>
+</div>
+
+<form asp-action="UpdateCustomer" asp-controller="Customer" asp-area="Admin" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="CustomerId" />
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d2d;color:#20c997;"><i class="fa-solid fa-user-pen"></i></div>
+                    <div><p class="section-title">Kimlik & Ehliyet</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Ad</label>
+                            <input type="text" asp-for="Name" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Soyad</label>
+                            <input type="text" asp-for="Surname" class="form-control" />
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">T.C. Kimlik No</label>
+                            <input type="text" asp-for="IdentityNumber" class="form-control" maxlength="11" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ehliyet No</label>
+                            <input type="text" asp-for="DrivingLicenseNumber" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ehliyet Tarihi</label>
+                            <input type="date" asp-for="DrivingLicenseDate" class="form-control"
+                                   value="@Model.DrivingLicenseDate.ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a2d;color:#d63384;"><i class="fa-solid fa-address-book"></i></div>
+                    <div><p class="section-title">İletişim</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="mb-3">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" asp-for="Phone" class="form-control" />
+                    </div>
+                    <div>
+                        <label class="form-label">E-posta</label>
+                        <input type="email" asp-for="Email" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <a href="@Url.Action("CustomerList", "Customer", new { area = "Admin" })" class="btn-cancel-form">Vazgeç</a>
+        <button type="submit" class="btn-submit-car">
+            <i class="fa-solid fa-floppy-disk"></i> Değişiklikleri Uygula
+        </button>
+    </div>
+</form>
