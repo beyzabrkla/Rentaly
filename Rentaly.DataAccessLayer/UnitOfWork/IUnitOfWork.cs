@@ -1,9 +1,6 @@
-﻿using Rentaly.DataAccessLayer.Abstract;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
+using Rentaly.DataAccessLayer.Abstract;
+using Rentaly.DataAccessLayer.EntityFramework;
 
 namespace Rentaly.DataAccessLayer.UnitOfWork
 {
@@ -17,6 +14,12 @@ namespace Rentaly.DataAccessLayer.UnitOfWork
         ICategoryDal CategoryDal { get; }
         ICustomerDal CustomerDal { get; }
         IRentalDal RentalDal { get; }
+        IAboutDal AboutDal { get; }
+        IBannerDal BannerDal {  get; }
+        IFaqDal FAQDal {  get; }
+        IProcessDal ProcessDal {  get; }
+        ITestimonialDal TestimonialDal { get; }
+
 
         IGenericDal<T> GetRepository<T>() where T : class;    //GetRepository<T>() metodu, herhangi bir entity türü için generic repository'ye erişim sağlar.
                                                               //Bu sayede, belirli bir entity türü için özel bir repository tanımlamak yerine, tek bir generic repository üzerinden tüm entity türlerine erişebiliriz.

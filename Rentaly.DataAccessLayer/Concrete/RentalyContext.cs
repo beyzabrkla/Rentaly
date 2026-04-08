@@ -34,13 +34,18 @@ namespace Rentaly.DataAccessLayer.Concrete
             base.OnModelCreating(modelBuilder);
         }
 
+        public DbSet<About> Abouts { get; set; }
+        public DbSet<Banner> Banners { get; set; }
         public DbSet<Branch> Branches { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Car> Cars { get; set; }
+        public DbSet<CarImage> CarImages { get; set; }
         public DbSet<CarModel> CarModels { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<FAQ> FAQs { get; set; }
+        public DbSet<Process> Processes { get; set; }
         public DbSet<Rental> Rentals { get; set; }
-        public DbSet<CarImage> CarImages { get; set; }
+        public DbSet<Testimonial> Testimonials { get; set; }
     }
 }

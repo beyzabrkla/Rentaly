@@ -1,0 +1,121 @@
+﻿@model CreateCustomerDTO
+@{
+    ViewData["Title"] = "Yeni Müşteri";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    @* Buraya paylaştığın CSS kodlarını aynen ekleyebilirsin *@
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Yeni Müşteri Kaydı</h1>
+        <p class="page-subtitle">Sisteme yeni bir müşteri profili tanımlayın.</p>
+    </div>
+    <a href="@Url.Action("CustomerList", "Customer", new { area = "Admin" })" class="btn-cancel-form">
+        <i class="fa-solid fa-arrow-left"></i> Listeye Dön
+    </a>
+</div>
+
+<form id="customerForm" asp-action="CreateCustomer" asp-controller="Customer" asp-area="Admin" method="post" novalidate>
+    @Html.AntiForgeryToken()
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            @* Kimlik Bilgileri *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#0a2d2d;color:#20c997;"><i class="fa-solid fa-user-check"></i></div>
+                    <div><p class="section-title">Kişisel Bilgiler</p><p class="section-subtitle">Ad, Soyad ve TC Kimlik No</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="Name">Ad <span class="required">*</span></label>
+                            <div class="input-icon-wrap">
+                                <input type="text" id="Name" name="Name" class="form-control" placeholder="Örn: Ahmet" required />
+                                <i class="fa-solid fa-user input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="Surname">Soyad <span class="required">*</span></label>
+                            <div class="input-icon-wrap">
+                                <input type="text" id="Surname" name="Surname" class="form-control" placeholder="Örn: Yılmaz" required />
+                                <i class="fa-solid fa-signature input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="IdentityNumber">T.C. Kimlik No <span class="required">*</span></label>
+                            <div class="input-icon-wrap">
+                                <input type="text" id="IdentityNumber" name="IdentityNumber" class="form-control"
+                                       placeholder="11 Haneli Kimlik No" maxlength="11"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
+                                <i class="fa-solid fa-id-card input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Ehliyet Bilgileri *@
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d1a0a;color:#fd7e14;"><i class="fa-solid fa-address-card"></i></div>
+                    <div><p class="section-title">Ehliyet Detayları</p><p class="section-subtitle">Ehliyet numarası ve veriliş tarihi</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="DrivingLicenseNumber">Ehliyet No</label>
+                            <div class="input-icon-wrap">
+                                <input type="text" id="DrivingLicenseNumber" name="DrivingLicenseNumber" class="form-control" placeholder="123456" />
+                                <i class="fa-solid fa-hashtag input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="DrivingLicenseDate">Ehliyet Alınış Tarihi</label>
+                            <div class="input-icon-wrap">
+                                <input type="date" id="DrivingLicenseDate" name="DrivingLicenseDate" class="form-control" />
+                                <i class="fa-solid fa-calendar-day input-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* İletişim *@
+        <div class="col-12 col-xl-4">
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon" style="background:#2d0a2d;color:#d63384;"><i class="fa-solid fa-address-book"></i></div>
+                    <div><p class="section-title">İletişim</p></div>
+                </div>
+                <div class="section-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="Phone">Telefon</label>
+                        <div class="input-icon-wrap">
+                            <input type="tel" id="Phone" name="Phone" class="form-control" placeholder="05XX XXX XX XX" />
+                            <i class="fa-solid fa-phone input-icon"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label" for="Email">E-posta</label>
+                        <div class="input-icon-wrap">
+                            <input type="email" id="Email" name="Email" class="form-control" placeholder="ornek@mail.com" />
+                            <i class="fa-solid fa-envelope input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <a href="@Url.Action("CustomerList", "Customer", new { area = "Admin" })" class="btn-cancel-form">Vazgeç</a>
+        <button type="submit" class="btn-submit-car">
+            <i class="fa-solid fa-plus"></i> Müşteriyi Kaydet
+        </button>
+    </div>
+</form>

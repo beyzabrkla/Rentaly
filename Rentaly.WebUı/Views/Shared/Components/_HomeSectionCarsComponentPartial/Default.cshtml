@@ -23,9 +23,6 @@
                             <div class="d-info">
                                 <div class="d-text">
                                     <h4>@car.Brand?.BrandName @car.CarModel?.ModelName</h4>
-                                    <div class="d-item_like">
-                                        <i class="fa fa-heart"></i><span>74</span>
-                                    </div>
                                     <div class="d-atr-group">
                                         <span class="d-atr"><img src="/RentalyHTML/images/icons/1-green.svg" alt="">@car.SeatCount</span>
                                         <span class="d-atr"><img src="/RentalyHTML/images/icons/2-green.svg" alt="">@car.PersonCount</span>
@@ -33,7 +30,7 @@
                                         <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">@car.Category?.CategoryName</span>
                                     </div>
                                     <div class="d-price">
-                                        Günlük kira bedeli: <span>$@car.DailyPrice.ToString("N0")</span>'den başlayan fiyatlarla
+                                        Günlük kira bedeli: <span>₺ @car.DailyPrice.ToString("N0")</span>'den başlayan fiyatlarla
                                         <a class="btn-main" href="/Car/Details/@car.CarId">Hemen Kirala</a>
                                     </div>
                                 </div>

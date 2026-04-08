@@ -1,12 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Rentaly.BusinessLayer.Abstract;
+using System.Threading.Tasks;
 
 namespace Rentaly.WebUI.ViewComponents
 {
-    public class _HomeFeaturesComponentPartial :ViewComponent
+    public class _HomeFeaturesComponentPartial : ViewComponent
     {
-        public IViewComponentResult Invoke()
+        private readonly IProcessService _processService;
+
+        public _HomeFeaturesComponentPartial(IProcessService processService)
         {
-            return View(); 
+            _processService = processService;
+        }
+
+        public async Task<IViewComponentResult> InvokeAsync()
+        {
+            // Process tablosundaki verileri çekiyoruz
+            var values = await _processService.TGetListAsync();
+            return View(values);
         }
     }
 }

@@ -1,19 +1,21 @@
-﻿@using Rentaly.EntityLayer.Entities
+﻿@model Rentaly.EntityLayer.Entities.Banner
+@using Rentaly.EntityLayer.Entities
 @{
     var categories = ViewBag.Categories as List<Category> ?? new List<Category>();
     var branches = ViewBag.Branches as List<Branch> ?? new List<Branch>();
 }
 
 <section id="section-hero" aria-label="section" class="jarallax full-height vertical-center">
-    <img src="/RentalyHTML/images/background/1.jpg" class="jarallax-img" alt="">
+    <img src="@(Model?.BackgroundImageUrl ?? "/RentalyHTML/images/background/1.jpg")" class="jarallax-img" alt="">
+    
     <div class="container position-relative z1000">
         <div class="row align-items-center">
             <div class="col-lg-6 text-light">
-                <h4><span class="id-color">Araç Kiralamanın Hızlı ve Kolay Yolu</span></h4>
+                <h4><span class="id-color">@(Model?.SubTitle ?? "Araç Kiralamanın Hızlı ve Kolay Yolu")</span></h4>
                 <div class="spacer-10"></div>
-                <h1 class="mb-2">Dünyayı konforlu araçlarımızla keşfedin</h1>
+                <h1 class="mb-2">@(Model?.Title ?? "Dünyayı konforlu araçlarımızla keşfedin")</h1>
                 <div class="spacer-10"></div>
-                <p class="lead">Olağanüstü konforlu ve şık araç filomuzla unutulmaz maceralara atılın ve dünyayı benzersiz bir rahatlıkla keşfedin.</p>
+                <p class="lead">@(Model?.Description ?? "Olağanüstü konforlu ve şık araç filomuzla unutulmaz maceralara atılın.")</p>
             </div>
 
             <div class="col-lg-6">
@@ -22,40 +24,16 @@
 
                     <form name="searchForm" id='search_form' method="post" action="/Home/SearchCars">
                         <h5>Araç tipiniz nedir?</h5>
-
-                        <div class="de_form de_radio row g-3">
-                            @if (categories.Count > 0)
+                        
+                        <div class="category-scroll-container custom-scroll">
+                            @foreach (var category in categories)
                             {
-                                @foreach (var category in categories.Take(4))
-                                {
-                                    <div class="radio-img col-lg-3 col-sm-3 col-6">
-                                        <input id="radio-cat-@category.CategoryId"
-                                               name="carType"
-                                               type="radio"
-                                               value="@category.CategoryName"
-                                               @(category.CategoryId == 1 ? "checked='checked'" : "")>
-                                        <label for="radio-cat-@category.CategoryId">
-                                            <img src="/RentalyHTML/images/select-form/car.png" alt="@category.CategoryName" style="height: 40px; width: auto; margin-bottom: 5px;">
-                                            <span style="font-size: 12px;">@category.CategoryName</span>
-                                        </label>
-                                    </div>
-                                }
-                            }
-                            else
-                            {
-                                <div class="radio-img col-lg-3 col-sm-3 col-6">
-                                    <input id="radio-1a" name="carType" type="radio" value="Sedan" checked="checked">
-                                    <label for="radio-1a">
-                                        <img src="/RentalyHTML/images/select-form/car.png" alt="Sedan" style="height: 40px; width: auto; margin-bottom: 5px;">
-                                        <span style="font-size: 12px;">Sedan</span>
-                                    </label>
-                                </div>
-
-                                <div class="radio-img col-lg-3 col-sm-3 col-6">
-                                    <input id="radio-1b" name="carType" type="radio" value="SUV">
-                                    <label for="radio-1b">
-                                        <img src="/RentalyHTML/images/select-form/van.png" alt="SUV" style="height: 40px; width: auto; margin-bottom: 5px;">
-                                        <span style="font-size: 12px;">SUV</span>
+                                <div class="radio-img-item">
+                                    <input id="radio-cat-@category.CategoryId" name="carType" type="radio" value="@category.CategoryName"
+                                    @(categories.IndexOf(category) == 0 ? "checked" : "")>
+                                    <label for="radio-cat-@category.CategoryId">
+                                        <img src="@(category.IconUrl ?? "/RentalyHTML/images/select-form/car.png")" alt="@category.CategoryName">
+                                        <span>@category.CategoryName</span>
                                     </label>
                                 </div>
                             }
@@ -66,59 +44,49 @@
                         <div class="row">
                             <div class="col-lg-6 mb20">
                                 <h5>Alış Yeri</h5>
-                                <select name="pickupLocation" id="pickupLocation" class="form-control" required>
-                                    <option value="">Alış konumunu seçin</option>
+                                <select name="pickupLocationId" class="form-control" required>
+                                    <option value="">Konum seçin</option>
                                     @foreach (var branch in branches)
                                     {
-                                        <option value="@branch.BranchName (@branch.City)">
-                                            @branch.BranchName - @branch.City
-                                        </option>
+                                        <option value="@branch.BranchId">@branch.BranchName - @branch.City</option>
                                     }
                                 </select>
                             </div>
 
                             <div class="col-lg-6 mb20">
                                 <h5>Dönüş Yeri</h5>
-                                <select name="dropoffLocation" id="dropoffLocation" class="form-control" required>
-                                    <option value="">Dönüş konumunu seçin</option>
+                                <select name="dropoffLocationId" class="form-control" required>
+                                    <option value="">Konum seçin</option>
                                     @foreach (var branch in branches)
                                     {
-                                        <option value="@branch.BranchName (@branch.City)">
-                                            @branch.BranchName - @branch.City
-                                        </option>
+                                        <option value="@branch.BranchId">@branch.BranchName - @branch.City</option>
                                     }
                                 </select>
                             </div>
 
                             <div class="col-lg-6 mb20">
-                                <h5>Alış Tarihi ve Saati</h5>
+                                <h5>Alış Tarihi</h5>
                                 <div class="date-time-field">
-                                    <input type="text" id="date-picker" name="pickUpDate" class="form-control" placeholder="Tarih seçin..." required>                                    <select name="pickUpTime" id="pickup-time" class="form-control" required>
-                                        <option selected disabled value="">Saat</option>
-                                        @for (int i = 8; i <= 22; i++)
-                                        {
-                                            <option value="@i:00">@i:00</option>
-                                        }
+                                    <input type="text" id="date-picker" name="pickUpDate" class="form-control" placeholder="Tarih seçin..." required>
+                                    <select name="pickUpTime" class="form-control">
+                                        @for (int i = 8; i <= 22; i++) { <option value="@i:00">@i:00</option> }
                                     </select>
                                 </div>
                             </div>
 
                             <div class="col-lg-6 mb20">
-                                <h5>Dönüş Tarihi ve Saati</h5>
+                                <h5>Dönüş Tarihi</h5>
                                 <div class="date-time-field">
-                                    <input type="text" id="date-picker-2" name="collectionDate" class="form-control" placeholder="Tarih seçin..." required>                                    <select name="collectionTime" id="collection-time" class="form-control" required>
-                                        <option selected disabled value="">Saat</option>
-                                        @for (int i = 8; i <= 22; i++)
-                                        {
-                                            <option value="@i:00">@i:00</option>
-                                        }
+                                    <input type="text" id="date-picker-2" name="dropOffDate" class="form-control" placeholder="Tarih seçin..." required>
+                                    <select name="dropOffTime" class="form-control">
+                                        @for (int i = 8; i <= 22; i++) { <option value="@i:00">@i:00</option> }
                                     </select>
                                 </div>
                             </div>
                         </div>
 
                         <div class="spacer-20"></div>
-                        <input type='submit' id='send_message' value='Araç Bul' class="btn-main pull-right">
+                        <input type='submit' value='Araç Bul' class="btn-main pull-right">
                         <div class="clearfix"></div>
                     </form>
                 </div>
@@ -128,56 +96,66 @@
 </section>
 
 <style>
-    .radio-img input[type="radio"] {
+    /* Kaydırma Tasarımı */
+    .category-scroll-container {
+        display: flex;
+        overflow-x: auto;
+        gap: 15px;
+        padding-bottom: 10px;
+        white-space: nowrap;
+    }
+
+    .radio-img-item {
+        flex: 0 0 auto;
+        width: 100px;
+        text-align: center;
+    }
+
+    .radio-img-item input[type="radio"] {
         display: none;
     }
 
-    .radio-img label {
+    .radio-img-item label {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        cursor: pointer;
         padding: 10px;
         border: 2px solid #333;
         border-radius: 8px;
-        transition: all 0.3s ease;
-        background: rgba(0, 0, 0, 0.3);
-        color: #fff;
+        cursor: pointer;
+        background: rgba(0,0,0,0.3);
+        transition: 0.3s;
     }
 
-    .radio-img input[type="radio"]:checked + label {
+    .radio-img-item label img {
+        height: 35px;
+        margin-bottom: 5px;
+    }
+
+    .radio-img-item label span {
+        font-size: 11px;
+    }
+
+    .radio-img-item input[type="radio"]:checked + label {
         border-color: #cc0c0c;
-        background: rgba(204, 12, 12, 0.3);
+        background: rgba(204, 12, 12, 0.2);
         color: #cc0c0c;
-        font-weight: bold;
+    }
+
+    /* Scrollbar'ı Güzelleştirme */
+    .custom-scroll::-webkit-scrollbar {
+        height: 4px;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+        background: #cc0c0c;
+        border-radius: 10px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+        background: #222;
     }
 
     .date-time-field {
         display: flex;
-        gap: 10px;
+        gap: 5px;
     }
-
-        .date-time-field input, .date-time-field select {
-            flex: 1;
-        }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Flatpickr kullanıyorsan buradaki ayarları yapmalısın
-        // Eğer hiçbir kütüphane yoksa, basitçe type="text" bırakıp
-        // JS ile sadece value yönetimi yapmalıyız.
-
-        const config = {
-            dateFormat: "d.m.Y",
-            minDate: "today"
-        };
-
-        // Eğer Flatpickr yüklüyse şunlar çalışır:
-        if (typeof flatpickr !== 'undefined') {
-            flatpickr("#date-picker", config);
-            flatpickr("#date-picker-2", config);
-        }
-    });
-</script>

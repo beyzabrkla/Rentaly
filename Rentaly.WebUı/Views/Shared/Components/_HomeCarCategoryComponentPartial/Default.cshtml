@@ -1,60 +1,24 @@
-﻿<section aria-label="section" class="pt40 pb40 text-light" data-bgcolor="#111111">
+﻿@model List<Rentaly.EntityLayer.Entities.Category>
+
+<section aria-label="section" class="pt40 pb40 text-light" data-bgcolor="#111111">
     <div class="wow fadeInRight d-flex">
         <div class="de-marquee-list">
             <div class="d-item">
-                <span class="d-item-txt">SUV</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Hatchback</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Crossover</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Cabrio</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Sedan</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Spor Araba</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Coupe</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Minivan</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Station Wagon</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Kamyonet</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Minivan</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Egzotik Araçlar</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
+                @foreach (var item in Model)
+                {
+                    <span class="d-item-txt">@item.CategoryName</span>
+                    <span class="d-item-display"><i class="d-item-dot"></i></span>
+                }
             </div>
         </div>
 
         <div class="de-marquee-list">
             <div class="d-item">
-                <span class="d-item-txt">SUV</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Hatchback</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Crossover</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Cabrio</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Sedan</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Spor Araba</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Coupe</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Minivan</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Station Wagon</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Kamyonet</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Minivan</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
-                <span class="d-item-txt">Egzotik Araçlar</span>
-                <span class="d-item-display"><i class="d-item-dot"></i></span>
+                @foreach (var item in Model)
+                {
+                    <span class="d-item-txt">@item.CategoryName</span>
+                    <span class="d-item-display"><i class="d-item-dot"></i></span>
+                }
             </div>
         </div>
     </div>

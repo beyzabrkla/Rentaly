@@ -1,37 +1,33 @@
-﻿<section class="text-light jarallax">
-    <img src="/RentalyHTML/images/background/9.jpg" class="jarallax-img" alt="">
+﻿@model About
+
+<section class="text-light jarallax">
+    <img src="@(Model?.ImageUrl ?? "/RentalyHTML/images/background/9.jpg")" class="jarallax-img" alt="">
     <div class="container">
         <div class="row g-5">
             <div class="col-lg-6 wow fadeInRight">
-                <h2>Müşterilerimize her ihtiyaca uygun ticari ve lüks araç seçenekleri sunuyoruz.</h2>
+                <h2>@(Model?.Title ?? "Müşterilerimize her ihtiyaca uygun seçenekler sunuyoruz.")</h2>
             </div>
             <div class="col-lg-6 wow fadeInLeft">
-                Araç kiralama acentemizde, bütçesi ne olursa olsun herkesin güvenilir ve konforlu bir araç kullanmanın keyfini yaşamayı hak ettiğine inanıyoruz. Şık sedanlardan geniş SUV modellerine kadar, bakımları titizlikle yapılmış, rekabetçi fiyatlara sahip geniş bir araç filosu oluşturduk. Basitleştirilmiş kiralama sürecimizle, dilediğiniz aracı hızlı ve zahmetsizce rezerve edebilirsiniz. İster iş seyahati, ister aile tatili, ister kısa bir hafta sonu kaçamağı için ulaşım arıyor olun, programınıza uyum sağlayacak esnek kiralama seçeneklerimizle hizmetinizdeyiz.
+                @(Model?.Description ?? "Araç kiralama acentemizde güvenilir hizmet sunuyoruz.")
             </div>
         </div>
         <div class="spacer-double"></div>
         <div class="row text-center">
-            <div class="col-md-3 col-sm-6 mb-sm-30">
+            <div class="col-md-4 col-sm-6 mb-sm-30">
                 <div class="de_count transparent text-light wow fadeInUp">
-                    <h3 class="timer" data-to="15425" data-speed="3000">0</h3>
-                    Tamamlanan Sipariş
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6 mb-sm-30">
-                <div class="de_count transparent text-light wow fadeInUp">
-                    <h3 class="timer" data-to="8745" data-speed="3000">0</h3>
+                    <h3 class="timer" data-to="@Model?.HappyCustomerCount" data-speed="3000">0</h3>
                     Mutlu Müşteri
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-sm-30">
+            <div class="col-md-4 col-sm-6 mb-sm-30">
                 <div class="de_count transparent text-light wow fadeInUp">
-                    <h3 class="timer" data-to="235" data-speed="3000">0</h3>
+                    <h3 class="timer" data-to="@Model?.CarCount" data-speed="3000">0</h3>
                     Araç Filosu
                 </div>
             </div>
-            <div class="col-md-3 col-sm-6 mb-sm-30">
+            <div class="col-md-4 col-sm-6 mb-sm-30">
                 <div class="de_count transparent text-light wow fadeInUp">
-                    <h3 class="timer" data-to="15" data-speed="3000">0</h3>
+                    <h3 class="timer" data-to="@Model?.ExperienceYear" data-speed="3000">0</h3>
                     Yıllık Deneyim
                 </div>
             </div>

@@ -33,14 +33,19 @@ builder.Services.AddDbContext<RentalyContext>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Service katmanı
+builder.Services.AddScoped<IAboutService, AboutManager>();
+builder.Services.AddScoped<IBannerService, BannerManager>();
 builder.Services.AddScoped<IBranchService, BranchManager>();
 builder.Services.AddScoped<IBrandService, BrandManager>();
 builder.Services.AddScoped<ICarService, CarManager>();
+builder.Services.AddScoped<ICarImageService, CarImageManager>();
 builder.Services.AddScoped<ICarModelService, CarModelManager>();
 builder.Services.AddScoped<ICategoryService, CategoryManager>();
 builder.Services.AddScoped<ICustomerService, CustomerManager>();
+builder.Services.AddScoped<IFaqService, FaqManager>();
+builder.Services.AddScoped<IProcessService, ProcessManager>();
 builder.Services.AddScoped<IRentalService, RentalManager>();
-builder.Services.AddScoped<ICarImageService, CarImageManager>();
+builder.Services.AddScoped<ITestimonialService, TestimonialManager>();
 
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 

@@ -1,0 +1,174 @@
+﻿@using Microsoft.AspNetCore.WebUtilities
+@model List<ResultCustomerDTO>
+@{
+    ViewData["Title"] = "Müşteri Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    string searchFilter = Context.Request.Query["search"];
+}
+
+@Html.AntiForgeryToken()
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Müşteri Listesi</h1>
+        <p class="page-subtitle">Sistemde kayıtlı tüm müşterileri yönetin.</p>
+    </div>
+    <a href="@Url.Action("CreateCustomer", "Customer", new { area = "Admin" })" class="btn-primary-custom">
+        <i class="fa-solid fa-user-plus"></i> Yeni Müşteri Ekle
+    </a>
+</div>
+
+@* Stat Kartları *@
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--text-main);">@Model.Count</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Toplam Müşteri</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:#10b981;">@Model.Count(x => !string.IsNullOrEmpty(x.DrivingLicenseNumber))</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Ehliyetli Sürücü</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="stat-card text-center py-3">
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:28px;font-weight:800;color:var(--primary);">@ViewBag.CurrentPage / @ViewBag.TotalPages</div>
+            <div style="font-size:12.5px;color:var(--text-muted);">Sayfa Bilgisi</div>
+        </div>
+    </div>
+</div>
+
+@* Toolbar *@
+<div class="toolbar-card">
+    <div class="search-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="customerSearchInput" placeholder="Müşteri adı veya T.C. ara..."
+               value="@searchFilter"
+               onkeypress="if(event.key==='Enter') filterCustomers()" />
+    </div>
+    <button class="btn-action btn-detail" onclick="resetCustomerFilters()">
+        <i class="fa-solid fa-rotate-left"></i> Sıfırla
+    </button>
+</div>
+
+@* Müşteri Kartları *@
+<div class="row g-4" id="customerGrid">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="col-12 text-center py-5">
+            <i class="fa-solid fa-users-slash fa-3x mb-3" style="color:var(--text-muted);opacity:.4;"></i>
+            <p style="color:var(--text-muted);">Müşteri bulunamadı.</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var customer in Model)
+        {
+            <div class="col-12 col-sm-6 col-xl-4">
+                <div class="vehicle-card" style="height: 100%;">
+                    <div class="vehicle-body">
+                        <div class="vehicle-brand">#@customer.CustomerId</div>
+                        <div class="vehicle-name">@customer.Name @customer.Surname</div>
+
+                        <div class="vehicle-specs">
+                            <div class="spec-item">
+                                <i class="fa-solid fa-id-card"></i>
+                                <span>@customer.IdentityNumber</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>@(customer.Phone ?? "Telefon Yok")</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>@(customer.Email ?? "E-posta Yok")</span>
+                            </div>
+                            <div class="spec-item">
+                                <i class="fa-solid fa-address-card"></i>
+                                <span>Ehliyet: @(customer.DrivingLicenseNumber ?? "Yok")</span>
+                            </div>
+                        </div>
+
+                        <div class="vehicle-price-row mt-3">
+                            <div class="vehicle-price">
+                                <span class="price-label">Ehliyet Tarihi:</span>
+                                <span class="price-amount" style="font-size: 14px;">@customer.DrivingLicenseDate.ToShortDateString()</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vehicle-actions">
+                        <a href="/Admin/Customer/UpdateCustomer/@customer.CustomerId" class="btn-action btn-edit">
+                            <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                        </a>
+                        <button type="button" class="btn-action btn-delete" onclick="confirmCustomerDelete(@customer.CustomerId)">
+                            <i class="fa-solid fa-trash-can"></i> Sil
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@* Sayfalama (Pagination) *@
+@if ((int)ViewBag.TotalPages > 1)
+{
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <nav style="display:flex;justify-content:center;gap:8px;">
+                @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                {
+                    <a href="@Url.Action("CustomerList", "Customer", new { area = "Admin", page = i, search = searchFilter })"
+                       class="btn-action @(i == (int)ViewBag.CurrentPage ? "btn-delete" : "btn-detail")"
+                       style="flex:unset;padding:8px 14px;">@i</a>
+                }
+            </nav>
+        </div>
+    </div>
+}
+
+@* Silme Modalı (Senin Tasarımınla Aynı) *@
+<div id="customerDeleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">
+        <i class="fa-solid fa-triangle-exclamation fa-2x mb-3" style="color:var(--warning);"></i>
+        <h5 class="mb-2" style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--text-main);">Müşteri Silinecek</h5>
+        <p style="font-size:13.5px;color:var(--text-muted);margin-bottom:24px;">Müşteri kaydı kalıcı olarak silinecektir. Emin misiniz?</p>
+        <div style="display:flex;gap:10px;justify-content:center;">
+            <button type="button" class="btn-action btn-detail" onclick="closeCustomerDeleteModal()">Vazgeç</button>
+            <button type="button" class="btn-action btn-delete" id="confirmCustomerDeleteBtn">Evet, Sil</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function filterCustomers() {
+            const search = document.getElementById('customerSearchInput').value;
+            window.location.href = '@Url.Action("CustomerList", "Customer", new { area = "Admin" })' + '?search=' + encodeURIComponent(search);
+        }
+
+        function resetCustomerFilters() {
+            window.location.href = '@Url.Action("CustomerList", "Customer", new { area = "Admin" })';
+        }
+
+        let pendingCustomerId = null;
+        function confirmCustomerDelete(id) {
+            pendingCustomerId = id;
+            document.getElementById('customerDeleteModal').style.display = 'flex';
+        }
+
+        function closeCustomerDeleteModal() {
+            document.getElementById('customerDeleteModal').style.display = 'none';
+        }
+
+        document.getElementById('confirmCustomerDeleteBtn').addEventListener('click', async function() {
+            if(!pendingCustomerId) return;
+            // Silme işlemi için controller'a POST isteği
+            window.location.href = '/Admin/Customer/DeleteCustomer/' + pendingCustomerId;
+        });
+    </script>
+}
