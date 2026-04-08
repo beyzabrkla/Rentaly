@@ -67,5 +67,26 @@ namespace Rentaly.DataAccessLayer.EntityFramework
             => await WithAllIncludes()
                     .Where(x => x.BranchId == branchId)
                     .ToListAsync();
+
+        public async Task<List<Car>> GetAvailableCarsByDateAsync(DateTime pickupDate, DateTime returnDate, int? branchId)
+        {
+            // O tarihlerde meşgul olan araç ID'lerini bulalım
+            var busyCarIds = await _context.Rentals
+                .Where(r => (r.Status == "Onaylandı" || r.Status == "Beklemede") &&
+                            pickupDate < r.ReturnDate && r.PickupDate < returnDate)
+                .Select(r => r.CarId)
+                .ToListAsync();
+
+            //Bu ID'ler dışındaki ve şubeye uygun araçları getirelim
+            var query = WithAllIncludes()
+                .Where(c => c.IsActive && !busyCarIds.Contains(c.CarId));
+
+            if (branchId.HasValue)
+            {
+                query = query.Where(c => c.BranchId == branchId.Value);
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

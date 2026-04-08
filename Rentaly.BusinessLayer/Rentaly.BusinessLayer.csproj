@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Rentaly.EntityLayer\Rentaly.EntityLayer.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ValidationRules\RentalValidator\" />
-  </ItemGroup>
-
 </Project>

@@ -18,6 +18,11 @@ namespace Rentaly.BusinessLayer.Concrete
             return await _unitOfWork.CarDal.GetAllWithDetailsAsync();
         }
 
+        public async Task<List<Car>> GetAvailableCarsByDateAsync(DateTime pickupDate, DateTime returnDate, int? branchId) // Belirli tarihler arasında müsait araçları alma (isteğe bağlı olarak şube bazında)
+        {
+           return await _unitOfWork.CarDal.GetAvailableCarsByDateAsync(pickupDate, returnDate, branchId);
+        }
+
         public async Task<List<Car>> GetAvailableWithDetailsAsync() // Sadece müsait araçları detaylı şekilde alma
         {
             return await _unitOfWork.CarDal.GetAvailableWithDetailsAsync();

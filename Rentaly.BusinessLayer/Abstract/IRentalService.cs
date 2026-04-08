@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace Rentaly.BusinessLayer.Abstract
 {
-    public interface IRentalService :IGenericService<Rental>
+    public interface IRentalService : IGenericService<Rental>
     {
+        // Admin onayı için statü değiştirme
+        Task TChangeStatusAsync(int rentalId, string status, bool isApproved);
+
+        // Müsaitlik kontrolü (Senin Case: "Seçilen tarih aralığında kilitlenecek")
+        Task<bool> TCheckCarAvailabilityAsync(int carId, DateTime pickup, DateTime returnDate);
+        Task<List<DateTime>> GetBusyDatesByCarIdAsync(int carId); // JS tarafında tarihleri kapatmak için (Opsiyonel)
     }
 }

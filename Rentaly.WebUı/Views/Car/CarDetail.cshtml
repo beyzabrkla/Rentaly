@@ -5,23 +5,17 @@
 }
 
 <style>
-    /* Orijinal Tema CSS */
     .de-spec .d-row { border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 0; color: #fff; display: flex; justify-content: space-between; align-items: center; }
     .de-spec .d-title { color: rgba(255, 255, 255, 0.7); font-weight: 600; }
     .de-spec .d-value { color: #fff; font-weight: 700; text-align: right; }
     
-    /* Fotoğraf Galerisi Genişletme */
     .pro-thumb-wrap { margin-top: 15px; width: 100%; }
     .pro-thumb-wrap img { cursor: pointer; border: 2px solid transparent; transition: 0.3s; border-radius: 4px; opacity: 0.6; width: 100%; height: 80px; object-fit: cover; }
     .pro-thumb-wrap img:hover, .pro-thumb-wrap img.active { border-color: #ff002d; opacity: 1; }
 
-    /* Fiyat Alanı Düzenleme */
     .price-box { border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; }
     .price-main { font-size: 24px; font-weight: 800; color: #fff; }
     .price-deposit { font-size: 18px; font-weight: 700; color: #ff002d !important; }
-
-    /* Hesaplama Paneli (Kırmızı Çerçeve) */
-    #total-price-area { background: rgba(255,0,45,0.1); border: 1px solid #ff002d; padding: 15px; border-radius: 5px; margin-top: 15px; }
 </style>
 
 <section id="subheader" class="jarallax text-light">
@@ -94,49 +88,14 @@
                     <hr style="border-color: rgba(255,255,255,0.1);">
                     <p class="text-muted small mb-0">Depozito Ücreti</p>
                     <div class="price-deposit">₺@Model?.DepositAmount.ToString("N2")</div>
-                </div>
-
-                <div class="de-box booking-box" style="background: #111; padding: 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
-                    <h4 class="text-white mb-4 text-center">Hızlı Rezervasyon</h4>
-                    <form method="post" action="/Booking/Create">
-                        <input type="hidden" id="raw-daily-price" value="@Model?.DailyPrice.ToString().Replace(",", ".")" />
-                        <input type="hidden" id="raw-deposit" value="@Model?.DepositAmount.ToString().Replace(",", ".")" />
-
-                        <div class="mb-3">
-                            <label class="small text-white-50">Teslim Şubesi</label>
-                            <select name="ReturnBranchId" class="form-control bg-dark text-white border-secondary">
-                                @if (ViewBag.Branches != null) {
-                                    foreach (var item in (List<Rentaly.EntityLayer.Entities.Branch>)ViewBag.Branches) {
-                                        <option value="@item.BranchId">@item.BranchName</option>
-                                    }
-                                }
-                            </select>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-6 mb-3">
-                                <label class="small text-white-50">Alış Tarihi</label>
-                                <input type="date" id="pickup_date" name="PickupDate" class="form-control bg-dark text-white border-secondary">
-                            </div>
-                            <div class="col-6 mb-3">
-                                <label class="small text-white-50">İade Tarihi</label>
-                                <input type="date" id="return_date" name="ReturnDate" class="form-control bg-dark text-white border-secondary">
-                            </div>
-                        </div>
-
-                        <div id="total-price-area" class="d-none">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span class="small text-white-50">Kira Bedeli:</span>
-                                <span id="rental-total" class="text-white fw-bold">₺0.00</span>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center fw-bold border-top pt-2 mt-2">
-                                <span class="text-white">TOPLAM:</span>
-                                <span style="color: #ff002d; font-size: 1.2rem;" id="grand-total">₺0.00</span>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn-main mt-3" style="width: 100%;">HEMEN KİRALA</button>
-                    </form>
+                    
+                    <div class="spacer-20"></div>
+                    
+                    <a href="/Rental/Index/@Model?.CarId" class="btn-main" style="width: 100%; text-align: center;">HEMEN KİRALA</a>
+                    
+                    <p class="small text-white-50 mt-3">
+                        * Rezervasyon işleminizi tamamlamak için rezervasyon formuna yönlendirileceksiniz.
+                    </p>
                 </div>
             </div>
         </div>
@@ -145,30 +104,6 @@
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const pDate = document.getElementById('pickup_date');
-            const rDate = document.getElementById('return_date');
-            const daily = parseFloat(document.getElementById('raw-daily-price').value);
-            const deposit = parseFloat(document.getElementById('raw-deposit').value);
-
-            function calc() {
-                if (pDate.value && rDate.value) {
-                    const start = new Date(pDate.value);
-                    const end = new Date(rDate.value);
-                    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                    
-                    if (days > 0) {
-                        const totalRent = days * daily;
-                        document.getElementById('rental-total').innerText = '₺' + totalRent.toLocaleString('tr-TR', { minimumFractionDigits: 2 });
-                        document.getElementById('grand-total').innerText = '₺' + (totalRent + deposit).toLocaleString('tr-TR', { minimumFractionDigits: 2 });
-                        document.getElementById('total-price-area').classList.remove('d-none');
-                    }
-                }
-            }
-            pDate.addEventListener('change', calc);
-            rDate.addEventListener('change', calc);
-        });
-
         function changeMainImage(img) {
             document.getElementById('mainCarImage').src = img.src;
             document.querySelectorAll('.pro-thumb-wrap img').forEach(i => i.classList.remove('active'));

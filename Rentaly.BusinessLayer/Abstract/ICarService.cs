@@ -11,5 +11,6 @@ namespace Rentaly.BusinessLayer.Abstract
         Task<List<Car>> GetAvailableWithDetailsAsync();
         Task<Car> GetCarByIdWithDetailsAsync(int id);
         Task<List<Car>> GetCarsByBranchWithDetailsAsync(int branchId);
+        Task<List<Car>> GetAvailableCarsByDateAsync(DateTime pickupDate, DateTime returnDate, int? branchId);
     }
 }
