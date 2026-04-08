@@ -29,14 +29,16 @@ namespace Rentaly.WebUI.Controllers
         {
             try
             {
-                var cars       = await _carService.GetAvailableWithDetailsAsync();
-                var branches   = await _branchService.TGetListAsync();
-                var categories = await _categoryService.TGetListAsync();
+                var cars = await _carService.GetAvailableWithDetailsAsync();
+                var allBranches = await _branchService.TGetListAsync();
 
-                ViewBag.TotalCars      = cars.Count;
-                ViewBag.TotalBranches  = branches.Count;
-                ViewBag.Branches       = branches;
-                ViewBag.Categories     = categories;
+                // Sadece AKTİF olanları al
+                var activeBranches = allBranches.Where(x => x.IsActive).ToList();
+
+                ViewBag.TotalCars = cars.Count;
+                ViewBag.TotalBranches = activeBranches.Count; // Burayı da aktif sayısına göre güncelle
+                ViewBag.Branches = activeBranches; // View'a sadece bunları gönder
+                ViewBag.Categories = await _categoryService.TGetListAsync();
 
                 return View();
             }
@@ -49,33 +51,51 @@ namespace Rentaly.WebUI.Controllers
 
         [HttpPost]
         public async Task<IActionResult> SearchCars(
-            string carType, string pickupLocation, string dropoffLocation,
-            DateTime pickUpDate, string pickUpTime,
-            string collectionDate, string collectionTime)
+            string carType,
+            int pickupLocationId,      // Şube ID 
+            int dropoffLocationId,     // Şube ID 
+            string pickUpDate,         
+            string pickUpTime,
+            string dropOffDate,        
+            string dropOffTime)
         {
             try
             {
-                var cars = await _carService.GetAvailableWithDetailsAsync();
+                //Tarih ve Saatleri birleştirerek tam DateTime objeleri oluşturuyoruz
+                if (!DateTime.TryParse($"{pickUpDate} {pickUpTime}", out DateTime start) ||
+                    !DateTime.TryParse($"{dropOffDate} {dropOffTime}", out DateTime end))
+                {
+                    TempData["Error"] = "Lütfen geçerli bir tarih ve saat seçiniz.";
+                    return RedirectToAction("Index");
+                }
 
+                // Bu metod, seçilen tarihlerde 'Onaylı' veya 'Beklemede' olan araçları otomatik eler.
+                var availableCars = await _carService.GetAvailableCarsByDateAsync(start, end, pickupLocationId);
+
+                //Eğer kategori (Sedan, SUV vb.) seçildiyse onu da filtrele
                 if (!string.IsNullOrEmpty(carType))
                 {
-                    cars = cars
+                    availableCars = availableCars
                         .Where(c => c.Category != null &&
-                                    c.Category.CategoryName.Contains(carType, StringComparison.OrdinalIgnoreCase))
+                                    c.Category.CategoryName.Equals(carType, StringComparison.OrdinalIgnoreCase))
                         .ToList();
                 }
 
-                TempData["SearchParams"] = $"Tür: {carType}, Alış: {pickupLocation}, Dönüş: {dropoffLocation}";
-                return RedirectToAction("CarList", "Car");
+                //Seçilen bu tarihleri Rental sayfasına taşımak için TempData'ya atıyoruz.
+                TempData["SelectedPickupDate"] = start.ToString("yyyy-MM-ddTHH:mm");
+                TempData["SelectedReturnDate"] = end.ToString("yyyy-MM-ddTHH:mm");
+                TempData["SelectedPickupBranch"] = pickupLocationId;
+                TempData["SelectedReturnBranch"] = dropoffLocationId;
+
+                return View("../Car/CarList", availableCars);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Araç arama hatası: {ex.Message}");
-                TempData["Error"] = "Araç aranırken hata oluştu.";
+                TempData["Error"] = "Araç aranırken teknik bir hata oluştu.";
                 return RedirectToAction("Index");
             }
         }
-
         public IActionResult PageNotFound()
         {
             return View();

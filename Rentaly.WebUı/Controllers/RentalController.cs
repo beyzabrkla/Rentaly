@@ -34,7 +34,7 @@ namespace Rentaly.WebUI.Controllers
                 {
                     CarId = id,
                     DailyPrice = car.DailyPrice,
-                    DepositAmount = car.DepositAmount,
+                    DepositAmount = car.DepositAmount, 
                     PickupDate = DateTime.Today.AddDays(1),
                     ReturnDate = DateTime.Today.AddDays(2),
                     PickupBranchId = car.BranchId
@@ -46,7 +46,7 @@ namespace Rentaly.WebUI.Controllers
                 CategoryName = car.Category.CategoryName,
                 PlateNumber = car.PlateNumber,
                 DailyPrice = car.DailyPrice,
-                DepositAmount = car.DepositAmount,
+                DepositAmount = car.DepositAmount, 
                 CurrentBranchName = car.Branch.BranchName
             };
 
@@ -64,22 +64,35 @@ namespace Rentaly.WebUI.Controllers
                 return View(model);
             }
 
+            // Araç müsaitlik kontrolü
             var isAvailable = await _rentalService.TCheckCarAvailabilityAsync(
                 model.CreateRentalDto.CarId,
-                model.CreateRentalDto.PickupDate,
-                model.CreateRentalDto.ReturnDate);
+                model.CreateRentalDto.PickupDate.Value,
+                model.CreateRentalDto.ReturnDate.Value);
 
             if (!isAvailable)
             {
-                ModelState.AddModelError("", "Seçilen tarihlerde araç dolu. Lütfen başka tarih seçiniz.");
+                ModelState.AddModelError("", "Seçilen tarihlerde araç maalesef dolu.");
                 await GetBackingDataForViewModel(model);
                 ViewBag.Branches = await _branchService.TGetListAsync();
                 return View(model);
             }
 
             var rental = _mapper.Map<Rental>(model.CreateRentalDto);
-            rental.Status = "Onay Bekliyor";
+
+            // (GÜN * KİRA) + DEPOZİTO = TOTAL ÖDEME
+            var timeSpan = model.CreateRentalDto.ReturnDate.Value - model.CreateRentalDto.PickupDate.Value;
+            int totalDays = (int)Math.Ceiling(timeSpan.TotalDays);
+            if (totalDays <= 0) totalDays = 1;
+
+            decimal rentalFee = totalDays * model.CreateRentalDto.DailyPrice;
+
+            rental.TotalPrice = rentalFee + model.CreateRentalDto.DepositAmount;
+
+            rental.Status = "Beklemede";
+            rental.IsApproved = false;
             rental.CreatedDate = DateTime.Now;
+
             await _rentalService.TInsertAsync(rental);
 
             return RedirectToAction("Confirmation", new { rentalId = rental.RentalId });
@@ -88,20 +101,24 @@ namespace Rentaly.WebUI.Controllers
         [HttpGet]
         public IActionResult Confirmation(int rentalId)
         {
-            return View(rentalId);
+            ViewBag.RentalId = rentalId;
+            return View();
         }
 
-        private async Task GetBackingDataForViewModel(RentalIndexViewModel model)
+        private async Task GetBackingDataForViewModel(RentalIndexViewModel model) // Model doğrulama başarısız olduğunda, araç bilgilerini tekrar yüklemek için yardımcı metod
         {
             var car = await _carService.GetCarByIdWithDetailsAsync(model.CreateRentalDto.CarId);
-            model.BrandName = car.Brand.BrandName;
-            model.ModelName = car.CarModel.ModelName;
-            model.CoverImageUrl = car.CoverImageUrl;
-            model.CategoryName = car.Category.CategoryName;
-            model.PlateNumber = car.PlateNumber;
-            model.DailyPrice = car.DailyPrice;
-            model.DepositAmount = car.DepositAmount;
-            model.CurrentBranchName = car.Branch.BranchName;
+            if (car != null)
+            {
+                model.BrandName = car.Brand.BrandName;
+                model.ModelName = car.CarModel.ModelName;
+                model.CoverImageUrl = car.CoverImageUrl;
+                model.CategoryName = car.Category.CategoryName;
+                model.PlateNumber = car.PlateNumber;
+                model.DailyPrice = car.DailyPrice;
+                model.DepositAmount = car.DepositAmount;
+                model.CurrentBranchName = car.Branch.BranchName;
+            }
         }
     }
 }
