@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rentaly.DataAccessLayer.Concrete;
 
@@ -11,9 +12,11 @@ using Rentaly.DataAccessLayer.Concrete;
 namespace Rentaly.DataAccessLayer.Migrations
 {
     [DbContext(typeof(RentalyContext))]
-    partial class RentalyContextModelSnapshot : ModelSnapshot
+    [Migration("20260408181008_fixEntityRental")]
+    partial class fixEntityRental
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -363,9 +366,6 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RentalId"));
 
-                    b.Property<string>("AdminNote")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("CarId")
                         .HasColumnType("int");
 
@@ -393,22 +393,19 @@ namespace Rentaly.DataAccessLayer.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PickupBranchId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("PickupDate")
+                    b.Property<DateTime>("PickupDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("ReturnBranchId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("ReturnDate")
+                    b.Property<DateTime>("ReturnDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")

@@ -18,14 +18,17 @@ public class RentalManager : GenericManager<Rental>, IRentalService
 
         //Bellek üzerinde (In-Memory) filtreleme yapıyoruz
         // ÖNEMLİ: Status kontrolünü veritabanındaki karşılığına göre (İptal Edildi veya Cancelled) güncelle
-        var rentals = allRentals.Where(x => x.CarId == carId && x.Status != "İptal Edildi").ToList();
+        var rentals = allRentals.Where(x => x.CarId == carId &&
+                                               x.Status != "İptal Edildi" &&
+                                               x.PickupDate.HasValue &&
+                                               x.ReturnDate.HasValue).ToList();
 
         var busyDates = new List<DateTime>();
 
         foreach (var rental in rentals)
         {
-            // Alış ve İade tarihleri arasındaki her günü listeye ekliyoruz
-            for (var date = rental.PickupDate; date <= rental.ReturnDate; date = date.AddDays(1))
+            // .Value kullanarak DateTime? -> DateTime dönüşümü yapıyoruz
+            for (var date = rental.PickupDate.Value; date <= rental.ReturnDate.Value; date = date.AddDays(1))
             {
                 busyDates.Add(date);
             }
@@ -61,8 +64,9 @@ public class RentalManager : GenericManager<Rental>, IRentalService
         bool isBusy = rentals.Any(r =>
             r.CarId == carId &&
             r.Status != "İptal Edildi" && // Sadece iptal edilmeyenler meşgul sayılır
-            r.Status != "Reddedildi" &&    // Eğer böyle bir statün varsa ekle
-            pickup < r.ReturnDate && r.PickupDate < returnDate);
+            r.Status != "Reddedildi" &&  
+            r.PickupDate.HasValue && r.ReturnDate.HasValue &&
+            pickup < r.ReturnDate.Value && r.PickupDate.Value < returnDate);
 
         return !isBusy;
     }

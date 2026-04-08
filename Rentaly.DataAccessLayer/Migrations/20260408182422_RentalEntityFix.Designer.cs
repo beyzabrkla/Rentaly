@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rentaly.DataAccessLayer.Concrete;
 
@@ -11,9 +12,11 @@ using Rentaly.DataAccessLayer.Concrete;
 namespace Rentaly.DataAccessLayer.Migrations
 {
     [DbContext(typeof(RentalyContext))]
-    partial class RentalyContextModelSnapshot : ModelSnapshot
+    [Migration("20260408182422_RentalEntityFix")]
+    partial class RentalEntityFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
