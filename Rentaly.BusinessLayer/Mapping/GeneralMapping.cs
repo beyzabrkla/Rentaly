@@ -19,23 +19,27 @@ namespace Rentaly.BusinessLayer.Mapping
             CreateMap<Branch, ResultBranchDTO>().ReverseMap();
             CreateMap<Branch, UpdateBranchDTO>().ReverseMap();
 
+
             CreateMap<Brand, CreateBrandDTO>().ReverseMap();
             CreateMap<Brand, ResultBrandDTO>().ReverseMap();
             CreateMap<Brand, UpdateBrandDTO>().ReverseMap();
 
+
             CreateMap<Car, CreateCarDTO>().ReverseMap();
+          
             CreateMap<Car, GetCarByIdDTO>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand.BrandName))
                 .ForMember(dest => dest.CarModelName, opt => opt.MapFrom(src => src.CarModel.ModelName))
                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.BranchName))
                 .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Branch.City));
+          
             CreateMap<Car, ResultCarDTO>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : null))
                 .ForMember(dest => dest.CarModelName, opt => opt.MapFrom(src => src.CarModel != null ? src.CarModel.ModelName : null))
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.CategoryName : null))
                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch != null ? src.Branch.BranchName : null))
                 .ReverseMap();
-
+           
             CreateMap<Car, UpdateCarDTO>()
                 .ForMember(dest => dest.BrandName, opt => opt.MapFrom(src => src.Brand != null ? src.Brand.BrandName : null))
                 .ForMember(dest => dest.CarModelName, opt => opt.MapFrom(src => src.CarModel != null ? src.CarModel.ModelName : null))
@@ -50,6 +54,7 @@ namespace Rentaly.BusinessLayer.Mapping
                 .ForMember(dest => dest.Branch, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.CarImages, opt => opt.Ignore());
+        
 
             CreateMap<CarImage, CreateCarImageDTO>().ReverseMap();
             CreateMap<CarImage, ResultCarImageDTO>().ReverseMap();

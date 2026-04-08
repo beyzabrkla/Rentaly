@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rentaly.DataAccessLayer.Concrete;
 
@@ -11,9 +12,11 @@ using Rentaly.DataAccessLayer.Concrete;
 namespace Rentaly.DataAccessLayer.Migrations
 {
     [DbContext(typeof(RentalyContext))]
-    partial class RentalyContextModelSnapshot : ModelSnapshot
+    [Migration("20260408160506_RentalEntity")]
+    partial class RentalEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,7 +56,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("AboutId");
 
-                    b.ToTable("Abouts", (string)null);
+                    b.ToTable("Abouts");
                 });
 
             modelBuilder.Entity("FAQ", b =>
@@ -72,7 +75,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("FAQId");
 
-                    b.ToTable("FAQs", (string)null);
+                    b.ToTable("FAQs");
                 });
 
             modelBuilder.Entity("Process", b =>
@@ -94,7 +97,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("ProcessId");
 
-                    b.ToTable("Processes", (string)null);
+                    b.ToTable("Processes");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Banner", b =>
@@ -119,7 +122,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("BannerId");
 
-                    b.ToTable("Banners", (string)null);
+                    b.ToTable("Banners");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Branch", b =>
@@ -145,7 +148,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("BranchId");
 
-                    b.ToTable("Branches", (string)null);
+                    b.ToTable("Branches");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Brand", b =>
@@ -167,7 +170,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("BrandId");
 
-                    b.ToTable("Brands", (string)null);
+                    b.ToTable("Brands");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Car", b =>
@@ -254,7 +257,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Cars", (string)null);
+                    b.ToTable("Cars");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.CarImage", b =>
@@ -275,7 +278,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.ToTable("CarImages", (string)null);
+                    b.ToTable("CarImages");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.CarModel", b =>
@@ -297,7 +300,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasIndex("BrandId");
 
-                    b.ToTable("CarModels", (string)null);
+                    b.ToTable("CarModels");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Category", b =>
@@ -316,7 +319,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("CategoryId");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Customer", b =>
@@ -352,7 +355,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("CustomerId");
 
-                    b.ToTable("Customers", (string)null);
+                    b.ToTable("Customers");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Rental", b =>
@@ -435,7 +438,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasIndex("ReturnBranchId");
 
-                    b.ToTable("Rentals", (string)null);
+                    b.ToTable("Rentals");
                 });
 
             modelBuilder.Entity("Testimonial", b =>
@@ -460,7 +463,7 @@ namespace Rentaly.DataAccessLayer.Migrations
 
                     b.HasKey("TestimonialId");
 
-                    b.ToTable("Testimonials", (string)null);
+                    b.ToTable("Testimonials");
                 });
 
             modelBuilder.Entity("Rentaly.EntityLayer.Entities.Car", b =>

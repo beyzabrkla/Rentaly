@@ -1,0 +1,423 @@
+﻿@model RentalIndexViewModel
+@{
+    ViewData["Title"] = "Rezervasyon";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .scan-container { position: relative; overflow: hidden; }
+    .scanner-line {
+        display: none; position: absolute; top: 0; left: 0;
+        width: 100%; height: 5px; background: #cc0c0c;
+        box-shadow: 0 0 20px #cc0c0c; z-index: 10;
+        animation: scan 2s linear infinite;
+    }
+    @@keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    .scanning .scanner-line { display: block; }
+    .custom-input[readonly] { background: rgba(255,255,255,0.1) !important; cursor: not-allowed; opacity: 0.8; }
+    .field-validation-error { color: #ff4d4d; font-size: 12px; margin-top: 5px; display: block; font-weight: 500; }
+    .input-validation-error { border: 1px solid #ff4d4d !important; background: rgba(255,77,77,0.05) !important; }
+
+    .flatpickr-calendar { background: #1a1a1a !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+    .flatpickr-day { color: #fff !important; }
+    .flatpickr-day:hover, .flatpickr-day.selected { background: #cc0c0c !important; border-color: #cc0c0c !important; }
+    .flatpickr-day.disabled { color: rgba(255,255,255,0.2) !important; }
+    .flatpickr-months, .flatpickr-weekdays { background: #111 !important; }
+    .flatpickr-current-month, .flatpickr-weekday { color: #fff !important; }
+    .flatpickr-prev-month svg, .flatpickr-next-month svg { fill: #fff !important; }
+    .numInput, .cur-year { color: #fff !important; }
+    .date-time-group { display: flex; gap: 8px; }
+    .date-time-group input { flex: 1; }
+    .date-time-group select { width: 105px; flex-shrink: 0; }
+</style>
+
+<section id="subheader" class="jarallax text-light">
+    <img src="/RentalyHTML/images/background/2.jpg" class="jarallax-img" alt="">
+    <div class="center-y relative text-center">
+        <div class="container">
+            <h1>Rezervasyon İşlemleri</h1>
+        </div>
+    </div>
+</section>
+
+<section id="section-rent-form" style="padding: 60px 0;">
+    <div class="container">
+        <div class="row g-5 align-items-start">
+
+            <div class="col-lg-8">
+                <div class="de-box" style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+
+                    @* ✅ Validasyon Summary — her zaman DOM'da, JS de kullanıyor *@
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div id="validationSummary" asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"
+                             style="background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; color: white;">
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="validationSummary" class="alert alert-danger mb-4"
+                             style="background: rgba(255,77,77,0.1); border: 1px solid #ff4d4d; color: white; display:none;">
+                        </div>
+                    }
+
+                    <div id="ocrWrapper" class="mb-5 p-4 scan-container"
+                         style="background: rgba(204,12,12,0.05); border: 1px dashed #cc0c0c; border-radius: 10px; min-height: 110px;">
+                        <div class="scanner-line"></div>
+                        <div class="row align-items-center" id="ocrInitialContent">
+                            <div class="col-md-8">
+                                <h4 class="text-white mb-1"><i class="fa fa-camera id-color"></i> Kimlik İle Hızlı Doldur</h4>
+                                <p class="text-white-50 small mb-0">Kimlik veya Ehliyet görselini yükleyin, bilgileri otomatik aktaralım.</p>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <input type="file" id="idCardUpload" style="display:none" accept="image/*">
+                                <button type="button" onclick="document.getElementById('idCardUpload').click()" class="btn-main btn-sm">GÖRSEL SEÇ</button>
+                            </div>
+                        </div>
+                        <div id="scanPreview" class="text-center d-none">
+                            <p class="text-white small mb-2"><i class="fa fa-spinner fa-spin"></i> Görsel Analiz Ediliyor...</p>
+                            <img id="idPreviewImage" src="#" alt="Önizleme" style="max-height: 150px; border-radius: 8px; opacity: 0.6; filter: grayscale(0.5);">
+                        </div>
+                    </div>
+
+                    <form method="post" action="/Rental/Index" id="rentalForm">
+                        @Html.HiddenFor(x => x.CreateRentalDto.CarId)
+                        @Html.HiddenFor(x => x.CreateRentalDto.DailyPrice)
+                        @Html.HiddenFor(x => x.CreateRentalDto.TotalPrice, new { id = "hdnTotalPrice" })
+                        <input type="hidden" asp-for="CreateRentalDto.PickupBranchId" />
+                        <input type="hidden" asp-for="CreateRentalDto.PickupDate" id="hdnPickupDate" />
+                        <input type="hidden" asp-for="CreateRentalDto.ReturnDate" id="hdnReturnDate" />
+
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <h5 class="text-white border-bottom pb-2">Kiralama Detayları</h5>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="text-white-50 small">Alış Şubesi</label>
+                                <input type="text" class="form-control custom-input" value="@Model.CurrentBranchName" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-white-50 small">Dönüş Şubesi</label>
+                                <select asp-for="CreateRentalDto.ReturnBranchId" class="form-control custom-input"
+                                        asp-items="@(new SelectList(ViewBag.Branches, "BranchId", "BranchName"))">
+                                    <option value="">Şube Seçiniz</option>
+                                </select>
+                                <span asp-validation-for="CreateRentalDto.ReturnBranchId"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="text-white-50 small">Alış Tarihi</label>
+                                <div class="date-time-group">
+                                    <input type="text" id="pickUpDateUI" class="form-control custom-input" placeholder="Tarih seçin...">
+                                    <select id="pickUpTime" class="form-control custom-input">
+                                        @for (int i = 8; i <= 22; i++)
+                                        {
+                                            <option value="@i">@i:00</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CreateRentalDto.PickupDate"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="text-white-50 small">Dönüş Tarihi</label>
+                                <div class="date-time-group">
+                                    <input type="text" id="dropOffDateUI" class="form-control custom-input" placeholder="Tarih seçin...">
+                                    <select id="dropOffTime" class="form-control custom-input">
+                                        @for (int i = 8; i <= 22; i++)
+                                        {
+                                            <option value="@i" selected="@(i == 10 ? "selected" : null)">@i:00</option>
+                                        }
+                                    </select>
+                                </div>
+                                <span asp-validation-for="CreateRentalDto.ReturnDate"></span>
+                            </div>
+
+                            <div class="col-md-12 mt-4 mb-4">
+                                <h5 class="text-white border-bottom pb-2">Sürücü Bilgileri</h5>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <input type="text" asp-for="CreateRentalDto.Name" id="txtFirstName" class="form-control custom-input" placeholder="Ad">
+                                <span asp-validation-for="CreateRentalDto.Name"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" asp-for="CreateRentalDto.Surname" id="txtLastName" class="form-control custom-input" placeholder="Soyad">
+                                <span asp-validation-for="CreateRentalDto.Surname"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" asp-for="CreateRentalDto.IdentityNumber" id="txtID" class="form-control custom-input" placeholder="T.C. Kimlik No">
+                                <span asp-validation-for="CreateRentalDto.IdentityNumber"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="email" asp-for="CreateRentalDto.Email" class="form-control custom-input" placeholder="E-posta">
+                                <span asp-validation-for="CreateRentalDto.Email"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" asp-for="CreateRentalDto.Phone" class="form-control custom-input" placeholder="Telefon (5xxxxxxxxx)">
+                                <span asp-validation-for="CreateRentalDto.Phone"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <input type="text" asp-for="CreateRentalDto.DrivingLicenseNumber" id="txtLicense" class="form-control custom-input" placeholder="Ehliyet Seri No">
+                                <span asp-validation-for="CreateRentalDto.DrivingLicenseNumber"></span>
+                            </div>
+
+                            <div class="col-md-12 mt-4">
+                                <button type="submit" class="btn-main w-100 py-3">REZERVASYONU ONAYLA</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div style="position: sticky; top: 100px;">
+                    <div style="background: #1a1a1a; padding: 25px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);">
+                        <h4 class="text-white mb-4">Kiralama Özeti</h4>
+                        <div class="d-flex align-items-center mb-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <img src="@Model.CoverImageUrl" class="rounded" style="width: 100px; height: 70px; object-fit: cover;">
+                            <div class="ms-3">
+                                <h5 class="text-white mb-1">@Model.BrandName @Model.ModelName</h5>
+                                <span class="badge bg-danger">@Model.PlateNumber</span>
+                            </div>
+                        </div>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex justify-content-between mb-3">
+                                <span class="text-white-50">Günlük Fiyat:</span>
+                                <span class="text-white">₺@Model.DailyPrice.ToString("N2")</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-3">
+                                <span class="text-white-50">Süre:</span>
+                                <span class="text-white" id="dayDisplay">— Gün</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-3">
+                                <span class="text-white-50">Alış:</span>
+                                <span class="text-white" id="pickupDisplay">—</span>
+                            </li>
+                            <li class="d-flex justify-content-between mb-3">
+                                <span class="text-white-50">Dönüş:</span>
+                                <span class="text-white" id="returnDisplay">—</span>
+                            </li>
+                            <hr style="border-color: rgba(255,255,255,0.1);">
+                            <li class="d-flex justify-content-between align-items-center">
+                                <h5 class="text-white mb-0">Toplam:</h5>
+                                <h4 class="id-color mb-0" id="totalDisplay">₺0.00</h4>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+<script>
+    const dailyPrice = @Html.Raw(Model.DailyPrice.ToString(System.Globalization.CultureInfo.InvariantCulture));
+
+    const fpPickup = flatpickr("#pickUpDateUI", {
+        locale: "tr",
+        dateFormat: "d.m.Y",
+        minDate: "today",
+        disableMobile: true,
+        onChange: () => { buildAndCalculate(); }
+    });
+
+    const fpReturn = flatpickr("#dropOffDateUI", {
+        locale: "tr",
+        dateFormat: "d.m.Y",
+        minDate: "today",
+        disableMobile: true,
+        onChange: () => { buildAndCalculate(); }
+    });
+
+    document.getElementById('pickUpTime').addEventListener('change', buildAndCalculate);
+    document.getElementById('dropOffTime').addEventListener('change', buildAndCalculate);
+
+    function buildAndCalculate() {
+        const pdObj = fpPickup.selectedDates[0];
+        const rdObj = fpReturn.selectedDates[0];
+        const pHour = parseInt(document.getElementById('pickUpTime').value);
+        const rHour = parseInt(document.getElementById('dropOffTime').value);
+
+        if (pdObj) {
+            const pd = new Date(pdObj);
+            pd.setHours(pHour, 0, 0, 0);
+            document.getElementById('hdnPickupDate').value = toLocalISOString(pd);
+            document.getElementById('pickupDisplay').innerText = formatDisplay(pd);
+        }
+
+        if (rdObj) {
+            const rd = new Date(rdObj);
+            rd.setHours(rHour, 0, 0, 0);
+            document.getElementById('hdnReturnDate').value = toLocalISOString(rd);
+            document.getElementById('returnDisplay').innerText = formatDisplay(rd);
+        }
+
+        calculate();
+    }
+
+    function calculate() {
+        const pVal = document.getElementById('hdnPickupDate').value;
+        const rVal = document.getElementById('hdnReturnDate').value;
+        if (!pVal || !rVal) return;
+
+        const start = new Date(pVal);
+        const end = new Date(rVal);
+        const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+
+        if (diffDays > 0) {
+            const total = diffDays * dailyPrice;
+            document.getElementById('dayDisplay').innerText = diffDays + " Gün";
+            document.getElementById('totalDisplay').innerText = "₺" + total.toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+            document.getElementById('hdnTotalPrice').value = total.toFixed(2);
+        } else {
+            document.getElementById('dayDisplay').innerText = "— Gün";
+            document.getElementById('totalDisplay').innerText = "₺0.00";
+            document.getElementById('hdnTotalPrice').value = "0";
+        }
+    }
+
+    function toLocalISOString(date) {
+        const pad = n => String(n).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+    }
+
+    function formatDisplay(date) {
+        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+               + ' ' + String(date.getHours()).padStart(2, '0') + ':00';
+    }
+
+    // ─── FORM SUBMIT — TARİH KONTROLÜ ────────────────────
+    document.getElementById('rentalForm').addEventListener('submit', function (e) {
+        const pVal = document.getElementById('hdnPickupDate').value;
+        const rVal = document.getElementById('hdnReturnDate').value;
+
+        if (!pVal || !rVal) {
+            e.preventDefault();
+            const summary = document.getElementById('validationSummary');
+            summary.style.display = 'block';
+            summary.innerHTML = '<ul><li>Lütfen alış ve dönüş tarihlerini seçiniz.</li></ul>';
+            summary.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    // ─── OCR ─────────────────────────────────────────────
+    document.getElementById('idCardUpload').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        const wrapper = document.getElementById('ocrWrapper');
+        const initialBlock = document.getElementById('ocrInitialContent');
+        const previewBlock = document.getElementById('scanPreview');
+        const previewImg = document.getElementById('idPreviewImage');
+
+        reader.onload = function (ev) {
+            previewImg.src = ev.target.result;
+            initialBlock.classList.add('d-none');
+            previewBlock.classList.remove('d-none');
+            wrapper.classList.add('scanning');
+
+            Tesseract.recognize(ev.target.result, 'tur+eng', {
+                logger: m => console.log(m.status, Math.round((m.progress || 0) * 100) + '%')
+            }).then(({ data: { text } }) => {
+                parseIdCard(text);
+                wrapper.classList.remove('scanning');
+                previewBlock.innerHTML = '<p class="text-success small mb-0"><i class="fa fa-check-circle"></i> Analiz tamamlandı! Bilgileri kontrol edin.</p>';
+                setTimeout(() => {
+                    previewBlock.innerHTML = `<p class="text-white small mb-2"><i class="fa fa-spinner fa-spin"></i> Görsel Analiz Ediliyor...</p><img id="idPreviewImage" src="#" alt="Önizleme" style="max-height:150px;border-radius:8px;opacity:0.6;filter:grayscale(0.5);">`;
+                    initialBlock.classList.remove('d-none');
+                    previewBlock.classList.add('d-none');
+                }, 3000);
+            }).catch(() => {
+                wrapper.classList.remove('scanning');
+                alert("Görsel okunamadı, lütfen netliği yüksek bir fotoğraf deneyin.");
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+
+function parseIdCard(rawText) {
+    // 1. Ham metni temizle ve kelimelere böl
+    const words = rawText.split(/[\s,.:;<>]+/)
+                         .map(w => w.trim())
+                         .filter(w => w.length > 2);
+    
+    const upWords = words.map(w => w.toUpperCase());
+
+    // 2. T.C. Kimlik No Yakala
+    const tcMatch = rawText.match(/\b\d{11}\b/);
+    if (tcMatch) setField('txtID', tcMatch[0]);
+
+    // 3. Yasaklı/Etiket Kelimeleri (Bunları isim/soyisim olarak alma)
+    const forbidden = [
+        "TURKEY", "REPUBLIC", "TÜRKİYE", "CUMHURİYETİ", "KİMLİK", "KARTI", 
+        "IDENTITY", "CARD", "SURNAME", "SOYADI", "GIVEN", "NAME", "ADI", 
+        "FATHER", "MOTHER", "BABA", "ANNE", "BIRTH", "DATE", "DOGUM", 
+        "GENDER", "SEX", "VALID", "UNTIL", "DOCUMENT", "T.C.", "TC", "TUR"
+    ];
+
+    let detectedName = "";
+    let detectedSurname = "";
+
+    // 4. SOYAD BULMA (REPUBLIC veya SURNAME kelimesinden sonraki ilk temiz kelime)
+    const republicIdx = upWords.findIndex(w => w === "REPUBLIC" || w === "SURNAME" || w === "SOYADI");
+    if (republicIdx !== -1) {
+        for (let i = republicIdx + 1; i < upWords.length; i++) {
+            if (!forbidden.includes(upWords[i]) && !/\d/.test(upWords[i])) {
+                detectedSurname = words[i];
+                break;
+            }
+        }
+    }
+
+    // 5. AD BULMA (GIVEN veya NAME kelimesinden sonraki ilk temiz kelime)
+    const nameIdx = upWords.findIndex(w => w === "GIVEN" || w === "NAME" || w === "ADI");
+    if (nameIdx !== -1) {
+        for (let i = nameIdx + 1; i < upWords.length; i++) {
+            // Bulunan soyadıyla aynı olmasın
+            if (!forbidden.includes(upWords[i]) && !/\d/.test(upWords[i]) && words[i] !== detectedSurname) {
+                detectedName = words[i];
+                break;
+            }
+        }
+    }
+
+    // 6. EĞER HALA BOŞSA (Tamamen Metin İçinden Tahmin)
+    if (!detectedName || !detectedSurname) {
+        const potentialData = words.filter(w => !forbidden.includes(w.toUpperCase()) && !/\d/.test(w));
+        if (!detectedSurname && potentialData[0]) detectedSurname = potentialData[0];
+        if (!detectedName && potentialData[1]) detectedName = potentialData[1];
+    }
+
+    if (detectedName) setField('txtFirstName', toTitleCase(detectedName));
+    if (detectedSurname) setField('txtLastName', toTitleCase(detectedSurname));
+}
+
+// Temizlik yardımcısı: Sayı içermeyen, en az 2 harfli ilk satırı getir
+function extractNextMeaningfulLine(lines, fromIndex) {
+    for (let j = fromIndex + 1; j < Math.min(fromIndex + 3, lines.length); j++) {
+        const clean = lines[j].replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, '').trim();
+        if (clean.length >= 2 && !/\d/.test(clean)) return clean;
+    }
+    return null;
+}
+
+    function extractNextMeaningfulLine(lines, fromIndex) {
+        for (let j = fromIndex + 1; j < Math.min(fromIndex + 4, lines.length); j++) {
+            const c = lines[j].replace(/[^a-zA-ZğüşıöçĞÜŞİÖÇ\s]/g, '').trim();
+            if (c.length >= 2 && !/\d/.test(c)) return c;
+        }
+        return null;
+    }
+
+    function setField(id, val) { const el = document.getElementById(id); if (el && val) el.value = val; }
+    function toTitleCase(s) { return s.toLowerCase().replace(/(?:^|\s)\S/g, c => c.toUpperCase()); }
+</script>
+}

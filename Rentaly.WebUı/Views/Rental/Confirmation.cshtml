@@ -1,0 +1,62 @@
+﻿@model int
+@{
+    ViewData["Title"] = "Rezervasyon Onaylandı";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section id="subheader" class="jarallax text-light">
+    <img src="/RentalyHTML/images/background/2.jpg" class="jarallax-img" alt="">
+    <div class="center-y relative text-center">
+        <div class="container">
+            <h1>Rezervasyon Onaylandı</h1>
+        </div>
+    </div>
+</section>
+
+<section style="padding: 80px 0;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 text-center">
+                <div style="background: #1a1a1a; padding: 50px 40px; border-radius: 16px;
+                            border: 1px solid rgba(255,255,255,0.08);">
+
+                    <div class="mb-4">
+                        <svg viewBox="0 0 100 100" width="100" height="100">
+                            <circle cx="50" cy="50" r="46"
+                                fill="none" stroke="#cc0c0c" stroke-width="4"
+                                stroke-dasharray="290" stroke-dashoffset="290"
+                                style="animation: drawCircle 0.6s ease forwards;">
+                            </circle>
+                            <polyline points="28,52 44,68 72,36"
+                                fill="none" stroke="#cc0c0c" stroke-width="5"
+                                stroke-linecap="round" stroke-linejoin="round"
+                                stroke-dasharray="60" stroke-dashoffset="60"
+                                style="animation: drawCheck 0.4s ease 0.5s forwards;">
+                            </polyline>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-white mb-2">Rezervasyon Alındı!</h2>
+                    <p class="text-white-50 mb-1">Rezervasyon No: <strong class="text-white">#@Model</strong></p>
+                    <p class="text-white-50 mb-4">Talebiniz alınmıştır. En kısa sürede e-posta ile bilgilendirileceksiniz.</p>
+
+                    <div style="background: rgba(204,12,12,0.08); border: 1px solid rgba(204,12,12,0.3);
+                                border-radius: 10px; padding: 18px; margin-bottom: 32px;">
+                        <p class="text-white-50 small mb-1">Durum</p>
+                        <span class="badge" style="background: rgba(204,12,12,0.2); color: #cc0c0c;
+                              border: 1px solid #cc0c0c; font-size: 14px; padding: 6px 16px;">
+                            ⏳ Onay Bekliyor
+                        </span>
+                    </div>
+
+                    <a href="/" class="btn-main">ANA SAYFAYA DÖN</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    @@keyframes drawCircle { to { stroke-dashoffset: 0; } }
+    @@keyframes drawCheck  { to { stroke-dashoffset: 0; } }
+</style>

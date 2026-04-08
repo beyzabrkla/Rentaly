@@ -144,15 +144,6 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 bool hasFile = imageFile != null && imageFile.Length > 0;
                 bool hasUrl = imageSourceType == "url" && !string.IsNullOrEmpty(createCarDTO.CoverImageUrl);
 
-                if (!hasFile && !hasUrl)
-                {
-                    ModelState.AddModelError("CoverImageUrl", "Araç görseli boş olamaz.");
-                    ViewBag.Brands = await _brandService.TGetListAsync();
-                    ViewBag.Categories = await _categoryService.TGetListAsync();
-                    ViewBag.Branches = await _branchService.TGetListAsync();
-                    return View(createCarDTO);
-                }
-
                 var car = _mapper.Map<Car>(createCarDTO);
                 car.CreatedDate = DateTime.Now;
                 await _carService.TInsertAsync(car);
@@ -180,6 +171,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 }
                 else if (hasUrl)
                 {
+                    car.CoverImageUrl = createCarDTO.CoverImageUrl;
                     await _carService.TUpdateAsync(car);
                     await _unitOfWork.SaveAsync();
                 }
@@ -220,7 +212,9 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 ViewBag.Brands = await _brandService.TGetListAsync();
                 ViewBag.Categories = await _categoryService.TGetListAsync();
                 ViewBag.Branches = await _branchService.TGetListAsync();
-                TempData["Error"] = $"Hata oluştu: {ex.Message} | Inner: {ex.InnerException?.Message}";
+
+                // Hatanın tamamını görmek için:
+                TempData["Error"] = $"HATA: {ex.ToString()}";
                 return View(createCarDTO);
             }
         }

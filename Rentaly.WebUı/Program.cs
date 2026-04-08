@@ -1,9 +1,12 @@
 using DinkToPdf;
 using DinkToPdf.Contracts;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Localization;
 using Rentaly.BusinessLayer.Abstract;
 using Rentaly.BusinessLayer.Concrete;
 using Rentaly.BusinessLayer.Mapping;
+using Rentaly.BusinessLayer.ValidationRules.RentalValidator;
 using Rentaly.DataAccessLayer.Concrete;
 using Rentaly.DataAccessLayer.UnitOfWork;
 using System.Globalization;
@@ -25,6 +28,8 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
 });
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRentalValidator>();
 
 // DbContext
 builder.Services.AddDbContext<RentalyContext>();
@@ -64,6 +69,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseStatusCodePagesWithReExecute("/Home/PageNotFound");
 app.UseRequestLocalization();
 app.UseRouting();
 app.UseAuthorization();
