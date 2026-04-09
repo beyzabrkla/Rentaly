@@ -44,31 +44,31 @@ Proje 5 ana katman üzerine inşa edilmiştir:
 
 Rentaly'nin ön yüzündeki tüm içerikler, güçlü bir Admin Paneli aracılığıyla dinamik olarak yönetilmektedir. İşte uygulamanın öne çıkan bölümleri:
 
-### 1. Ana Sayfa Karşılama ve Hızlı Rezervasyon (Hero Section)
+### 🏠 1. Ana Sayfa Karşılama ve Hızlı Rezervasyon (Hero Section)
 Kullanıcıyı karşılayan ilk ekran, yüksek kaliteli bir görsel ve dinamik araç tipi seçimiyle kurgulanmıştır.
 * **Dinamik Yapı:** Arka plan metinleri ve araç kategorileri (Sedan, SUV vb.) veritabanından anlık olarak çekilir.
 * **Teknik Detay:** Filtreleme alanları, `RentalIndexViewModel` üzerinden yönetilerek asenkron arama altyapısına hazır hale getirilmiştir.
 
-### 2. Dinamik Araç Filosu (Car Fleet Section)
+### 🏎️ 2. Dinamik Araç Filosu (Car Fleet Section)
 Kullanıcıların kiralayabileceği araçların listelendiği, şık bir kart tasarımıdır.
 * **Admin Kontrolü:** Araçların günlük kira bedeli, yolcu kapasitesi, bagaj hacmi ve vites tipi gibi tüm teknik veriler admin panelinden güncellenmektedir.
 * **Tasarım:** Carousel yapısı ile akıcı bir kullanıcı deneyimi sağlanmıştır.
 
-### 3. Kurumsal İstatistikler ve Hakkımızda
+### 📊 3. Kurumsal İstatistikler ve Hakkımızda
 Şirket güvenilirliğini artıran sayaç (counter) ve tanıtım bölümüdür.
 * **Dinamik Veri:** "Mutlu Müşteri", "Araç Filosu" ve "Deneyim Yılı" gibi rakamlar `ViewComponent` kullanılarak doğrudan veritabanından çekilir; böylece her güncelleme anında yansır.
 
-### 4. Hizmet Özelliklerimiz (Features Section)
+### 🌟 4. Hizmet Özelliklerimiz (Features Section)
 Projenin "Neden Biz?" sorusuna cevap verdiği bölümdür.
 * **İkonik Yönetim:** FontAwesome ikon sınıfları admin panelinden metin olarak girilir (`fa-solid fa-trophy` vb.) ve arayüzde dinamik olarak render edilir.
 * **UI/UX:** Pixel-perfect ikon yerleşimi ve hover efektleri ile görsel bütünlük sağlanmıştır.
 
-### 5. Müşteri Deneyimleri (Testimonials)
+### 💬 5. Müşteri Deneyimleri (Testimonials)
 Müşterilerin gerçek fotoğrafları ve yorumlarını içeren referans bölümüdür.
 * **Mimari:** `TestimonialService` aracılığıyla gelen veriler, frontend tarafında asimetrik bir kart düzeniyle sergilenir.
 * **Yönetim:** Admin panelinden yeni yorum eklendiği anda bu kartlar otomatik olarak güncellenir.
 
-### 6. Sıkça Sorulan Sorular (FAQ) ve Footer
+### ❓ 6. Sıkça Sorulan Sorular (FAQ) ve Footer
 Kullanıcıların destek alabileceği son durak noktasıdır.
 * **Akordeon Yapısı:** FAQ bölümü tamamen dinamik olup, admin tarafından eklenen her yeni soru-cevap çifti otomatik olarak listede yerini alır.
 * **Footer:** İletişim bilgileri, sosyal medya linkleri ve hızlı bağlantılar merkezi bir `layout` üzerinden yönetilir.
@@ -80,7 +80,7 @@ Kullanıcıların destek alabileceği son durak noktasıdır.
 <img width="1870" height="424" alt="6" src="https://github.com/user-attachments/assets/b1ae1926-6395-4cfd-b514-e679240d16ae" />
 <img width="1860" height="944" alt="7" src="https://github.com/user-attachments/assets/1046ee6d-98aa-47c7-bce7-3c9eafa96e3c" />
 
-### 7. Gelişmiş Araç Filtreleme ve Arama Sistemi
+### 🔍 7. Gelişmiş Araç Filtreleme ve Arama Sistemi
 Kullanıcıların ihtiyaçlarına en uygun aracı saniyeler içinde bulmasını sağlayan dinamik bir arama motorudur.
 * **Teknik Detay:** `LINQ` sorguları ile veritabanı seviyesinde optimize edilmiş filtreleme uygulanmıştır. Seçilen araç tipi, lokasyon ve tarih bilgileri `QueryString` üzerinden Controller'a taşınarak dinamik sonuçlar üretilir.
 * **Müsaitlik Kontrolü (Availability Logic):** Sistem, veritabanındaki tüm araçları değil, **yalnızca durumu müsait olan (IsAvailable=true)** ve aktif bir rezervasyonu bulunmayan araçları listeler. Kiralanmış veya bakımda olan araçlar arama sonuçlarında yer almaz.
@@ -88,7 +88,7 @@ Kullanıcıların ihtiyaçlarına en uygun aracı saniyeler içinde bulmasını 
 <img width="791" height="575" alt="8 filtrelemeli araç listeleme" src="https://github.com/user-attachments/assets/3914f9d2-6453-4204-ad43-78c3999fdd82" />
 <img width="1864" height="997" alt="9" src="https://github.com/user-attachments/assets/f2e1a228-c60d-4517-a3d0-f68f48a5ce40" />
 
-### 8. Kapsamlı Araç Katalogu ve Çoklu Filtreleme
+### 📑 8. Kapsamlı Araç Katalogu ve Çoklu Filtreleme
 Kullanıcıların geniş araç filosunu detaylı kriterlere göre daraltabildiği merkezi listeleme sayfasıdır.
 
 * **Çok Boyutlu Filtreleme Paneli:** Sol panelde yer alan dinamik filtreler sayesinde kullanıcılar; **Kategori, Koltuk Sayısı, Yakıt Tipi, Şube (Lokasyon)** ve **Marka/Model** bazlı arama yapabilirler.
@@ -99,7 +99,7 @@ Kullanıcıların geniş araç filosunu detaylı kriterlere göre daraltabildiğ
 <img width="1857" height="943" alt="11" src="https://github.com/user-attachments/assets/334f6dd7-1345-4a59-a8e0-2c5c95368690" />
 <img width="1862" height="511" alt="12" src="https://github.com/user-attachments/assets/b0a652ad-a795-4636-a202-59347cf53a4f" />
 
-### 9. Araç Detay Sayfası ve Dinamik Rezervasyon Sistemi
+### 💳 9. Araç Detay Sayfası ve Dinamik Rezervasyon Sistemi
 Kullanıcıların seçtikleri araç hakkında tüm teknik detaylara ulaştığı ve rezervasyon işlemlerini başlattığı kapsamlı modüldür.
 
 * **Zengin İçerik Yönetimi:** Aracın şube bilgisi, plakası, kilometresi, yakıt türü ve vites tipi gibi teknik özellikleri dinamik olarak listelenir. Ayrıca araç hakkında hazırlanan detaylı tanıtım metni ve galeri yapısı ile kullanıcı bilgilendirilir.
@@ -116,21 +116,15 @@ Kullanıcıların seçtikleri araç hakkında tüm teknik detaylara ulaştığı
 
 Rentaly'nin tüm operasyonel süreçleri, veriye dayalı kararlar almayı kolaylaştıran kapsamlı bir yönetim paneli üzerinden yürütülmektedir. Admin paneli, sistemdeki tüm dinamik içeriğin merkez üssüdür.
 
-### 1. Sistem Panoraması ve Veri Analitiği (Dashboard)
+### 📈1. Sistem Panoraması ve Veri Analitiği (Dashboard)
 Yöneticilerin sistemin genel durumunu saniyeler içinde analiz edebilmesi için tasarlanmış özet ekranıdır.
 
 * **Canlı İstatistik Kartları:** Mevcut araç filosu, kayıtlı alt modeller, aktif hizmet noktaları (şubeler) ve segment dağılımı gibi kritik veriler dinamik sayaçlar üzerinden takip edilir.
 * **Filo Büyüme Analizi:** `Chart.js` veya benzeri bir grafik kütüphanesi entegrasyonu ile araç sayısındaki aylık artış trendi görselleştirilmiştir. Bu sayede operasyonel büyüme grafik üzerinden izlenebilir.
 * **Son Kayıtlar ve Operasyonel Verimlilik:** Sisteme en son dahil edilen araçlar (plaka ve model bazlı) anlık olarak listelenir. Ayrıca, aktif araçların toplam filoya oranını gösteren "Operasyonel Verimlilik" barı ile filo doluluk oranı takip edilir.
-
-### 2. Merkezi Yönetim Modülleri
-Panelin sol menüsünde yer alan modüller sayesinde veritabanındaki tüm tablolar üzerinde tam kontrol sağlanır:
-* **Araç ve Filo Yönetimi:** Araç listesi, yeni araç ekleme, marka ve model tanımlamaları.
-* **Operasyonel Kontrol:** Şube yönetimi, müşteri bilgileri ve kiralama geçmişi takibi.
-* **İçerik Yönetimi (CMS):** Banner alanları, "Hakkımızda" metinleri, Sıkça Sorulan Sorular ve Müşteri Yorumları gibi frontend alanlarının dinamik değişimi.
 <img width="1875" height="939" alt="16" src="https://github.com/user-attachments/assets/a82bf7b9-a4e5-4757-8ead-c09dfdc42d6c" />
 
-### 3. Gelişmiş Araç ve Filo Yönetimi
+###  🚜2. Gelişmiş Araç ve Filo Yönetimi
 Admin paneli üzerinden araç filosunun tüm teknik ve idari verileri üzerinde tam kontrol sağlanmaktadır.
 
 * **Dinamik Listeleme ve Akıllı Filtreleme:** Araç listesi; **Marka, Durum (Müsait/Kirada/Bakımda)** ve **Yakıt Tipi** gibi kriterlere göre anlık olarak filtrelenebilir. Bu özellik, büyük filolarda aranan araca hızlıca ulaşılmasını sağlar.
@@ -145,7 +139,7 @@ Admin paneli üzerinden araç filosunun tüm teknik ve idari verileri üzerinde 
 <img width="1864" height="950" alt="22" src="https://github.com/user-attachments/assets/64bbdda6-0018-4ad6-890d-962a022099d9" />
 <img width="1866" height="945" alt="23" src="https://github.com/user-attachments/assets/6f44260f-4abf-4c07-8e69-fe619441024d" />
 
-### 4. Marka Yönetimi ve İlişkisel Veri Takibi
+### 🔖3. Marka Yönetimi ve İlişkisel Veri Takibi
 Sistemdeki araçların bağlı olduğu markaların merkezi olarak yönetildiği modüldür.
 
 * **Durum Bazlı Filtreleme (Aktif/Pasif):** Markalar "Aktif" veya "Pasif" olarak işaretlenebilir. Pasif olan bir markaya ait araçlar, kullanıcı tarafındaki arama sonuçlarında otomatik olarak gizlenir.
@@ -153,7 +147,7 @@ Sistemdeki araçların bağlı olduğu markaların merkezi olarak yönetildiği 
 * **Hızlı Güncelleme:** Marka adı, logosu ve durumu üzerinde yapılan değişiklikler, veritabanındaki tüm ilişkili araçları anlık olarak etkiler.
 <img width="1869" height="948" alt="24" src="https://github.com/user-attachments/assets/65714a2b-5f24-4ca3-8791-f1e4787038cd" />
 
-### 5. Araç Model Yönetimi ve Hiyerarşik Yapı
+### 🏎️4. Araç Model Yönetimi ve Hiyerarşik Yapı
 Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, hiyerarşik veri yapısını tamamlayan modüldür.
 
 * **Aktif/Pasif Durum Kontrolü:** Modeller bazında listeleme yapılarak, operasyonel duruma göre modeller aktif veya pasif hale getirilebilir.
@@ -164,7 +158,7 @@ Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, hiyer
 <img width="496" height="559" alt="26-1" src="https://github.com/user-attachments/assets/3e407597-87fc-420e-aaab-46282cbd4669" />
 <img width="536" height="431" alt="26-" src="https://github.com/user-attachments/assets/a4c653ac-82c3-4d84-b00b-03dec9484016" />
 
-### 6. Araç KAtegori Yönetimi ve Hiyerarşik Yapı
+### 📂5. Araç Kategori Yönetimi ve Hiyerarşik Yapı
 Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, projenin hiyerarşik veri yapısını (Marka -> Model -> Araç) tamamlayan modüldür.
 
 * **Aktif/Pasif Durum Kontrolü:** Modeller bazında listeleme yapılarak, operasyonel duruma göre modeller aktif veya pasif hale getirilebilir.
@@ -174,7 +168,7 @@ Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, proje
 <img width="1869" height="952" alt="26" src="https://github.com/user-attachments/assets/18510383-e704-4f62-870f-f021f9dfb048" />
 
 
-### 7. Şube ve Lokasyon Yönetimi
+### 📍6. Şube ve Lokasyon Yönetimi
 Uygulamanın hizmet noktalarının merkezi olarak yönetildiği ve araçların fiziksel konumlarına göre gruplandırıldığı modüldür.
 
 * **Dinamik Şube Listesi:** Tüm aktif ve pasif şubeler, lokasyon bilgileriyle birlikte listelenir. Şube durumu (Aktif/Pasif) üzerinden yapılan değişiklikler, kullanıcı tarafındaki lokasyon seçimlerini doğrudan günceller.
@@ -186,7 +180,7 @@ Uygulamanın hizmet noktalarının merkezi olarak yönetildiği ve araçların f
 <img width="558" height="704" alt="29" src="https://github.com/user-attachments/assets/b8a993b7-a5b4-4747-b5e9-98ec8b70cab7" />
 
 
-### 8. Rezervasyon ve Müşteri İlişkileri Yönetimi (CRM)
+### 👥7. Rezervasyon ve Müşteri İlişkileri Yönetimi (CRM)
 Kiralama süreçlerinin uçtan uca takip edildiği, onay mekanizmalarının ve müşteri bilgilendirme sistemlerinin bulunduğu modüldür.
 
 * **Onaylı Müşteri Listesi:** Rezervasyon süreci başarıyla tamamlanan ve onaylanan müşteriler, merkezi bir listede takip edilir. Bu liste, aktif kiralama yapan kullanıcıların verilerine hızlı erişim sağlar.
@@ -198,7 +192,7 @@ Kiralama süreçlerinin uçtan uca takip edildiği, onay mekanizmalarının ve m
 <img width="658" height="905" alt="32" src="https://github.com/user-attachments/assets/3a165cd8-5620-4b57-89f8-ad3f59c402da" />
 <img width="463" height="804" alt="Ekran görüntüsü 2026-04-09 173634" src="https://github.com/user-attachments/assets/7e2767b0-6a62-4882-817d-92c9f8c0c9b1" />
 
-### 9. Dinamik İçerik Yönetimi (CMS Modülleri)
+### 📝8. Dinamik İçerik Yönetimi (CMS Modülleri)
 Uygulamanın ana sayfasındaki tüm metin, görsel ve bilgilendirme alanları, Admin Paneli üzerinden anlık olarak yönetilmektedir.
 
 * **Banner ve Karşılama Yönetimi:** Ana sayfanın en üst kısmında yer alan başlık, alt başlık ve arka plan görselleri bu panelden güncellenir. `Listeleme` ve `Düzenleme` yetenekleri sayesinde kampanya dönemlerine göre hızlı içerik değişimi sağlanır.
@@ -212,7 +206,7 @@ Uygulamanın ana sayfasındaki tüm metin, görsel ve bilgilendirme alanları, A
 <img width="1864" height="958" alt="36" src="https://github.com/user-attachments/assets/50ec8b03-ea00-4860-bc78-b325504ebed2" />
 <img width="1869" height="947" alt="37" src="https://github.com/user-attachments/assets/35e60f2a-2f3a-4cbd-82c4-721ccf5b13ba" />
 
-### 10. Gelişmiş Raporlama ve Veri Analitiği Sistemi
+### 📈9. Gelişmiş Raporlama ve Veri Analitiği Sistemi
 Yöneticilerin filo verimliliğini, finansal tabloları ve operasyonel durumu ölçümleyebildiği, yüksek detaylı raporlama merkezidir.
 
 * **Dinamik İstatistik Analizleri:**
