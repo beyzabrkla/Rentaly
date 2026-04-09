@@ -14,9 +14,6 @@
         <h1 class="page-title">Müşteri Listesi</h1>
         <p class="page-subtitle">Sistemde kayıtlı tüm müşterileri yönetin.</p>
     </div>
-    <a href="@Url.Action("CreateCustomer", "Customer", new { area = "Admin" })" class="btn-primary-custom">
-        <i class="fa-solid fa-user-plus"></i> Yeni Müşteri Ekle
-    </a>
 </div>
 
 @* Stat Kartları *@
@@ -95,15 +92,14 @@
                         <div class="vehicle-price-row mt-3">
                             <div class="vehicle-price">
                                 <span class="price-label">Ehliyet Tarihi:</span>
-                                <span class="price-amount" style="font-size: 14px;">@customer.DrivingLicenseDate.ToShortDateString()</span>
+                                <span class="price-amount" style="font-size: 14px;">
+                                    @(customer.DrivingLicenseDate != null ? customer.DrivingLicenseDate.Value.ToShortDateString() : "Belirtilmedi")
+                                </span>
                             </div>
                         </div>
                     </div>
 
                     <div class="vehicle-actions">
-                        <a href="/Admin/Customer/UpdateCustomer/@customer.CustomerId" class="btn-action btn-edit">
-                            <i class="fa-solid fa-pen-to-square"></i> Düzenle
-                        </a>
                         <button type="button" class="btn-action btn-delete" onclick="confirmCustomerDelete(@customer.CustomerId)">
                             <i class="fa-solid fa-trash-can"></i> Sil
                         </button>
@@ -114,24 +110,44 @@
     }
 </div>
 
-@* Sayfalama (Pagination) *@
-@if ((int)ViewBag.TotalPages > 1)
+@* Sayfalama *@
+@if (ViewBag.TotalPages > 1)
 {
     <div class="row mt-5">
         <div class="col-12 text-center">
-            <nav style="display:flex;justify-content:center;gap:8px;">
+            <nav style="display:flex; justify-content:center; align-items:center; gap:5px;">
+                
+                @* Geri Butonu *@
+                @if (ViewBag.CurrentPage > 1)
+                {
+                    <a href="@Url.Action("CustomerList", new { page = ViewBag.CurrentPage - 1, search = searchFilter })"
+                           class="btn-action btn-detail" style="flex:unset; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                }
+
+                @* Sayfa Numaraları *@
                 @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
                 {
-                    <a href="@Url.Action("CustomerList", "Customer", new { area = "Admin", page = i, search = searchFilter })"
-                       class="btn-action @(i == (int)ViewBag.CurrentPage ? "btn-delete" : "btn-detail")"
-                       style="flex:unset;padding:8px 14px;">@i</a>
+                    <a href="@Url.Action("CustomerList", new { page = i, search = searchFilter })"
+                           class="btn-action @(i == (int)ViewBag.CurrentPage ? "btn-delete" : "btn-detail")"
+                           style="flex:unset; min-width:40px; height:40px; font-weight:700; display:flex; align-items:center; justify-content:center;">
+                        @i
+                    </a>
+                }
+
+                @* İleri Butonu *@
+                @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                {
+                    <a href="@Url.Action("CustomerList", new { page = ViewBag.CurrentPage + 1, search = searchFilter })"
+                           class="btn-action btn-detail" style="flex:unset; width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
                 }
             </nav>
         </div>
     </div>
 }
-
-@* Silme Modalı (Senin Tasarımınla Aynı) *@
 <div id="customerDeleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;align-items:center;justify-content:center;">
     <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4);">
         <i class="fa-solid fa-triangle-exclamation fa-2x mb-3" style="color:var(--warning);"></i>

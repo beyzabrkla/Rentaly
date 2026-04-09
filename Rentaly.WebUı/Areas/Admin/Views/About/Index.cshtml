@@ -1,0 +1,61 @@
+﻿@model List<About>
+@{
+    ViewData["Title"] = "Hakkımızda Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Hakkımızda İçeriği</h1>
+        <p class="page-subtitle">Anasayfadaki kurumsal bilgileri ve istatistikleri buradan yönetin.</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col-12 col-xl-6">
+            <div class="vehicle-card" style="height: 100%;">
+                <div class="vehicle-body">
+                    <div class="vehicle-brand">#@item.AboutId</div>
+                    <div class="vehicle-name">@item.Title</div>
+                    <div style="color:var(--text-muted); font-size:13px; margin-bottom:15px;">@item.SubTitle</div>
+
+                    <div class="vehicle-specs">
+                        <div class="spec-item">
+                            <i class="fa-solid fa-calendar-check"></i>
+                            <span>Deneyim: <strong>@item.ExperienceYear</strong></span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-car"></i>
+                            <span>Araç Sayısı: <strong>@item.CarCount</strong></span>
+                        </div>
+                        <div class="spec-item">
+                            <i class="fa-solid fa-face-smile"></i>
+                            <span>Mutlu Müşteri: <strong>@item.HappyCustomerCount</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 p-3" style="background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 13px; color: var(--text-muted);">
+                        @if (item.Description != null && item.Description.Length > 150)
+                        {
+                            @item.Description.Substring(0, 150)
+                        
+                            <span>...</span>
+                        }
+                        else
+                        {
+                            @item.Description
+                        }
+                    </div>
+                </div>
+
+                <div class="vehicle-actions">
+                    <a href="/Admin/About/UpdateAbout/@item.AboutId" class="btn-action btn-detail" style="text-decoration:none; justify-content:center;">
+                        <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

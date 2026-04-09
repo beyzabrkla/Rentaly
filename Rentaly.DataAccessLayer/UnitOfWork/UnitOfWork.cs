@@ -13,6 +13,8 @@ namespace Rentaly.DataAccessLayer.UnitOfWork
         {
             _context = context;
         }
+        public RentalyContext Context => _context;
+
 
         public IBranchDal BranchDal => new EFBranchDal(_context);
         public IBrandDal BrandDal => new EFBrandDal(_context);
@@ -26,6 +28,7 @@ namespace Rentaly.DataAccessLayer.UnitOfWork
         public IFaqDal FAQDal => new EFFaqDal(_context);
         public IProcessDal ProcessDal => new EFProcessDal(_context);
         public ITestimonialDal TestimonialDal => new EFTestimonialDal(_context);
+
 
         public async Task SaveAsync()
         {

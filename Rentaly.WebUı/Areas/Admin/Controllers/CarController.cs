@@ -49,60 +49,82 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
             try
             {
                 var allCars = await _carService.GetAllWithDetailsAsync();
-                var query = allCars.OrderByDescending(x => x.CreatedDate).AsQueryable(); // En yeni en üstte
+                var query = allCars.AsQueryable();
 
+                // Özet İstatistikler (Filtrelemeden bağımsız)
                 ViewBag.TotalCars = allCars.Count;
-                ViewBag.AvailableCount = allCars.Count(c => c.IsAvailable);
+                ViewBag.AvailableCount = allCars.Count(c => c.IsAvailable && c.IsActive);
                 ViewBag.RentedCount = allCars.Count(c => !c.IsAvailable);
+                ViewBag.PassiveCount = allCars.Count(c => !c.IsActive);
 
-                //Filtreleme
+                // Arama Filtresi
                 if (!string.IsNullOrEmpty(search))
-                    query = query.Where(c => (c.Brand != null && c.Brand.BrandName.Contains(search, StringComparison.OrdinalIgnoreCase)) || (c.CarModel != null && c.CarModel.ModelName.Contains(search, StringComparison.OrdinalIgnoreCase)));
-
-                //BrandList'ten gelen ID buraya düşer
-                if (brand.HasValue && brand.Value > 0)
                 {
-                    query = query.Where(c => c.BrandId == brand.Value);
-                    ViewBag.SelectedBrandId = brand.Value;
-
-                    query = query.Where(c => c.BrandId == brand.Value);
-                    ViewBag.CurrentBrand = brand.Value;
+                    search = search.ToLower();
+                    query = query.Where(c =>
+                        (c.Brand != null && c.Brand.BrandName.ToLower().Contains(search)) ||
+                        (c.PlateNumber != null && c.PlateNumber.ToLower().Contains(search)));
                 }
 
-                if (!string.IsNullOrEmpty(fuel))
-                    query = query.Where(c => !string.IsNullOrEmpty(c.FuelType) && c.FuelType.Equals(fuel, StringComparison.OrdinalIgnoreCase));
-
+                // --- DÜZELTİLEN KISIM: Kiralama Durumu Filtresi ---
+                // JS'den "true" (Müsait) veya "false" (Kirada) geliyor
                 if (!string.IsNullOrEmpty(status))
-                    query = query.Where(c => status == "Müsait" ? c.IsAvailable : !c.IsAvailable);
+                {
+                    if (status.ToLower() == "true")
+                        query = query.Where(c => c.IsAvailable);
+                    else if (status.ToLower() == "false")
+                        query = query.Where(c => !c.IsAvailable);
+                }
 
+                // Yayın Durumu Filtresi (IsActive)
                 if (!string.IsNullOrEmpty(active))
-                    query = query.Where(c => active == "Aktif" ? c.IsActive : !c.IsActive);
+                {
+                    query = query.Where(c => active.ToLower() == "true" ? c.IsActive : !c.IsActive);
+                }
 
+                // Marka Filtresi (Eksikti, eklendi)
+                if (brand.HasValue)
+                {
+                    query = query.Where(c => c.BrandId == brand.Value);
+                }
+
+                // Yakıt Filtresi (Eksikti, eklendi)
+                if (!string.IsNullOrEmpty(fuel))
+                {
+                    query = query.Where(c => c.FuelType == fuel);
+                }
+
+                // Fiyat Filtreleri
                 if (minPrice.HasValue) query = query.Where(c => c.DailyPrice >= minPrice.Value);
                 if (maxPrice.HasValue) query = query.Where(c => c.DailyPrice <= maxPrice.Value);
 
+                // Sayfalama işlemleri
                 int totalFiltered = query.Count();
                 int totalPages = (int)Math.Ceiling(totalFiltered / (double)PAGE_SIZE);
                 page = Math.Max(1, Math.Min(page, totalPages == 0 ? 1 : totalPages));
 
-                var pagedCars = query.Skip((page - 1) * PAGE_SIZE).Take(PAGE_SIZE).ToList();
+                var pagedCars = query.OrderByDescending(x => x.CreatedDate)
+                                     .Skip((page - 1) * PAGE_SIZE)
+                                     .Take(PAGE_SIZE)
+                                     .ToList();
 
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
                 ViewBag.Brands = await _brandService.TGetListAsync();
 
-                ViewBag.CurrentSearch = search;
+                // Mevcut filtreleri View'da korumak için (Opsiyonel ama önerilir)
+                ViewBag.CurrentStatus = status;
                 ViewBag.CurrentBrand = brand;
 
                 return View(_mapper.Map<List<ResultCarDTO>>(pagedCars));
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Araçlar listelenirken bir teknik hata oluştu.";
+                TempData["Error"] = "Araç listesi yüklenirken teknik bir hata oluştu.";
                 return View(new List<ResultCarDTO>());
             }
         }
-
+        
         [HttpGet]
         public async Task<IActionResult> CreateCar()
         {

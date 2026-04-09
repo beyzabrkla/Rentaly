@@ -15,6 +15,12 @@ namespace Rentaly.EntityLayer.Entities
         [Required, StringLength(11)]
         public string? IdentityNumber { get; set; }
         public string? DrivingLicenseNumber { get; set; }
-        public DateTime DrivingLicenseDate { get; set; }
+
+        // Formdan gelen veriyi karşılamak için nullable olması daha güvenlidir
+        public DateTime? DrivingLicenseDate { get; set; }
+
+        // --- Hata veren ve eklenmesi gereken alanlar ---
+        public DateTime CreatedDate { get; set; } // Müşterinin sisteme ilk giriş tarihi
+        public bool IsActive { get; set; } = true; // Müşteri aktiflik durumu
     }
 }

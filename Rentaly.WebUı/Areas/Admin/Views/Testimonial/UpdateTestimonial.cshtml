@@ -1,0 +1,63 @@
+﻿@model Testimonial
+@{
+    ViewData["Title"] = (Model == null ? "Yeni Yorum" : "Yorum Düzenle");
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Müşteri Yorumu @(Model == null ? "Ekle" : "Düzenle")</h1>
+        <p class="page-subtitle">Referans bilgilerinizi buradan güncelleyebilirsiniz.</p>
+    </div>
+</div>
+
+<div class="toolbar-card" style="display: block; padding: 30px;">
+    <form method="post">
+        @if (Model != null)
+        {
+            <input type="hidden" asp-for="TestimonialId" />
+        }
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700;">MÜŞTERİ ADI</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-user text-danger"></i>
+                    <input type="text" asp-for="Name" placeholder="Örn: Ahmet Yılmaz" required />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700;">UNVAN / ŞEHİR</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-briefcase text-danger"></i>
+                    <input type="text" asp-for="Title" placeholder="Örn: Yazılım Mühendisi veya İstanbul" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700;">GÖRSEL URL</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-image text-danger"></i>
+                    <input type="text" asp-for="ImageUrl" placeholder="Profil fotoğrafı linki..." />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700;">MÜŞTERİ YORUMU</label>
+                <textarea asp-for="Comment" class="form-control" rows="5"
+                          placeholder="Müşterinin kiralama deneyimi hakkında yazdıkları..."
+                          style="background:var(--bg-main); border:1px solid var(--border); color:#e0e0e0; border-radius:12px; padding:15px; width:100%; outline:none;" required></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+            <button type="submit" class="btn-action btn-delete" style="padding: 12px 40px; flex: none;">
+                <i class="fa-solid fa-check"></i> @(Model == null ? "Kaydı Oluştur" : "Değişiklikleri Kaydet")
+            </button>
+            <a href="/Admin/Testimonial/Index" class="btn-action btn-detail" style="padding: 12px 30px; flex: none; text-decoration:none;">
+                Vazgeç
+            </a>
+        </div>
+    </form>
+</div>

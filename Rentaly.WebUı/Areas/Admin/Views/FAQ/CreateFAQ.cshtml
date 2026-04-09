@@ -1,0 +1,67 @@
+﻿@model FAQ
+@{
+    ViewData["Title"] = "Yeni Soru Ekle";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Yeni Soru & Cevap Oluştur</h1>
+        <p class="page-subtitle">Müşterilerinizden sık gelen soruları sisteme kaydedin.</p>
+    </div>
+</div>
+
+<div class="toolbar-card" style="display: block; padding: 30px;">
+    <form asp-action="CreateFAQ" method="post">
+        @* Create işleminde ID gizli alanına gerek yoktur *@
+
+        <div class="row g-4">
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+                    Soru Metni
+                </label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-circle-question text-danger"></i>
+                    <input type="text" asp-for="Question" placeholder="Örn: Kiralama sırasında depozito alınıyor mu?" required />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+                    Cevap Metni
+                </label>
+                <textarea asp-for="Answer" class="form-control" rows="6"
+                          placeholder="Soruya verilecek detaylı yanıtı buraya yazın..."
+                          style="background:var(--bg-main); border:1px solid var(--border); color:#e0e0e0; border-radius:12px; padding:15px; width:100%; outline:none;"
+                          required></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+            <button type="submit" class="btn-action btn-delete" style="padding: 12px 40px; flex: none;">
+                <i class="fa-solid fa-plus-circle"></i> Soruyu Kaydet
+            </button>
+            <a href="/Admin/FAQ/Index" class="btn-action btn-detail" style="padding: 12px 30px; flex: none; text-decoration:none;">
+                Vazgeç
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* Textarea odaklandığında kenarlık rengini değiştirir */
+    textarea:focus {
+        border-color: #cc0c0c !important;
+        box-shadow: 0 0 10px rgba(204, 12, 12, 0.1);
+    }
+    
+    /* Input odaklandığında genel wrap stilini korumak için */
+    .search-wrap:focus-within {
+        border-color: #cc0c0c !important;
+    }
+
+    .form-label {
+        margin-bottom: 8px;
+        display: block;
+    }
+</style>

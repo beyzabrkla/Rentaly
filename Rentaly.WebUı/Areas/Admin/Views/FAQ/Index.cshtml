@@ -1,0 +1,86 @@
+﻿@model List<FAQ>
+@{
+    ViewData["Title"] = "SSS Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .faq-answer {
+        color: #d1d1d1 !important;
+        font-size: 14.5px;
+        line-height: 1.6;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+        border-left: 3px solid #cc0c0c; /* Cevabı belirginleştirmek için */
+    }
+    .question-title {
+        color: #ffffff !important;
+        font-weight: 700;
+        font-size: 16px;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 50px;
+        background: rgba(255,255,255,0.02);
+        border-radius: 15px;
+        border: 1px dashed var(--border);
+    }
+</style>
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">Sıkça Sorulan Sorular</h1>
+        <p class="page-subtitle">Kullanıcıların merak ettiği soruları ve yanıtları düzenleyin.</p>
+    </div>
+    @* Sağ Üst Ekleme Butonu *@
+    <a href="/Admin/FAQ/CreateFAQ" class="btn-action btn-delete" style="text-decoration:none; flex:none; padding: 12px 25px;">
+        <i class="fa-solid fa-plus-circle"></i> Yeni Soru Ekle
+    </a>
+</div>
+
+<div class="row g-4">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fa-solid fa-comment-slash fa-3x mb-3" style="color:var(--text-muted); opacity:0.3;"></i>
+                <p style="color:var(--text-muted);">Henüz hiç soru eklenmemiş.</p>
+                <a href="/Admin/FAQ/CreateFAQ" class="btn-action btn-detail" style="display:inline-flex; width:auto; text-decoration:none;">
+                    İlk Soruyu Şimdi Ekle
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var item in Model)
+        {
+            <div class="col-12">
+                <div class="vehicle-card">
+                    <div class="vehicle-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="vehicle-brand">SORU #@item.FAQId</div>
+                        </div>
+                        <div class="question-title mt-1">
+                            <i class="fa-solid fa-circle-question me-2" style="color:#cc0c0c;"></i> @item.Question
+                        </div>
+                        <div class="faq-answer">
+                            <strong>Cevap:</strong> @item.Answer
+                        </div>
+                    </div>
+
+                    <div class="vehicle-actions">
+                        <a href="/Admin/FAQ/UpdateFAQ/@item.FAQId" class="btn-action btn-detail" style="text-decoration:none; justify-content:center;">
+                            <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                        </a>
+                        <a href="/Admin/FAQ/DeleteFAQ/@item.FAQId" class="btn-action btn-delete" style="text-decoration:none; justify-content:center;" onclick="return confirm('Bu soruyu silmek istediğinize emin misiniz?')">
+                            <i class="fa-solid fa-trash-can"></i> Sil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

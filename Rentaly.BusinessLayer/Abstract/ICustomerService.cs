@@ -9,5 +9,6 @@ namespace Rentaly.BusinessLayer.Abstract
 {
     public interface ICustomerService:IGenericService<Customer>
     {
+        Task<Customer> TGetByIdentityNumberAsync(string identityNumber);
     }
 }

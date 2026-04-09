@@ -30,8 +30,8 @@ namespace Rentaly.EntityLayer.Entities
         public int Kilometer { get; set; }
         public decimal DailyPrice { get; set; }
         public decimal DepositAmount { get; set; }
-        public bool IsAvailable { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsAvailable { get; set; } = true;
+        public bool IsActive { get; set; } = true;
         public virtual ICollection<CarImage> CarImages { get; set; } = new List<CarImage>();
         public string? CoverImageUrl { get; set; }
         public int PersonCount { get; set; }
