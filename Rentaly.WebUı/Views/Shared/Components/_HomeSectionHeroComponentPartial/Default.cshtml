@@ -56,7 +56,7 @@
                             <div class="col-lg-6 mb20">
                                 <h5>Dönüş Yeri</h5>
                                 <select name="dropoffLocationId" class="form-control">
-                                    <option value="">Aynı Şube</option>
+                                    <option value="">Konum Seçin</option>
                                     @foreach (var branch in branches.Where(x => x.IsActive))
                                     {
                                         <option value="@branch.BranchId">@branch.BranchName - @branch.City</option>
