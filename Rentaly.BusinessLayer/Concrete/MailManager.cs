@@ -37,7 +37,7 @@ namespace Rentaly.BusinessLayer.Concrete
             using var smtp = new SmtpClient("smtp.gmail.com", 587);
             smtp.EnableSsl = true;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("beyzailetisimapp@gmail.com", "cuhnsotkrdfpxerh");
+            smtp.Credentials = new NetworkCredential("beyzailetisimapp@gmail.com", "");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
 
             using var message = new MailMessage(fromAddress, toAddress)
