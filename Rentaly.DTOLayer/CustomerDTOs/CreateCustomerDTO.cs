@@ -8,7 +8,6 @@
         public string? Phone { get; set; }
         public string IdentityNumber { get; set; }
         public string? DrivingLicenseNumber { get; set; }
-        public DateTime DrivingLicenseDate { get; set; }
-
+        public DateTime? DrivingLicenseDate { get; set; }
     }
 }

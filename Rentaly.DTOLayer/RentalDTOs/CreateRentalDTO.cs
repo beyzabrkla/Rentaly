@@ -12,6 +12,7 @@
         public string? Phone { get; set; }
         public string? IdentityNumber { get; set; }
         public string? DrivingLicenseNumber { get; set; }
+        public DateTime? DrivingLicenseDate { get; set; } // Sadece formdan veri taşımak için
 
         public DateTime? PickupDate { get; set; }
         public DateTime? ReturnDate { get; set; }

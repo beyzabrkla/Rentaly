@@ -1,0 +1,91 @@
+﻿@model Process
+@{
+    ViewData["Title"] = "Adım Düzenle";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    /* 1. İkonların Belirginleşmesi */
+    .vehicle-body i {
+        color: #cc0c0c !important; /* Rentaly Kırmızısı - Değişken çalışmıyorsa direkt renk */
+        margin-bottom: 20px;
+        display: inline-block;
+        filter: drop-shadow(0 0 5px rgba(204, 12, 12, 0.3)); /* Hafif parlama efekti */
+    }
+
+    /* 2. Okunmayan Küçük Yazılar (Description) */
+    .vehicle-body p {
+        color: #d1d1d1 !important; /* Saf gri yerine daha açık bir ton */
+        font-size: 14.5px !important;
+        line-height: 1.6;
+        font-weight: 400;
+        margin-top: 10px;
+    }
+
+    /* 3. Kart Üzerindeki Başlıklar */
+    .vehicle-name {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        margin-bottom: 8px;
+    }
+
+    /* 4. Form İçindeki İpucu Yazıları (Update sayfası için) */
+    .form-label {
+        color: #f0f0f0 !important; /* Daha beyaz */
+        letter-spacing: 0.5px;
+    }
+
+    .text-muted {
+        color: #a0a0a0 !important; /* Çok karanlık kalmasın */
+    }
+
+    /* 5. Input İçindeki İkonlar */
+    .search-wrap i {
+        color: #cc0c0c !important;
+    }
+</style>
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Adım Bilgilerini Güncelle</h1>
+        <p class="page-subtitle">Süreç adımını ve ikonunu düzenleyin.</p>
+    </div>
+</div>
+
+<div class="toolbar-card" style="display: block; padding: 30px;">
+    <form method="post">
+        <input type="hidden" asp-for="ProcessId" />
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Adım Başlığı</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-list-check"></i>
+                    <input type="text" asp-for="Title" placeholder="Örn: Aracını Seç" />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Font Awesome İkonu</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-icons"></i>
+                    <input type="text" asp-for="Icon" placeholder="Örn: fa-solid fa-car" />
+                </div>
+                <small class="text-muted" style="font-size:10px;">İpucu: <a href="https://fontawesome.com/search" target="_blank" class="text-danger">FontAwesome</a> sitesinden ikon kodu alabilirsiniz.</small>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Adım Açıklaması</label>
+                <textarea asp-for="Description" class="form-control" rows="4"
+                          style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-main); border-radius:12px; padding:15px; width:100%; outline:none;"></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+            <button type="submit" class="btn-action btn-delete" style="padding: 12px 40px; flex: none;">
+                <i class="fa-solid fa-save"></i> Güncelle
+            </button>
+            <a href="/Admin/Process/Index" class="btn-action btn-detail" style="padding: 12px 30px; flex: none; text-decoration:none;">
+                İptal
+            </a>
+        </div>
+    </form>
+</div>

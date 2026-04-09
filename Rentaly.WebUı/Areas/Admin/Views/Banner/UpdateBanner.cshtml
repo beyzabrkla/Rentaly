@@ -1,0 +1,68 @@
+﻿@model Banner
+@{
+    ViewData["Title"] = "Banner Güncelle";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Banner Düzenle</h1>
+        <p class="page-subtitle">Giriş ekranı başlıklarını ve arka plan görselini güncelleyin.</p>
+    </div>
+</div>
+
+<div class="toolbar-card" style="display: block; padding: 30px;">
+    <form asp-action="UpdateBanner" method="post">
+        <input type="hidden" asp-for="BannerId" />
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Ana Başlık (Keşfet Temalı)</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-earth-americas"></i>
+                    <input type="text" asp-for="Title" placeholder="Örn: Dünyayı keşfedin..." />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Alt Başlık (Slogan)</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-bolt"></i>
+                    <input type="text" asp-for="SubTitle" placeholder="Örn: Hızlı ve Kolay Yol..." />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Kısa Açıklama</label>
+                <textarea asp-for="Description" class="form-control" rows="4"
+                          style="background:var(--bg-main); border:1px solid var(--border); color:var(--text-main); border-radius:12px; padding:15px; width:100%; outline:none;"></textarea>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:var(--text-muted); font-size:12px; font-weight:700; text-transform:uppercase;">Arka Plan Görsel URL</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-panorama"></i>
+                    <input type="text" asp-for="BackgroundImageUrl" placeholder="/RentalyHTML/images/background/1.jpg" />
+                </div>
+                <div class="mt-2 text-muted" style="font-size:11px;">
+                    <i class="fa-solid fa-circle-info me-1"></i> İpucu: Görselin yüksek çözünürlüklü olması anasayfa kalitesini artırır.
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+            <button type="submit" class="btn-action btn-delete" style="padding: 12px 40px; flex: none;">
+                <i class="fa-solid fa-save"></i> Güncelle ve Yayınla
+            </button>
+            <a href="/Admin/Banner/Index" class="btn-action btn-detail" style="padding: 12px 30px; flex: none; text-decoration:none;">
+                İptal Et
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    textarea:focus {
+        border-color: var(--primary) !important;
+    }
+</style>

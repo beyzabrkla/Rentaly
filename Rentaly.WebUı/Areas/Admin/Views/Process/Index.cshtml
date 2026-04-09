@@ -1,0 +1,83 @@
+﻿@model List<Process>
+@{
+    ViewData["Title"] = "İşleyiş Yönetimi";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    /* 1. İkonların Belirginleşmesi ve Görünmesi */
+    .vehicle-body i {
+        /* FontAwesome'ın doğru render edilmesi için zorunlu */
+        font-family: "Font Awesome 6 Free", "Font Awesome 6 Solid" !important;
+        font-weight: 900 !important;
+        color: #cc0c0c !important; /* Rentaly Kırmızısı */
+        margin-bottom: 20px;
+        display: inline-block;
+        filter: drop-shadow(0 0 8px rgba(204, 12, 12, 0.4));
+    }
+
+    /* 2. Okunmayan Küçük Yazılar (Description) */
+    .vehicle-body p {
+        color: #e0e0e0 !important; /* Griyi açtık, beyaza yaklaştırdık */
+        font-size: 15px !important; /* Okunurluk için hafif büyüttük */
+        line-height: 1.6 !important;
+        font-weight: 400;
+        margin-top: 10px;
+        opacity: 1 !important;
+    }
+
+    /* 3. Kart Üzerindeki Başlıklar */
+    .vehicle-name {
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        margin-bottom: 8px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .vehicle-brand {
+        color: #cc0c0c !important;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 700;
+    }
+</style>
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h1 class="page-title">Nasıl Çalışır?</h1>
+        <p class="page-subtitle">Kiralama sürecindeki adımları yönetin.</p>
+    </div>
+    <a href="/Admin/Process/CreateProcess" class="btn-action btn-detail" style="text-decoration:none; flex:none; padding: 10px 20px;">
+        <i class="fa-solid fa-plus"></i> Yeni Adım Ekle
+    </a>
+</div>
+
+<div class="row g-4">
+    @foreach (var item in Model)
+    {
+        <div class="col-12 col-md-6 col-xl-4">
+            <div class="vehicle-card" style="height: 100%;">
+                <div class="vehicle-body text-center">
+                    <div class="mb-3">
+                        @* style="color:var(--primary)" kısmını sildik, CSS bloğu yönetecek *@
+                        <i class="@item.Icon fa-3x"></i>
+                    </div>
+                    <div class="vehicle-brand">ADIM #@item.ProcessId</div>
+                    <div class="vehicle-name">@item.Title</div>
+                    @* Buradaki style="..." kısmını da temizledik ki CSS'imiz çalışsın *@
+                    <p class="mt-2">@item.Description</p>
+                </div>
+
+                <div class="vehicle-actions">
+                    <a href="/Admin/Process/UpdateProcess/@item.ProcessId" class="btn-action btn-detail" style="text-decoration:none; justify-content:center;">
+                        <i class="fa-solid fa-pen-to-square"></i> Düzenle
+                    </a>
+                    <a href="/Admin/Process/DeleteProcess/@item.ProcessId" class="btn-action btn-delete" style="text-decoration:none; justify-content:center;" onclick="return confirm('Bu adımı silmek istediğinize emin misiniz?')">
+                        <i class="fa-solid fa-trash-can"></i> Sil
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

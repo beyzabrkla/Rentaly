@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rentaly.DataAccessLayer.Abstract;
+using Rentaly.DataAccessLayer.Concrete;
 using Rentaly.DataAccessLayer.EntityFramework;
 
 namespace Rentaly.DataAccessLayer.UnitOfWork
@@ -20,9 +21,9 @@ namespace Rentaly.DataAccessLayer.UnitOfWork
         IProcessDal ProcessDal {  get; }
         ITestimonialDal TestimonialDal { get; }
 
-
         IGenericDal<T> GetRepository<T>() where T : class;    //GetRepository<T>() metodu, herhangi bir entity türü için generic repository'ye erişim sağlar.
                                                               //Bu sayede, belirli bir entity türü için özel bir repository tanımlamak yerine, tek bir generic repository üzerinden tüm entity türlerine erişebiliriz.
+        RentalyContext Context { get; } // UnitOfWork üzerinden DbContext'e erişim sağlamak için ekledik. Böylece, Business katmanında ihtiyaç duyduğumuzda context üzerinden doğrudan sorgular yapabiliriz.
         Task SaveAsync(); // Tüm işlemleri tek seferde veritabanına işler
     }
 }

@@ -14,6 +14,8 @@ namespace Rentaly.BusinessLayer.Abstract
 
         // Müsaitlik kontrolü (Senin Case: "Seçilen tarih aralığında kilitlenecek")
         Task<bool> TCheckCarAvailabilityAsync(int carId, DateTime pickup, DateTime returnDate);
-        Task<List<DateTime>> GetBusyDatesByCarIdAsync(int carId); // JS tarafında tarihleri kapatmak için (Opsiyonel)
+        Task<List<DateTime>> GetBusyDatesByCarIdAsync(int carId); // JS tarafında tarihleri kapatmak için
+        Task<List<Rental>> TGetListWithDetailsAsync(); // Kiralamaları detaylarıyla birlikte getirmek için
+        Task<List<Rental>> TGetRentalsWithDetailsAsync();// Kiralamaları detaylarıyla birlikte getirmek için (Admin tarafında)
     }
 }

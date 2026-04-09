@@ -1,0 +1,48 @@
+﻿@model FAQ
+@{
+    ViewData["Title"] = "Soru Düzenle";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Soru & Cevap Düzenle</h1>
+        <p class="page-subtitle">Müşterilerinize rehberlik edecek bilgileri güncelleyin.</p>
+    </div>
+</div>
+
+<div class="toolbar-card" style="display: block; padding: 30px;">
+    <form method="post">
+        <input type="hidden" asp-for="FAQId" />
+
+        <div class="row g-4">
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700; text-transform:uppercase;">Soru Cümlesi</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-question text-danger"></i>
+                    <input type="text" asp-for="Question" placeholder="Örn: Araç teslimatında hangi belgeler gereklidir?" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700; text-transform:uppercase;">Detaylı Cevap</label>
+                <textarea asp-for="Answer" class="form-control" rows="5"
+                          style="background:var(--bg-main); border:1px solid var(--border); color:#e0e0e0; border-radius:12px; padding:15px; width:100%; outline:none;"></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+            <button type="submit" class="btn-action btn-delete" style="padding: 12px 40px; flex: none;">
+                <i class="fa-solid fa-save"></i> Değişiklikleri Kaydet
+            </button>
+            <a href="/Admin/FAQ/Index" class="btn-action btn-detail" style="padding: 12px 30px; flex: none; text-decoration:none;">
+                Vazgeç
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    textarea:focus { border-color: #cc0c0c !important; }
+    .search-wrap input:focus { outline: none; }
+</style>

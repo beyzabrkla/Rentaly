@@ -1,0 +1,106 @@
+﻿@model Testimonial
+@{
+    ViewData["Title"] = "Yeni Müşteri Yorumu";
+    Layout = "/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Yeni Müşteri Yorumu Ekle</h1>
+        <p class="page-subtitle">Sisteme yeni bir referans ve geri bildirim kaydedin.</p>
+    </div>
+</div>
+
+<div class="toolbar-card" style="display: block; padding: 30px;">
+    <form asp-action="CreateTestimonial" method="post">
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700; text-transform:uppercase;">Müşteri Adı Soyadı</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-user-plus text-danger"></i>
+                    <input type="text" asp-for="Name" placeholder="Örn: Mehmet Can" required />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700; text-transform:uppercase;">Unvan / Meslek</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-id-card text-danger"></i>
+                    <input type="text" asp-for="Title" placeholder="Örn: CEO, Avukat veya Şehir" />
+                </div>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700; text-transform:uppercase;">Profil Fotoğrafı URL</label>
+                <div class="search-wrap" style="width:100%;">
+                    <i class="fa-solid fa-link text-danger"></i>
+                    <input type="text" asp-for="ImageUrl" placeholder="https://resimlinki.com/foto.jpg" />
+                </div>
+                <small class="text-muted" style="font-size:11px; margin-top:5px; display:block;">
+                    <i class="fa-solid fa-info-circle me-1"></i> Boş bırakılırsa varsayılan bir profil resmi atanır.
+                </small>
+            </div>
+
+            <div class="col-12">
+                <label class="form-label" style="color:#f0f0f0; font-size:12px; font-weight:700; text-transform:uppercase;">Müşteri Deneyimi (Yorum)</label>
+                <textarea asp-for="Comment" class="form-control" rows="6"
+                          placeholder="Müşterinin kiralama süreci hakkındaki görüşlerini buraya yazın..."
+                          style="background:var(--bg-main); border:1px solid var(--border); color:#e0e0e0; border-radius:12px; padding:15px; width:100%; outline:none;" required></textarea>
+            </div>
+        </div>
+
+        <div class="mt-5 d-flex gap-3">
+            <button type="submit" class="btn-action btn-delete" style="padding: 12px 40px; flex: none;">
+                <i class="fa-solid fa-plus"></i> Yorumu Yayınla
+            </button>
+            <a href="/Admin/Testimonial/Index" class="btn-action btn-detail" style="padding: 12px 30px; flex: none; text-decoration:none;">
+                İptal Et
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+    /* 1. Üst Başlık Altındaki Küçük Yazı (Slogan/Subtitle) */
+    .page-subtitle {
+        color: #b0b0b0 !important; /* Daha açık bir gri */
+        font-size: 14px !important;
+        opacity: 1 !important;
+    }
+
+    /* 2. Input Altındaki Bilgilendirme Yazısı (small) */
+    .text-muted {
+        color: #a0a0a0 !important; /* Görünürlüğü artırılmış gri */
+        font-size: 11px !important;
+        opacity: 1 !important;
+    }
+
+    /* 3. Etiketler (MÜŞTERİ ADI vs.) */
+    .form-label {
+        color: #ffffff !important; /* Tam beyaz yaparak netleştiriyoruz */
+        margin-bottom: 10px;
+        display: block;
+        letter-spacing: 0.5px;
+    }
+
+    /* 4. Textarea ve Input İçindeki Placeholder (İpucu) Yazıları */
+    ::placeholder {
+        color: #666 !important; /* Yazmaya başlamadan önceki ipucu rengi */
+    }
+
+    /* Bonus: Input ve Textarea içine yazılan asıl metin */
+    input, textarea {
+        color: #ffffff !important;
+    }
+    
+        /* Fokus durumunda textarea kenarlığını parlat */
+        textarea:focus {
+            border-color: #cc0c0c !important;
+            box-shadow: 0 0 15px rgba(204, 12, 12, 0.1) !important;
+        }
+
+    .search-wrap:focus-within {
+        border-color: #cc0c0c !important;
+    }
+</style>

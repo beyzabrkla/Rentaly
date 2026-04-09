@@ -52,6 +52,12 @@ public class ReportController : Controller
 
         ViewBag.TotalCount = dtoList.Count;
         ViewBag.ActiveCount = dtoList.Count(x => x.IsActive);
+
+        //Aktiflik Oranı Hesaplama
+        ViewBag.ActiveRate = dtoList.Count > 0
+            ? (int)Math.Round((double)dtoList.Count(x => x.IsActive) / dtoList.Count * 100)
+            : 0;
+
         ViewBag.TotalValue = dtoList.Sum(x => x.DailyPrice);
         ViewBag.AvgPrice = dtoList.Count > 0 ? (int)dtoList.Average(x => x.DailyPrice) : 0;
         ViewBag.Branches = await _unitOfWork.BranchDal.GetListAsync();
@@ -64,7 +70,6 @@ public class ReportController : Controller
         var pagedData = dtoList.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         return View(pagedData);
     }
-
     public async Task<IActionResult> ExportExcel(int? branchId, bool? status, string rent, string search)
     {
         var dtoList = await GetFilteredCarsAsync(branchId, status, rent, search);

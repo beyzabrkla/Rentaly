@@ -51,6 +51,7 @@ builder.Services.AddScoped<IFaqService, FaqManager>();
 builder.Services.AddScoped<IProcessService, ProcessManager>();
 builder.Services.AddScoped<IRentalService, RentalManager>();
 builder.Services.AddScoped<ITestimonialService, TestimonialManager>();
+builder.Services.AddScoped<IMailService, MailManager>();
 
 builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
 

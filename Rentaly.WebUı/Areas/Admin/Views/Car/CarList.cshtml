@@ -58,27 +58,28 @@
                value="@searchFilter"
                onkeypress="if(event.key==='Enter') filterCars()" />
     </div>
-        <select class="filter-select" id="brandFilter" onchange="filterCars()">
-            <option value="">Tüm Markalar</option>
-            @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
-            {
-                <option value="@brand.BrandId" selected="@(ViewBag.CurrentBrand != null && (int)ViewBag.CurrentBrand == brand.BrandId)">
-                    @brand.BrandName
-                </option>
-            }
-        </select>
-        <select class="filter-select" id="statusFilter" onchange="filterCars()">
-            <option value="">Tüm Durumlar</option>
-            <!option value="Müsait" @(statusFilter == "Müsait" ? "selected" : "")>Müsait</!option>
-            <!option value="Kirada" @(statusFilter == "Kirada" ? "selected" : "")>Kirada</!option>
-        </select>
-        <select class="filter-select" id="fuelFilter" onchange="filterCars()">
-            <option value="">Tüm Yakıt Tipleri</option>
-            @foreach (var fuel in new[] { "Benzin", "Dizel", "Elektrik", "Hibrit" })
-            {
-                <!option value="@fuel" @(fuelFilter == fuel ? "selected" : "")>@fuel</!option>
-            }
-        </select>
+    
+    <select class="filter-select" id="brandFilter" onchange="filterCars()">
+        <option value="">Tüm Markalar</option>
+        @foreach (var brand in ViewBag.Brands as List<Brand> ?? new List<Brand>())
+        {
+            <option value="@brand.BrandId" selected="@(ViewBag.CurrentBrand != null && (int)ViewBag.CurrentBrand == brand.BrandId)">
+                @brand.BrandName
+            </option>
+        }
+    </select>
+    <select class="filter-select" id="statusFilter" onchange="filterCars()">
+        <option value="">Tüm Durumlar</option>
+        <option value="true" selected="@(statusFilter == "true")">Müsait</option>
+        <option value="false" selected="@(statusFilter == "false")">Kirada</option>
+    </select>
+    <select class="filter-select" id="fuelFilter" onchange="filterCars()">
+        <option value="">Tüm Yakıt Tipleri</option>
+        @foreach (var fuel in new[] { "Benzin", "Dizel", "Elektrik", "Hibrit" })
+        {
+            <option value="@fuel" selected="@(fuelFilter == fuel)">@fuel</option>
+        }
+    </select>
         <button class="btn-action btn-detail" onclick="resetFilters()">
             <i class="fa-solid fa-rotate-left"></i> Sıfırla
         </button>

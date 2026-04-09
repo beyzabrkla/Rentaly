@@ -50,7 +50,7 @@ namespace Rentaly.WebUI.Controllers
                 CurrentBranchName = car.Branch.BranchName
             };
 
-            ViewBag.Branches = await _branchService.TGetListAsync();
+            ViewBag.Branches = (await _branchService.TGetListAsync()).Where(x => x.IsActive).ToList();
             return View(model);
         }
 
@@ -60,7 +60,7 @@ namespace Rentaly.WebUI.Controllers
             if (!ModelState.IsValid)
             {
                 await GetBackingDataForViewModel(model);
-                ViewBag.Branches = await _branchService.TGetListAsync();
+                ViewBag.Branches = (await _branchService.TGetListAsync()).Where(x => x.IsActive).ToList();
                 return View(model);
             }
 
