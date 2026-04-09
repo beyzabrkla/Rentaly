@@ -1,4 +1,5 @@
 ﻿@using Newtonsoft.Json
+@using System.Globalization
 @model List<ResultRentalDTO>
 @{
     ViewData["Title"] = "Rezervasyon Yönetimi";
@@ -484,19 +485,29 @@
                     <td>
                         <div style="font-size:12px; color:#ccc;">
                             <i class="fa-solid fa-calendar-days me-1" style="color:var(--accent); font-size:10px;"></i>
-                            @item.PickupDate?.ToString("dd MMM yyyy")
+                            @item.PickupDate?.ToString("dd MMM yyyy", new System.Globalization.CultureInfo("tr-TR"))
                         </div>
-                        <div style="font-size:12px; color:#ccc; margin-top:2px;">
+                        <div style="font-size:11px; color:var(--text-muted); margin-left: 14px;">
+                            <i class="fa-solid fa-location-dot me-1" style="font-size:9px;"></i> @item.PickupBranchName
+                        </div>
+
+                        <div style="font-size:12px; color:#ccc; margin-top:5px;">
                             <i class="fa-solid fa-arrow-right me-1" style="color:#555; font-size:10px;"></i>
-                            @item.ReturnDate?.ToString("dd MMM yyyy")
+                            @item.ReturnDate?.ToString("dd MMM yyyy", new System.Globalization.CultureInfo("tr-TR"))
                         </div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-left: 14px;">
+                            <i class="fa-solid fa-location-arrow me-1" style="font-size:9px;"></i> @item.ReturnBranchName
+                        </div>
+
                         <div style="font-size:11px; color:#f59e0b; font-weight:700; margin-top:3px;">
                             @days gün
                         </div>
                     </td>
                     <td>
-                        <div class="text-white fw-bold" style="font-size:14px;">₺@item.TotalPrice.ToString("N0")</div>
-                        <div style="font-size:11px; color:var(--text-muted);">₺@item.DailyPrice.ToString("N0")/gün</div>
+                <div class="text-white fw-bold" style="font-size:14px;">
+                        ₺@item.TotalPrice.ToString("N0", new CultureInfo("tr-TR"))
+                    </div>                        
+                    <div style="font-size:11px; color:var(--text-muted);">₺@item.DailyPrice.ToString("N0")/gün</div>
                     </td>
                     <td>
                         <span class="badge-custom @badgeClass">
@@ -538,6 +549,7 @@
     </div>
 }
 
+
 <!-- PAGING -->
 @if (total > 1)
 {
@@ -566,6 +578,7 @@
         </div>
     </div>
 }
+
 
 <!-- DETAY MODAL -->
 <div class="rental-modal-overlay" id="rentalModalOverlay" onclick="closeDetailOnOverlay(event)">
@@ -600,7 +613,7 @@
 </div>
 
 <!-- VERİ -->
-<script id="rentalData" type="application/json">@Html.Raw(rentalJson)</script>
+<script id="rentalData" type="application/json">@Html.Raw(ViewBag.RentalJson)</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -657,8 +670,13 @@
         const r = allRentals.find(x => x.rentalId == id || x.RentalId == id);
         if (!r) return;
 
-        const pickupDateVal    = r.pickupDate    || r.PickupDate;
-        const returnDateVal    = r.returnDate    || r.ReturnDate;
+        // Tarihler
+        const pickupDateVal = r.pickupDate || r.PickupDate;
+        const returnDateVal = r.returnDate || r.ReturnDate;
+
+        // --- BURASI DÜZELTİLDİ: Senin paylaştığın koddaki alan isimleri kullanıldı ---
+        const pickupLocVal  = r.PickupBranchName || r.pickupBranchName || r.pickupLocation || 'Belirtilmedi';
+        const dropOffLocVal = r.ReturnBranchName || r.returnBranchName || r.returnLocation || 'Belirtilmedi';        
         const dailyPriceVal    = parseFloat(r.dailyPrice    ?? r.DailyPrice)    || 0;
         const depositAmountVal = parseFloat(r.depositAmount ?? r.DepositAmount) || 0;
         const diffDays         = r.days > 0 ? r.days : 1;
@@ -711,8 +729,20 @@
 
             <div class="modal-section-title"><i class="fa-solid fa-calendar me-2"></i>Kiralama Detayları</div>
             <div class="mb-4">
-                <div class="modal-info-row"><span class="modal-info-label">Alış Tarihi</span><span class="modal-info-value">${pickupDateVal}</span></div>
-                <div class="modal-info-row"><span class="modal-info-label">İade Tarihi</span><span class="modal-info-value">${returnDateVal}</span></div>
+                <div class="modal-info-row">
+                    <span class="modal-info-label">Alış Tarihi & Şubesi</span>
+                    <span class="modal-info-value text-end">
+                        <div style="font-weight:700; color:white;">${pickupDateVal}</div>
+                        <div style="font-size:11px; color:#10b981;"><i class="fa-solid fa-location-dot me-1"></i>${pickupLocVal}</div>
+                    </span>
+                </div>
+                <div class="modal-info-row">
+                    <span class="modal-info-label">İade Tarihi & Şubesi</span>
+                    <span class="modal-info-value text-end">
+                        <div style="font-weight:700; color:white;">${returnDateVal}</div>
+                        <div style="font-size:11px; color:#f59e0b;"><i class="fa-solid fa-location-arrow me-1"></i>${dropOffLocVal}</div>
+                    </span>
+                </div>
                 <div class="modal-info-row">
                     <span class="modal-info-label">Süre</span>
                     <span class="modal-info-value" style="color:#f59e0b;font-weight:700;">${diffDays} Gün</span>

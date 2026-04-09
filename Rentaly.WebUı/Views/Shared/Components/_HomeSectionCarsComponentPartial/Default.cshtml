@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Car>
+﻿@using System.Globalization
+@model IEnumerable<Car>
 <section id="section-cars">
     <div class="container">
         <div class="row align-items-center">
@@ -30,7 +31,7 @@
                                         <span class="d-atr"><img src="/RentalyHTML/images/icons/4-green.svg" alt="">@car.Category?.CategoryName</span>
                                     </div>
                                     <div class="d-price">
-                                        Günlük kira bedeli: <span>₺ @car.DailyPrice.ToString("N0")</span>'den başlayan fiyatlarla
+                                        Günlük kira bedeli: <span>₺@car.DailyPrice.ToString("N0", new CultureInfo("tr-TR"))</span>'den başlayan fiyatlarla
                                         <a class="btn-main" href="/Car/CarDetail/@car.CarId">Hemen Kirala</a>
                                     </div>
                                 </div>

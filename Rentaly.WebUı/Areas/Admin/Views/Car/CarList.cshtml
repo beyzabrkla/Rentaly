@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.WebUtilities
+@using System.Globalization
 @model List<ResultCarDTO>
 @{
     ViewData["Title"] = "Araç Yönetimi";
@@ -155,7 +156,7 @@
 
                         <div class="vehicle-price-row">
                             <div class="vehicle-price">
-                                <span class="price-amount">₺@car.DailyPrice.ToString("N0")</span>
+                                <span class="price-amount">₺@car.DailyPrice.ToString("N0", new CultureInfo("tr-TR"))</span>
                                 <span class="price-label">/ günlük</span>
                             </div>
                             <span class="vehicle-year-badge">@car.Year</span>

@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.WebUtilities
 @using Rentaly.EntityLayer.Entities
+@using System.Globalization
 @model List<ResultCarDTO>
 @{
     ViewData["Title"] = "Araç Listesi";
@@ -98,7 +99,7 @@
                 <div class="item_filter_group">
                     <h4>Günlük Fiyat (₺)</h4>
                     <div class="price-input">
-                        <input type="number" id="minPrice" class="form-control mb-2" placeholder="Min" value="@minPriceFilter" onchange="filterCars()">
+                        <input type="number" id="minPrice" class="form-control" placeholder="Min" value="@minPriceFilter" onchange="filterCars()">
                         <input type="number" id="maxPrice" class="form-control" placeholder="Max" value="@maxPriceFilter" onchange="filterCars()">
                     </div>
                 </div>
@@ -144,7 +145,7 @@
                                                 <span class="d-atr"><i class="fa fa-map-marker"></i> @car.BranchName</span>
                                             </div>
                                             <div class="d-price">
-                                                Günlük: <span>₺@car.DailyPrice.ToString("N0")</span>
+                                                Günlük: <span>₺@car.DailyPrice.ToString("N0", new CultureInfo("tr-TR"))</span>
                                                 <a class="btn-main" href="/Car/CarDetail/@car.CarId">Kirala</a>
                                             </div>
                                         </div>

@@ -32,16 +32,17 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
 
             try
             {
-                // Include'lu versiyon — şubeler ve araç bilgileri dolu gelir
+                //Veriyi tüm detaylarıyla (Car, Brand, Branch vb.) çekiyoruz
                 var allRentals = await _rentalService.TGetListWithDetailsAsync();
                 var query = allRentals.AsQueryable();
 
-                // İstatistikler (filtreden önce)
+                //İstatistikler (Filtreleme öncesi)
                 ViewBag.TotalCount = allRentals.Count;
                 ViewBag.PendingCount = allRentals.Count(x => x.Status == "Beklemede");
                 ViewBag.ApprovedCount = allRentals.Count(x => x.Status == "Onaylandı");
                 ViewBag.CancelledCount = allRentals.Count(x => x.Status == "İptal Edildi");
 
+                //Filtreleme Mantığı
                 if (!string.IsNullOrEmpty(status))
                     query = query.Where(x => x.Status == status);
 
@@ -54,6 +55,7 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                         (x.Car != null && x.Car.PlateNumber != null && x.Car.PlateNumber.ToLower().Contains(s)));
                 }
 
+                //Sayfalama Hesaplamaları
                 int totalRecords = query.Count();
                 int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
@@ -64,8 +66,16 @@ namespace Rentaly.WebUI.Areas.Admin.Controllers
                 ViewBag.TotalPages = totalPages;
                 ViewBag.TotalRecords = totalRecords;
 
+                //Veriyi Sayfalayıp DTO'ya Map'liyoruz
                 var paged = query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
                 var mappedList = _mapper.Map<List<ResultRentalDTO>>(paged);
+
+                // PropertyNamingPolicy = null sayesinde "PickupBranchName" ismi JSON'da da aynen korunur.
+                var jsonOptions = new System.Text.Json.JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = null
+                };
+                ViewBag.RentalJson = System.Text.Json.JsonSerializer.Serialize(mappedList, jsonOptions);
 
                 return View(mappedList);
             }
