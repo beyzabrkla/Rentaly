@@ -161,11 +161,10 @@ Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, hiyer
 * **Yeni Model Tanımlama:** Seçilen bir markaya bağlı olarak yeni model isimleri sisteme dahil edilebilir; bu yapı veritabanında `MarkaID` üzerinden kurulan güçlü bir ilişkisel tablo (One-to-Many) ile yönetilir.
 * **Kullanıcı Dostu UI:** Model listesi üzerinde markaların logoları ve isimleri bir arada sunularak görsel yönetim kolaylaştırılmıştır.
 <img width="1867" height="931" alt="25" src="https://github.com/user-attachments/assets/5fce9268-a80c-4031-9d4c-5a1a4188ee46" />
-<img width="1859" height="941" alt="25-1" src="https://github.com/user-attachments/assets/9c27fe4f-3d4a-491b-a334-66204f566491" />
-<img width="480" height="365" alt="25-2" src="https://github.com/user-attachments/assets/6aecc1f0-f131-4d72-a03c-ecd05725c41e" />
-<img width="431" height="455" alt="25-3" src="https://github.com/user-attachments/assets/67956c3c-d891-412c-ac5f-a7529f5d86ae" />
+<img width="496" height="559" alt="26-1" src="https://github.com/user-attachments/assets/3e407597-87fc-420e-aaab-46282cbd4669" />
+<img width="536" height="431" alt="26-" src="https://github.com/user-attachments/assets/a4c653ac-82c3-4d84-b00b-03dec9484016" />
 
-### 6. Araç Model Yönetimi ve Hiyerarşik Yapı
+### 6. Araç KAtegori Yönetimi ve Hiyerarşik Yapı
 Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, projenin hiyerarşik veri yapısını (Marka -> Model -> Araç) tamamlayan modüldür.
 
 * **Aktif/Pasif Durum Kontrolü:** Modeller bazında listeleme yapılarak, operasyonel duruma göre modeller aktif veya pasif hale getirilebilir.
@@ -173,22 +172,9 @@ Marka altındaki model tanımlamalarının yapıldığı ve yönetildiği, proje
 * **Yeni Model Tanımlama ve Güncelleme:** Seçilen bir markaya bağlı olarak yeni modeller sisteme dahil edilebilir veya mevcut modellerin marka ilişkileri güncellenebilir. Bu yapı, veritabanında `MarkaID` üzerinden kurulan güçlü bir ilişkisel tablo (One-to-Many) ile yönetilir.
 * **Kullanıcı Dostu UI:** Model listesi üzerinde markaların logoları ve isimleri bir arada sunularak görsel yönetim kolaylaştırılmıştır.
 <img width="1869" height="952" alt="26" src="https://github.com/user-attachments/assets/18510383-e704-4f62-870f-f021f9dfb048" />
-<img width="496" height="559" alt="26-1" src="https://github.com/user-attachments/assets/3e407597-87fc-420e-aaab-46282cbd4669" />
-<img width="536" height="431" alt="26-" src="https://github.com/user-attachments/assets/a4c653ac-82c3-4d84-b00b-03dec9484016" />
 
 
-### 7. Kategori Yönetimi ve Dinamik Segmentasyon
-Araçların segmentlerine (Sedan, SUV, Minivan vb.) göre ayrıştırıldığı ve ön yüzdeki filtreleme sistemini besleyen temel yönetim modülüdür.
-
-* **Durum Kontrolü (Aktif/Pasif):** Kategoriler sistem üzerinden aktif veya pasif hale getirilebilir. Pasif edilen bir kategori, kullanıcı arayüzündeki arama ve filtreleme seçeneklerinden otomatik olarak kaldırılır.
-* **Kategori Bazlı Araç Analizi:** Her kategorinin yanında bulunan "Araçları Gör" butonu ile o segmente ait tüm araçlar ilişkisel veri tabanı sorguları (LINQ) aracılığıyla listelenir.
-* **Dinamik İçerik Yönetimi:** Yeni kategori ekleme ve mevcut kategorileri güncelleme işlemleri; `Entity Framework Core` ve `Generic Repository` desenleri kullanılarak güvenli bir şekilde gerçekleştirilir.
-* **İlişkisel Veri Bütünlüğü:** Kategoriler üzerinde yapılan değişiklikler, bu kategoriye bağlı tüm araç tanımlamalarıyla eşzamanlı olarak çalışır.
-<img width="1871" height="942" alt="Ekran görüntüsü 2026-04-09 172009" src="https://github.com/user-attachments/assets/5d7f07eb-6d27-45ac-9f3a-c4a489fb4196" />
-<img width="504" height="288" alt="Ekran görüntüsü 2026-04-09 172017" src="https://github.com/user-attachments/assets/54df4bc4-5c01-4f6f-9f5e-2c3329f50794" />
-<img width="459" height="271" alt="Ekran görüntüsü 2026-04-09 172022" src="https://github.com/user-attachments/assets/102f22b4-e991-451e-a580-7f3be0b0427c" />
-
-### 8. Şube ve Lokasyon Yönetimi
+### 7. Şube ve Lokasyon Yönetimi
 Uygulamanın hizmet noktalarının merkezi olarak yönetildiği ve araçların fiziksel konumlarına göre gruplandırıldığı modüldür.
 
 * **Dinamik Şube Listesi:** Tüm aktif ve pasif şubeler, lokasyon bilgileriyle birlikte listelenir. Şube durumu (Aktif/Pasif) üzerinden yapılan değişiklikler, kullanıcı tarafındaki lokasyon seçimlerini doğrudan günceller.
@@ -199,7 +185,8 @@ Uygulamanın hizmet noktalarının merkezi olarak yönetildiği ve araçların f
 <img width="1863" height="943" alt="28" src="https://github.com/user-attachments/assets/3ca12fdf-5edb-4667-9d0d-628084cc78f0" />
 <img width="558" height="704" alt="29" src="https://github.com/user-attachments/assets/b8a993b7-a5b4-4747-b5e9-98ec8b70cab7" />
 
-### 7. Rezervasyon ve Müşteri İlişkileri Yönetimi (CRM)
+
+### 8. Rezervasyon ve Müşteri İlişkileri Yönetimi (CRM)
 Kiralama süreçlerinin uçtan uca takip edildiği, onay mekanizmalarının ve müşteri bilgilendirme sistemlerinin bulunduğu modüldür.
 
 * **Onaylı Müşteri Listesi:** Rezervasyon süreci başarıyla tamamlanan ve onaylanan müşteriler, merkezi bir listede takip edilir. Bu liste, aktif kiralama yapan kullanıcıların verilerine hızlı erişim sağlar.
@@ -209,7 +196,39 @@ Kiralama süreçlerinin uçtan uca takip edildiği, onay mekanizmalarının ve m
 <img width="1865" height="944" alt="30" src="https://github.com/user-attachments/assets/3a13c67c-214c-40e9-873b-52b7cfc55bd6" />
 <img width="1873" height="949" alt="31" src="https://github.com/user-attachments/assets/3f899f28-8d9d-41b6-aea0-e27f843c7fc6" />
 <img width="658" height="905" alt="32" src="https://github.com/user-attachments/assets/3a165cd8-5620-4b57-89f8-ad3f59c402da" />
-![WhatsApp Image 2026-04-09 at 17 25 01](https://github.com/user-attachments/assets/800c9b71-37b0-4d04-9029-12e973ddebde)
+<img width="463" height="804" alt="Ekran görüntüsü 2026-04-09 173634" src="https://github.com/user-attachments/assets/7e2767b0-6a62-4882-817d-92c9f8c0c9b1" />
 
+### 9. Dinamik İçerik Yönetimi (CMS Modülleri)
+Uygulamanın ana sayfasındaki tüm metin, görsel ve bilgilendirme alanları, Admin Paneli üzerinden anlık olarak yönetilmektedir.
+
+* **Banner ve Karşılama Yönetimi:** Ana sayfanın en üst kısmında yer alan başlık, alt başlık ve arka plan görselleri bu panelden güncellenir. `Listeleme` ve `Düzenleme` yetenekleri sayesinde kampanya dönemlerine göre hızlı içerik değişimi sağlanır.
+* **Hakkımızda (About) Paneli:** Şirket vizyonu, misyonu ve tanıtım metinleri merkezi olarak yönetilir. Veritabanından çekilen bu içerikler, ön yüzde asenkron olarak render edilir.
+* **"Nasıl Çalışır?" (Process) Adımları:** Kiralama sürecini anlatan adımların ikonları, başlıkları ve açıklamaları üzerinde tam CRUD (Ekleme-Düzenleme-Silme) yetkisi sunar. İkonlar, veritabanına kaydedilen CSS sınıfları üzerinden dinamik olarak yüklenir.
+* **Sıkça Sorulan Sorular (FAQ):** Müşteri destek yükünü azaltmak amacıyla kurgulanan soru-cevap bankası tamamen dinamiktir. Yeni sorular eklenebilir, mevcutlar güncellenebilir veya yayından kaldırılabilir.
+* **Müşteri Yorumları (Testimonials):** Gerçek kullanıcı deneyimlerinin, fotoğrafların ve memnuniyet puanlarının yönetildiği bölümdür. UI katmanındaki carousel yapısını doğrudan besleyen bir veri akışına sahiptir.
+<img width="1870" height="954" alt="33" src="https://github.com/user-attachments/assets/5f1916cf-7d58-42d4-b9b8-628bb1b66371" />
+<img width="1865" height="952" alt="34" src="https://github.com/user-attachments/assets/d045d06b-ca2e-46b8-b3b1-fdc26dce447c" />
+<img width="1864" height="949" alt="35" src="https://github.com/user-attachments/assets/8ae1f298-df80-4278-8979-4a67638ab14d" />
+<img width="1864" height="958" alt="36" src="https://github.com/user-attachments/assets/50ec8b03-ea00-4860-bc78-b325504ebed2" />
+<img width="1869" height="947" alt="37" src="https://github.com/user-attachments/assets/35e60f2a-2f3a-4cbd-82c4-721ccf5b13ba" />
+
+### 10. Gelişmiş Raporlama ve Veri Analitiği Sistemi
+Yöneticilerin filo verimliliğini, finansal tabloları ve operasyonel durumu ölçümleyebildiği, yüksek detaylı raporlama merkezidir.
+
+* **Dinamik İstatistik Analizleri:**
+    * **Filo Özeti:** Sistemdeki toplam araç sayısı ve aktif olarak kiralanabilir durumdaki araçların anlık takibi.
+    * **Finansal Projeksiyon:** Tüm araçların toplam değeri ve günlük kiralama bedelleri üzerinden filo hacmi hesaplaması.
+    * **Ortalama Performans:** Mevcut araçların günlük kiralama fiyat ortalamaları (Örn: "23 Aracın Günlük Fiyat Ortalaması") gibi metriklerle pazar analizi.
+* **Şube ve Operasyonel Dağılım:**
+    * **Lokasyon Analizi:** Araçların şubelere göre dağılım sayıları ve her bir şubedeki aktif/pasif araç oranlarının grafiksel/tablosal gösterimi.
+    * **Durum Takibi:** Kira durumları (Müsait, Kirada, Bakımda) bazında operasyonel iş akışı yönetimi.
+* **Akıllı Filtreleme ve Esnek Raporlama:**
+    * Kullanıcılar; **Şube, Aktiflik Durumu** ve **Kira Durumu** gibi filtreleri kombine ederek özel veri setleri oluşturabilirler.
+* **Profesyonel Dışa Aktarma (Export) Yetenekleri:**
+    * **Excel Çıktısı (ClosedXML):** Filtrelenen içerik, tüm kolon yapıları korunarak tek tıkla Excel formatına aktarılır.
+    * **PDF Raporlama (DinkToPdf):** Kurumsal şablonlara uygun, tablo düzeni optimize edilmiş PDF dökümleri oluşturulabilir.
+<img width="1870" height="955" alt="38" src="https://github.com/user-attachments/assets/b018ee82-a90d-4817-9b3c-3713170b07ad" />
+<img width="815" height="197" alt="39" src="https://github.com/user-attachments/assets/bcbb1e96-2864-4a8a-a957-34c405495c0f" />
+<img width="786" height="470" alt="40" src="https://github.com/user-attachments/assets/441309ce-77b1-4327-98d0-7bfaa7b0143c" />
 
 
