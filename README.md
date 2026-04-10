@@ -6,7 +6,8 @@ Proje, sürdürülebilir kod prensipleri ve kurumsal standartlara uygun olarak a
 
 ### 🛠️ Teknik Yığın (Tech Stack)
 * **Framework:** .NET 8.0 (ASP.NET Core MVC)
-* **Veritabanı:** MSSQL Server & Entity Framework Core (Code First)
+* **Veritabanı:** MSSQL Server & Entity Framework Core (Code First)![WhatsApp Image 2026-04-10 at 16 38 11](https://github.com/user-attachments/assets/2b9b9d86-415a-474f-8b63-7edec0b97384)
+
 * **Validasyon:** FluentValidation (Business ve UI katmanlı kontrol)
 * **Mapping:** AutoMapper (Entity-DTO dönüşümleri için)
 * **Raporlama:** ClosedXML (Excel) & DinkToPdf (PDF Raporlama)
@@ -186,6 +187,7 @@ Kiralama süreçlerinin uçtan uca takip edildiği, onay mekanizmalarının ve m
 * **Kapsamlı Rezervasyon Takibi:** Sistemdeki tüm rezervasyonlar (Beklemede, Onaylandı, İptal Edildi vb.) tek bir panel üzerinden yönetilir. Durum bazlı filtreleme ile operasyonel yoğunluk kolayca analiz edilebilir.
 * **Detaylı Rezervasyon Modalı:** Her bir rezervasyon için özel olarak tasarlanmış modal yapısı sayesinde, sayfadan ayrılmadan; kiralama tarihleri, araç detayları ve sürücü bilgilerine ait tüm ayrıntılar görüntülenebilir.
 * **Otomatik E-Posta Bildirim Sistemi:** Rezervasyon onaylandığı anda müşteriye otomatik olarak bir konfirmasyon maili gönderilir. Bu entegrasyon, kullanıcı güvenini artırırken operasyonel iş yükünü minimize eder.
+<img width="1272" height="640" alt="Ekran görüntüsü 2026-04-10 163958" src="https://github.com/user-attachments/assets/4bd9cd9d-c149-474c-883f-928061621453" />
 <img width="1873" height="949" alt="31" src="https://github.com/user-attachments/assets/3f899f28-8d9d-41b6-aea0-e27f843c7fc6" />
 <img width="658" height="905" alt="32" src="https://github.com/user-attachments/assets/3a165cd8-5620-4b57-89f8-ad3f59c402da" />
 <img width="463" height="804" alt="Ekran görüntüsü 2026-04-09 173634" src="https://github.com/user-attachments/assets/7e2767b0-6a62-4882-817d-92c9f8c0c9b1" />
