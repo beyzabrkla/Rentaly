@@ -108,7 +108,6 @@ Kullanıcıların seçtikleri araç hakkında tüm teknik detaylara ulaştığı
     * Bu işlem, kullanıcı henüz sayfayı terk etmeden "Kiralama Özeti" panelinde anlık olarak güncellenir.
 * **Hızlı Rezervasyon Formu:** Kullanıcıdan alınan sürücü bilgileri (Ad, Soyad, T.C. Kimlik, Ehliyet Seri No vb.), `FluentValidation` kütüphanesi ile hem istemci (Client-side) hem de sunucu (Server-side) tarafında doğrulanarak veritabanına kaydedilir.
 * **Güvenlik ve Validasyon:** T.C. Kimlik No ve Ehliyet Seri No gibi alanlar için özel karakter ve uzunluk kontrolleri uygulanarak veri tutarlılığı sağlanmıştır.
-<img width="1868" height="947" alt="13" src="https://github.com/user-attachments/assets/be15943a-ac00-4471-938a-bbf234be847c" />
 <img width="1870" height="945" alt="14" src="https://github.com/user-attachments/assets/270b7c58-00e0-476b-bf0a-7b227dd7f591" />
 <img width="1871" height="944" alt="15" src="https://github.com/user-attachments/assets/1d32ae98-1f7c-48cc-831e-75c572459228" />
 
